@@ -13,8 +13,9 @@ More information is available on [its GitHub page](https://emzi0767.github.io/di
 You need .NET Core SDK 2.0 Preview 2 to build the project, and .NET Core 2.0.0-preview3-25518-01 runtime to run it.
 
 1. In order to build this project, you will need to add the following package sources to your NuGet:
-   * `https://www.myget.org/F/discord-net/api/v3/index.json`
+   * `https://www.myget.org/F/dsharpplus-nightly/api/v3/index.json`
    * `https://dotnet.myget.org/F/roslyn/api/v3/index.json`
+   * `https://dotnet.myget.org/F/dotnet-core/api/v3/index.json`
 2. Next, you must restore all NuGet packages (`dotnet restore`).
 3. Then build the code in Release mode (`dotnet build -c Release`).
 4. Finally publish the bot (`dotnet publish -c Release -f netcoreapp2.0`).
