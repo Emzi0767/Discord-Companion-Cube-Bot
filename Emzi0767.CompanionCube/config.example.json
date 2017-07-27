@@ -1,0 +1,35 @@
+{
+  "version": {
+    "config": 3
+  },
+  "discord": {
+    "token": "insert_token_here",
+    "prefixes": [ "cc!", "//", "??" ],
+    "mention_prefix": true,
+    "message_cache_size": 512,
+    "shards": 1,
+    "game": "with Portals"
+  },
+  "postgres": {
+    "hostname": "localhost",
+    "port": 5432,
+    "database": "companion_cube",
+    "username": "companion_cube",
+    "password": "hunter2",
+    "ssl": true,
+    "trust_certificate": true
+  },
+  "lavalink": {
+    "hostname": "localhost",
+    "port": 2333,
+    "password": "youshallnotpass"
+  },
+  "youtube": {
+    "api_key": "insert_api_key_here"
+  },
+  "github": {
+    "enabled": true,
+    "channels": [],
+    "guilds": []
+  }
+}
