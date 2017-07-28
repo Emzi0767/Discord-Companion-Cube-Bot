@@ -182,8 +182,8 @@ namespace Emzi0767.CompanionCube
             
             var b = new byte[8];
             this.RNGesus.GetNonZeroBytes(b);
-            var d = Math.Abs(BitConverter.ToDouble(b, 0));
-            if (d <= 0.05)
+            var d = Math.Abs(BitConverter.ToDouble(b, 0)) / double.MaxValue;
+            if (d >= 0.95)
                 await this.Database.IssueCurrencyAsync(ea.Author.Id, 1);
         }
 
