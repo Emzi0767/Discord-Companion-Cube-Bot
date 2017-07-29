@@ -180,9 +180,9 @@ namespace Emzi0767.CompanionCube
             if (ea.Channel.Type != ChannelType.Text || ea.Guild == null || ea.Author.IsBot || this.Shared.BlockedChannels.Contains(ea.Channel.Id) || this.Shared.BlockedGuilds.Contains(ea.Guild.Id))
                 return; // nothing to see here, move along
             
-            var b = new byte[8];
-            this.RNGesus.GetNonZeroBytes(b);
-            var d = Math.Abs(BitConverter.ToDouble(b, 0)) / double.MaxValue;
+            var b = new byte[4];
+            this.RNGesus.GetBytes(b);
+            var d = (double)BitConverter.ToUInt32(b, 0) / (double)uint.MaxValue;
             if (d >= 0.95)
                 await this.Database.IssueCurrencyAsync(ea.Author.Id, 1);
         }
