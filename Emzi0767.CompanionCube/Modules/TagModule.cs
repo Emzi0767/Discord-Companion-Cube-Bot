@@ -48,6 +48,9 @@ namespace Emzi0767.CompanionCube.Modules
             
             if (string.IsNullOrWhiteSpace(contents))
                 throw new ArgumentException("Contents cannot be null, empty, or all-whitespace.", nameof(contents));
+
+            if (contents.Length > 1500)
+                throw new ArgumentException("Contents cannot be longer than 1500 characters.", nameof(contents));
             
             name = Formatter.Strip(name.ToLower());
             var success = await this.Database.CreateTagAsync(ctx.User.Id, ctx.Channel.Id, name, contents).ConfigureAwait(false);
@@ -156,6 +159,9 @@ namespace Emzi0767.CompanionCube.Modules
 
             if (string.IsNullOrWhiteSpace(new_contents))
                 throw new ArgumentException("Contents cannot be null, empty, or all-whitespace.", nameof(new_contents));
+
+            if (new_contents.Length > 1500)
+                throw new ArgumentException("Contents cannot be longer than 1500 characters.", nameof(new_contents));
             
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
@@ -165,7 +171,7 @@ namespace Emzi0767.CompanionCube.Modules
             {
                 var tag = res.ResultTag;
 
-                var success = await this.Database.EditTagAsync(tag.Id, ctx.User.Id, new_contents, false);
+                var success = await this.Database.EditTagAsync(tag.Id, ctx.User.Id, new_contents, false).ConfigureAwait(false);
                 if (!success)
                 {
                     embed.Title = "Failed to edit tag";
@@ -199,6 +205,9 @@ namespace Emzi0767.CompanionCube.Modules
 
             if (string.IsNullOrWhiteSpace(new_contents))
                 throw new ArgumentException("Contents cannot be null, empty, or all-whitespace.", nameof(new_contents));
+
+            if (new_contents.Length > 1500)
+                throw new ArgumentException("Contents cannot be longer than 1500 characters.", nameof(new_contents));
             
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
@@ -208,7 +217,7 @@ namespace Emzi0767.CompanionCube.Modules
             {
                 var tag = res.ResultTag;
 
-                var success = await this.Database.EditTagAsync(tag.Id, ctx.User.Id, new_contents, true);
+                var success = await this.Database.EditTagAsync(tag.Id, ctx.User.Id, new_contents, true).ConfigureAwait(false);
                 if (!success)
                 {
                     embed.Title = "Failed to edit tag";
@@ -285,6 +294,7 @@ namespace Emzi0767.CompanionCube.Modules
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbed();
+            var cntnt = "";
             if (res.IsSuccess)
             {
                 var tag = res.ResultTag;
@@ -292,25 +302,8 @@ namespace Emzi0767.CompanionCube.Modules
                 if (ctx.User.Id != tag.OwnerId)
                     await this.Database.IncrementTagUsageAsync(tag.Id).ConfigureAwait(false);
 
-                DiscordUser usr = ctx.Guild.Members.FirstOrDefault(xm => xm.Id == tag.OwnerId);
-                if (usr == null)
-                    usr = await ctx.Guild.GetMemberAsync(tag.OwnerId);
-                if (usr == null)
-                    usr = await ctx.Client.GetUserAsync(tag.OwnerId);
-
-                embed.Title = tag.Name;
-                embed.Description = tag.Contents[edit_id];
-                embed.Color = 0xD091B2;
-                embed.Timestamp = tag.Edits[edit_id];
-                embed.Footer = new DiscordEmbedFooter
-                {
-                    Text = "Creation date"
-                };
-                embed.Author = new DiscordEmbedAuthor
-                {
-                    Name = usr is DiscordMember mbr ? mbr.DisplayName : usr.Username,
-                    IconUrl = usr.AvatarUrl
-                };
+                embed = null;
+                cntnt = string.Concat("\u200b", tag.Contents[edit_id]);
             }
             else
             {
@@ -327,7 +320,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Color = 0xFF0000;
             }
 
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync(cntnt, embed: embed).ConfigureAwait(false);
         }
 
         // This might happen in the future, for now, disabled
@@ -347,29 +340,13 @@ namespace Emzi0767.CompanionCube.Modules
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbed();
+            var cntnt = "";
             if (res.IsSuccess)
             {
                 var tag = res.ResultTag;
 
-                DiscordUser usr = ctx.Guild.Members.FirstOrDefault(xm => xm.Id == tag.OwnerId);
-                if (usr == null)
-                    usr = await ctx.Guild.GetMemberAsync(tag.OwnerId);
-                if (usr == null)
-                    usr = await ctx.Client.GetUserAsync(tag.OwnerId);
-
-                embed.Title = tag.Name;
-                embed.Description = Formatter.Sanitize(tag.Contents.Last());
-                embed.Color = 0xD091B2;
-                embed.Timestamp = tag.Edits.LastOrDefault();
-                embed.Footer = new DiscordEmbedFooter
-                {
-                    Text = "Creation date"
-                };
-                embed.Author = new DiscordEmbedAuthor
-                {
-                    Name = usr is DiscordMember mbr ? mbr.DisplayName : usr.Username,
-                    IconUrl = usr.AvatarUrl
-                };
+                embed = null;
+                cntnt = string.Concat("\u200b", Formatter.Sanitize(tag.Contents.Last()));
             }
             else
             {
@@ -386,7 +363,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Color = 0xFF0000;
             }
 
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync(cntnt, embed: embed).ConfigureAwait(false);
         }
 
         [Command("info"), Description("Views information about a tag.")]
@@ -405,9 +382,9 @@ namespace Emzi0767.CompanionCube.Modules
 
                 DiscordUser usr = ctx.Guild.Members.FirstOrDefault(xm => xm.Id == tag.OwnerId);
                 if (usr == null)
-                    usr = await ctx.Guild.GetMemberAsync(tag.OwnerId);
+                    usr = await ctx.Guild.GetMemberAsync(tag.OwnerId).ConfigureAwait(false);
                 if (usr == null)
-                    usr = await ctx.Client.GetUserAsync(tag.OwnerId);
+                    usr = await ctx.Client.GetUserAsync(tag.OwnerId).ConfigureAwait(false);
 
                 embed.Title = tag.Name;
                 embed.Color = 0xD091B2;
@@ -533,6 +510,7 @@ namespace Emzi0767.CompanionCube.Modules
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbed();
+            var cntnt = "";
             if (res.IsSuccess)
             {
                 var tag = res.ResultTag;
@@ -540,25 +518,8 @@ namespace Emzi0767.CompanionCube.Modules
                 if (ctx.User.Id != tag.OwnerId)
                     await this.Database.IncrementTagUsageAsync(tag.Id).ConfigureAwait(false);
 
-                DiscordUser usr = ctx.Guild.Members.FirstOrDefault(xm => xm.Id == tag.OwnerId);
-                if (usr == null)
-                    usr = await ctx.Guild.GetMemberAsync(tag.OwnerId);
-                if (usr == null)
-                    usr = await ctx.Client.GetUserAsync(tag.OwnerId);
-
-                embed.Title = tag.Name;
-                embed.Description = tag.Contents.Last();
-                embed.Color = 0xD091B2;
-                embed.Timestamp = tag.Edits.LastOrDefault();
-                embed.Footer = new DiscordEmbedFooter
-                {
-                    Text = "Creation date"
-                };
-                embed.Author = new DiscordEmbedAuthor
-                {
-                    Name = usr is DiscordMember mbr ? mbr.DisplayName : usr.Username,
-                    IconUrl = usr.AvatarUrl
-                };
+                embed = null;
+                cntnt = string.Concat("\u200b", tag.Contents.Last());
             }
             else
             {
@@ -575,7 +536,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Color = 0xFF0000;
             }
 
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync(cntnt, embed: embed).ConfigureAwait(false);
         }
     }
 
