@@ -97,6 +97,7 @@ namespace Emzi0767.CompanionCube
             this.CommandsNext.RegisterCommands<CurrencyModule>();
             this.CommandsNext.RegisterCommands<AdministrationModule>();
             this.CommandsNext.RegisterCommands<TagModule>();
+            this.CommandsNext.RegisterCommands<TagsModule>();
             this.CommandsNext.RegisterCommands<MiscCommandsModule>();
 
             // hook events

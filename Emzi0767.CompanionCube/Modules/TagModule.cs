@@ -472,7 +472,7 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
         }
 
-        [Command("list"), Description("Lists tag, optionally specifying a search query.")]
+        [Command("list"), Description("Lists tags, optionally specifying a search query.")]
         public async Task ListAsync(CommandContext ctx, [RemainingText, Description("Optional, tag name to search for.")] string like)
         {
             if (string.IsNullOrWhiteSpace(like) || ForbiddenNames.Contains(like.ToLower()))
@@ -537,6 +537,19 @@ namespace Emzi0767.CompanionCube.Modules
             }
 
             await ctx.RespondAsync(cntnt, embed: embed).ConfigureAwait(false);
+        }
+    }
+
+    [NotBlocked]
+    public sealed class TagsModule
+    {
+        [Command("tags"), Description("Lists tags, optionally specifying a search query.")]
+        public async Task TagsAsync(CommandContext ctx, [RemainingText, Description("Optional, tag name to search for.")] string like)
+        {
+            var tag = ctx.CommandsNext.RegisteredCommands["tag"] as CommandGroup;
+            var taglist = tag.Children.FirstOrDefault(xc => xc.Name == "list");
+
+            await taglist.ExecuteAsync(ctx).ConfigureAwait(false);
         }
     }
 
