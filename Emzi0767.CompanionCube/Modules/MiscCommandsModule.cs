@@ -122,7 +122,7 @@ namespace Emzi0767.CompanionCube.Modules
             for (var i = 0; i < max_count; i += 100)
             {
                 var msgs = await ctx.Channel.GetMessagesAsync(Math.Min(max_count - i, 100), before: lid != 0 ? (ulong?)lid : null).ConfigureAwait(false);
-                var msgsf = msgs.Where(xm => xm.Id == ctx.Client.CurrentUser.Id).OrderBy(xm => xm.Id);
+                var msgsf = msgs.Where(xm => xm.Author.Id == ctx.Client.CurrentUser.Id).OrderBy(xm => xm.Id);
 
                 var lmsg = msgsf.FirstOrDefault();
                 if (lmsg == null)
