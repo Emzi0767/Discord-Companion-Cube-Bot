@@ -501,7 +501,7 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
         }
 
-        public async Task ExecuteGroup(CommandContext ctx, [RemainingText, Description("Name of the tag to display.")] string name)
+        public async Task ExecuteGroupAsync(CommandContext ctx, [RemainingText, Description("Name of the tag to display.")] string name)
         {
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
                 throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));

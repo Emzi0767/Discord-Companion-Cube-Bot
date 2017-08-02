@@ -10,8 +10,9 @@
     <AssemblyTitle>Companion Cube</AssemblyTitle>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="2.5.5-beta-00162"/>
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="2.5.5-beta-00162"/>
+    <PackageReference Include="DSharpPlus" Version="2.5.5-beta-00171"/>
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="2.5.5-beta-00171"/>
+    <PackageReference Include="DSharpPlus.Interactivity" Version="2.5.5-beta-00171"/>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.0.0-dev-61717-03"/>
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" Version="3.0.0-dev-61717-03"/>
     <PackageReference Include="Npgsql" Version="3.2.4.1"/>

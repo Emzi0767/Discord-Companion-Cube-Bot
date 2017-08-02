@@ -15,11 +15,14 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Interactivity;
 using Emzi0767.CompanionCube.Exceptions;
 using Emzi0767.CompanionCube.Services;
 
@@ -117,7 +120,7 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
         }
 
-        public async Task ExecuteGroup(CommandContext ctx, [Description("Member to check balance for. If not specified, defaults to invoker.")] DiscordMember mbr = null)
+        public async Task ExecuteGroupAsync(CommandContext ctx, [Description("Member to check balance for. If not specified, defaults to invoker.")] DiscordMember mbr = null)
         {
             var usr = mbr ?? ctx.Member;
             DiscordEmbed embed = null;
@@ -144,5 +147,100 @@ namespace Emzi0767.CompanionCube.Modules
             };
             await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
         }
+
+        [Group("gamble"), Aliases("gambling"), Description("Lets you gamble your life's savings.")]
+        public class CurrencyGamblingModule
+        {
+            private DatabaseClient Database { get; }
+            private SharedData Shared { get; }
+            private IDictionary<DiscordEmoji, RpsResponse> RpsResponses { get; }
+            private IDictionary<RpsResponseType, DiscordEmoji> RpsResponseEmotes { get; }
+
+            public CurrencyGamblingModule(DiscordClient client, DatabaseClient database, SharedData shared)
+            {
+                this.Database = database;
+                this.Shared = shared;
+
+                var emotes_s = new[] 
+                { 
+                    new[] { ":fist:", ":left_facing_fist:", ":right_facing_fist:", ":punch:" }, 
+                    new[] { ":hand_splayed:", ":raised_hand:", ":raised_back_of_hand:" }, 
+                    new[] { ":v:" } 
+                };
+                var emotes_t = new[] { "", ":skin-tone-1:", ":skin-tone-2:", ":skin-tone-3:", ":skin-tone-4:", ":skin-tone-5:" };
+                this.RpsResponses = new Dictionary<DiscordEmoji, RpsResponse>();
+                this.RpsResponseEmotes = new Dictionary<RpsResponseType, DiscordEmoji>();
+
+                for (var i = 0; i < emotes_s.Length; i++)
+                {
+                    this.RpsResponseEmotes[(RpsResponseType)(i + 1)] = DiscordEmoji.FromName(client, emotes_s[i][0]);
+
+                    for (var j = 0; j < emotes_s[i].Length; j++)
+                    {
+                        var rpsrs = emotes_t.Select(xs => DiscordEmoji.FromName(client, string.Concat(emotes_s[i][j], xs)))
+                            .Select(xe => new RpsResponse { Emote = xe, Type = (RpsResponseType)(i + 1) });
+                        foreach (var rpsr in rpsrs)
+                            this.RpsResponses[rpsr.Emote] = rpsr;
+                    }
+                }
+            }
+
+            [Command("rps"), Description("Play a game of rock-paper-scissors against the bot.")]
+            public async Task RockPaperScissorsAsync(CommandContext ctx, [Description("Amount of currency to bet.")] int amount)
+            {
+                var interactivity = ctx.Client.GetInteractivityModule();
+
+                var rpsr = 0;
+                var buff = new byte[8];
+                using (var rng = RandomNumberGenerator.Create())
+                    rng.GetBytes(buff);
+                rpsr = (int)((BitConverter.ToUInt64(buff, 0) % 30) / 30) + 1;
+                
+                var msg = await ctx.RespondAsync("React with one of :fist:, :left_facing_fist:, :right_facing_fist:, :punch:, :hand_splayed:, :raised_hand:, :raised_back_of_hand:, or :v: to this message within 30s.").ConfigureAwait(false);
+
+                var em = await interactivity.WaitForMessageReactionAsync(xe => this.RpsResponses.Keys.Contains(xe), msg, TimeSpan.FromSeconds(30), ctx.User.Id).ConfigureAwait(false);
+                if (em == null)
+                {
+                    await ctx.RespondAsync("Too slow, your bet is lost.").ConfigureAwait(false);
+                    return;
+                }
+
+                var usrr = this.RpsResponses[em];
+                var usrt = usrr.Type;
+
+                var t1 = rpsr;
+                var t2 = (int)usrt;
+                if ((t1 == 3 && t2 == 1) || t2 > t1)
+                {
+                    await ctx.RespondAsync(":trophy: A winner is you!").ConfigureAwait(false);
+                }
+                else if ((t1 == 1 && t2 == 3) || t2 < t1)
+                {
+                    await ctx.RespondAsync(":confused: Nope, try again!").ConfigureAwait(false);
+                }
+                else if (t2 == t1)
+                {
+                    await ctx.RespondAsync(":shrug: Draw, try again!").ConfigureAwait(false);
+                }
+                else
+                {
+                    await ctx.RespondAsync("<:onswat:332690977926152204> I'm hosed, let someone know.").ConfigureAwait(false);
+                }
+            }
+        }
+    }
+
+    public enum RpsResponseType
+    {
+        Unknown = 0,
+        Rock = 1,
+        Paper = 2,
+        Scissors = 3
+    }
+
+    public struct RpsResponse
+    {
+        public DiscordEmoji Emote { get; set; }
+        public RpsResponseType Type { get; set; }
     }
 }

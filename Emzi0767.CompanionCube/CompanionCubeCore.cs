@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
+using DSharpPlus.Interactivity;
 using Emzi0767.CompanionCube.Modules;
 using Emzi0767.CompanionCube.Services;
 
@@ -41,6 +42,7 @@ namespace Emzi0767.CompanionCube
 
         public DiscordClient Client { get; private set; }
         public CommandsNextModule CommandsNext { get; private set; }
+        public InteractivityModule Interactivity { get; private set; }
         public DatabaseClient Database { get; }
 
         public CompanionCubeCore(CompanionCubeConfig config, int shard_id, DatabaseClient database, SharedData shared_data)
@@ -76,6 +78,7 @@ namespace Emzi0767.CompanionCube
 
             // initialize cnext dependencies
             var deps = new DependencyCollectionBuilder()
+                .AddInstance(this.Client)
                 .AddInstance(this.Database)
                 .AddInstance(this.Shared);
 
@@ -99,6 +102,9 @@ namespace Emzi0767.CompanionCube
             this.CommandsNext.RegisterCommands<TagModule>();
             this.CommandsNext.RegisterCommands<TagsModule>();
             this.CommandsNext.RegisterCommands<MiscCommandsModule>();
+
+            // initialize interactivity
+            this.Interactivity = this.Client.UseInteractivity();
 
             // hook events
             this.Client.DebugLogger.LogMessageReceived += this.LogMessageHandler;
