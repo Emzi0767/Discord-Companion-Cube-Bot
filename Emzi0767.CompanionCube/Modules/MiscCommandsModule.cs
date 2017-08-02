@@ -114,5 +114,26 @@ namespace Emzi0767.CompanionCube.Modules
             var ups = this.Shared.TimeSpanToString(upt);
             await ctx.RespondAsync(string.Concat("\u200b", DiscordEmoji.FromName(ctx.Client, ":companion_cube:"), " The bot has been running for ", Formatter.Bold(ups), ".")).ConfigureAwait(false);
         }
+
+        [Command("cleanup")]
+        public async Task CleanupAsync(CommandContext ctx, [Description("Maximum number of messages to clean up.")] int max_count = 100)
+        {
+            var lid = 0ul;
+            for (var i = 0; i < max_count; i += 100)
+            {
+                var msgs = await ctx.Channel.GetMessagesAsync(Math.Min(max_count - i, 100), before: lid != 0 ? (ulong?)lid : null).ConfigureAwait(false);
+                var msgsf = msgs.Where(xm => xm.Author.Id == ctx.Client.CurrentUser.Id).OrderBy(xm => xm.Id);
+
+                var lmsg = msgsf.FirstOrDefault();
+                if (lmsg == null)
+                    break;
+
+                lid = lmsg.Id;
+
+                await ctx.Channel.DeleteMessagesAsync(msgsf).ConfigureAwait(false);
+            }
+
+            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+        }
     }
 }
