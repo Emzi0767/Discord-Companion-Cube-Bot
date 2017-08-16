@@ -52,7 +52,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (contents.Length > 1500)
                 throw new ArgumentException("Contents cannot be longer than 1500 characters.", nameof(contents));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             var success = await this.Database.CreateTagAsync(ctx.User.Id, ctx.Channel.Id, name, contents).ConfigureAwait(false);
             var embed = new DiscordEmbedBuilder();
             if (success)
@@ -77,7 +77,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
                 throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbedBuilder();
@@ -117,7 +117,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
                 throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbedBuilder();
@@ -163,7 +163,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (new_contents.Length > 1500)
                 throw new ArgumentException("Contents cannot be longer than 1500 characters.", nameof(new_contents));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbedBuilder();
@@ -209,7 +209,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (new_contents.Length > 1500)
                 throw new ArgumentException("Contents cannot be longer than 1500 characters.", nameof(new_contents));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbedBuilder();
@@ -249,7 +249,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
                 throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbedBuilder();
@@ -290,7 +290,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
                 throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbedBuilder();
@@ -336,7 +336,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
                 throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbedBuilder();
@@ -372,7 +372,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
                 throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbedBuilder();
@@ -421,7 +421,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
                 throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             await this.Database.SetTagHiddenFlagAsync(ctx.Channel.Id, name, false).ConfigureAwait(false);
             await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
         }
@@ -432,7 +432,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
                 throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             await this.Database.SetTagHiddenFlagAsync(ctx.Channel.Id, name, true).ConfigureAwait(false);
             await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
         }
@@ -444,7 +444,7 @@ namespace Emzi0767.CompanionCube.Modules
                 like = null;
             
             if (like != null)
-                like = Formatter.Strip(like.ToLower());
+                like = Formatter.Strip(like.ToLower()).Trim();
             var res = await this.Database.ListTagsAsync(ctx.Channel.Id, like).ConfigureAwait(false);
 
             var embed = new DiscordEmbedBuilder();
@@ -471,7 +471,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
                 throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
             
-            name = Formatter.Strip(name.ToLower());
+            name = Formatter.Strip(name.ToLower()).Trim();
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
             var embed = new DiscordEmbedBuilder();
