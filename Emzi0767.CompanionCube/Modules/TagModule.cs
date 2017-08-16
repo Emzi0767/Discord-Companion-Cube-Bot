@@ -54,21 +54,21 @@ namespace Emzi0767.CompanionCube.Modules
             
             name = Formatter.Strip(name.ToLower());
             var success = await this.Database.CreateTagAsync(ctx.User.Id, ctx.Channel.Id, name, contents).ConfigureAwait(false);
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             if (success)
             {
                 embed.Title = "Tag creation successful.";
                 embed.Description = string.Concat("A channel tag named ", Formatter.InlineCode(name), " was created successfully.");
-                embed.Color = 0x007FFF;
+                embed.Color = new DiscordColor(0x007FFF);
             }
             else
             {
                 embed.Title = "Tag creation failed.";
                 embed.Description = string.Concat("Could not create tag named ", Formatter.Strip(name), ". It is possible that a tag with that name exists already.");
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
         [Command("delete"), Aliases("remove"), Description("Deletes a tag.")]
@@ -80,7 +80,7 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             if (res.IsSuccess)
             {
                 var tag = res.ResultTag;
@@ -90,7 +90,7 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Title = "Failed to delete tag";
                     embed.Description = "Make sure the tag exists and that you are its owner.";
-                    embed.Color = 0xFF0000;
+                    embed.Color = new DiscordColor(0xFF0000);
                 }
             }
             else
@@ -105,10 +105,10 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found.");
                 }
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync(embed.Title == null ? DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString() : "", embed: embed.Title == null ? null : embed).ConfigureAwait(false);
+            await ctx.RespondAsync(embed.Title == null ? DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString() : "", embed: embed.Title == null ? null : embed.Build()).ConfigureAwait(false);
         }
 
         [Command("force_delete"), Aliases("force_remove"), Description("Forcefully deletes a tag. This is meant for channel moderators."), OwnerOrPermission(Permissions.ManageChannels)]
@@ -120,7 +120,7 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             if (res.IsSuccess)
             {
                 var tag = res.ResultTag;
@@ -130,7 +130,7 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Title = "Failed to delete tag";
                     embed.Description = "Make sure the tag exists.";
-                    embed.Color = 0xFF0000;
+                    embed.Color = new DiscordColor(0xFF0000);
                 }
             }
             else
@@ -145,10 +145,10 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found.");
                 }
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync(embed.Title == null ? DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString() : "", embed: embed.Title == null ? null : embed).ConfigureAwait(false);
+            await ctx.RespondAsync(embed.Title == null ? DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString() : "", embed: embed.Title == null ? null : embed.Build()).ConfigureAwait(false);
         }
 
         [Command("edit"), Aliases("modify"), Description("Edits a tag.")]
@@ -166,7 +166,7 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             if (res.IsSuccess)
             {
                 var tag = res.ResultTag;
@@ -176,7 +176,7 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Title = "Failed to edit tag";
                     embed.Description = "Make sure the tag exists and that you are its owner.";
-                    embed.Color = 0xFF0000;
+                    embed.Color = new DiscordColor(0xFF0000);
                 }
             }
             else
@@ -191,10 +191,10 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found.");
                 }
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
             
-            await ctx.RespondAsync(embed.Title == null ? DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString() : "", embed: embed.Title == null ? null : embed).ConfigureAwait(false);
+            await ctx.RespondAsync(embed.Title == null ? DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString() : "", embed: embed.Title == null ? null : embed.Build()).ConfigureAwait(false);
         }
 
         [Command("force_edit"), Aliases("force_modify"), Description("Forcefully edits a tag. This is meant for channel moderators."), OwnerOrPermission(Permissions.ManageChannels)]
@@ -212,7 +212,7 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             if (res.IsSuccess)
             {
                 var tag = res.ResultTag;
@@ -222,7 +222,7 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Title = "Failed to edit tag";
                     embed.Description = "Make sure the tag exists and that you are its owner.";
-                    embed.Color = 0xFF0000;
+                    embed.Color = new DiscordColor(0xFF0000);
                 }
             }
             else
@@ -237,10 +237,10 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found.");
                 }
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
             
-            await ctx.RespondAsync(embed.Title == null ? DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString() : "", embed: embed.Title == null ? null : embed).ConfigureAwait(false);
+            await ctx.RespondAsync(embed.Title == null ? DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString() : "", embed: embed.Title == null ? null : embed.Build()).ConfigureAwait(false);
         }
 
         [Command("history"), Description("Views edit history for a tag.")]
@@ -252,7 +252,7 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             if (res.IsSuccess)
             {
                 var tag = res.ResultTag;
@@ -264,7 +264,7 @@ namespace Emzi0767.CompanionCube.Modules
 
                 embed.Title = string.Concat("List of edits to ", tag.Name);
                 embed.Description = sb.ToString();
-                embed.Color = 0xD091B2;
+                embed.Color = new DiscordColor(0xD091B2);
             }
             else
             {
@@ -278,10 +278,10 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found.");
                 }
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
         [Command("view_edit"), Description("Views a tag's specific edit.")]
@@ -293,7 +293,7 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             var cntnt = "";
             if (res.IsSuccess)
             {
@@ -317,10 +317,10 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found.");
                 }
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync(cntnt, embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync(cntnt, embed: embed.Build()).ConfigureAwait(false);
         }
 
         // This might happen in the future, for now, disabled
@@ -339,7 +339,7 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             var cntnt = "";
             if (res.IsSuccess)
             {
@@ -360,10 +360,10 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found.");
                 }
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync(cntnt, embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync(cntnt, embed: embed.Build()).ConfigureAwait(false);
         }
 
         [Command("info"), Description("Views information about a tag.")]
@@ -375,7 +375,7 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             if (res.IsSuccess)
             {
                 var tag = res.ResultTag;
@@ -387,50 +387,15 @@ namespace Emzi0767.CompanionCube.Modules
                     usr = await ctx.Client.GetUserAsync(tag.OwnerId).ConfigureAwait(false);
 
                 embed.Title = tag.Name;
-                embed.Color = 0xD091B2;
+                embed.Color = new DiscordColor(0xD091B2);
                 embed.Timestamp = tag.Edits.LastOrDefault();
-                embed.Footer = new DiscordEmbedFooter
-                {
-                    Text = "Creation date"
-                };
-                embed.Author = new DiscordEmbedAuthor
-                {
-                    Name = usr is DiscordMember mbr ? mbr.DisplayName : usr.Username,
-                    IconUrl = usr.AvatarUrl
-                };
-                embed.Fields = new List<DiscordEmbedField>()
-                {
-                    new DiscordEmbedField
-                    {
-                        Name = "Originally created",
-                        Value = tag.Edits.First().ToString("yyyy-MM-dd HH:mm:ss zzz"),
-                        Inline = false
-                    },
-                    new DiscordEmbedField
-                    {
-                        Name = "Latest version from",
-                        Value = tag.Edits.Last().ToString("yyyy-MM-dd HH:mm:ss zzz"),
-                        Inline = false
-                    },
-                    new DiscordEmbedField
-                    {
-                        Name = "Version count",
-                        Value = tag.Edits.Count.ToString("#,##0"),
-                        Inline = false
-                    },
-                    new DiscordEmbedField
-                    {
-                        Name = "Use count",
-                        Value = tag.Uses.ToString("#,##0"),
-                        Inline = false
-                    },
-                    new DiscordEmbedField
-                    {
-                        Name = "Is hidden?",
-                        Value = tag.IsHidden ? "Yes" : "No",
-                        Inline = false
-                    }
-                };
+                embed.WithFooter("Creation date");
+                embed.WithAuthor(usr is DiscordMember mbr ? mbr.DisplayName : usr.Username, null, usr.AvatarUrl);
+                embed.AddField("Originally created", tag.Edits.First().ToString("yyyy-MM-dd HH:mm:ss zzz"), false)
+                    .AddField("Latest version from", tag.Edits.Last().ToString("yyyy-MM-dd HH:mm:ss zzz"), false)
+                    .AddField("Version count", tag.Edits.Count.ToString("#,##0"), false)
+                    .AddField("Use count", tag.Uses.ToString("#,##0"), false)
+                    .AddField("Is hidden?", tag.IsHidden ? "Yes" : "No", false);
             }
             else
             {
@@ -444,10 +409,10 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found.");
                 }
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
         [Command("approve"), Description("Approves a tag, making it appear in listings."), OwnerOrPermission(Permissions.ManageChannels)]
@@ -482,23 +447,23 @@ namespace Emzi0767.CompanionCube.Modules
                 like = Formatter.Strip(like.ToLower());
             var res = await this.Database.ListTagsAsync(ctx.Channel.Id, like).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             if (res.SuggestedTags != null && res.SuggestedTags.Any())
             {
                 var tstr = string.Join(", ", res.SuggestedTags.Select(xt => Formatter.InlineCode(xt.Name)));
 
                 embed.Title = "Tag list";
                 embed.Description = string.Concat("Following tags matching your query were found:\n\n", tstr);
-                embed.Color = 0xD091B2;
+                embed.Color = new DiscordColor(0xD091B2);
             }
             else
             {
                 embed.Title = "No tags found";
                 embed.Description = "No tags matching the query were found.";
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
         public async Task ExecuteGroupAsync(CommandContext ctx, [RemainingText, Description("Name of the tag to display.")] string name)
@@ -509,7 +474,7 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower());
             var res = await this.Database.GetTagAsync(ctx.Channel.Id, name).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed();
+            var embed = new DiscordEmbedBuilder();
             var cntnt = "";
             if (res.IsSuccess)
             {
@@ -533,10 +498,10 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found.");
                 }
-                embed.Color = 0xFF0000;
+                embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync(cntnt, embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync(cntnt, embed: embed.Build()).ConfigureAwait(false);
         }
     }
 

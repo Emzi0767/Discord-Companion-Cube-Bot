@@ -234,7 +234,7 @@ namespace Emzi0767.CompanionCube
                 string.Concat("User '", ea.Context.User.Username, "#", ea.Context.User.Discriminator, "' (", ea.Context.User.Id, ") tried to execute '", 
                     ea.Command?.QualifiedName ?? "<unknown command>", "' in #", ea.Context.Channel.Name, " (", ea.Context.Channel.Id, ") and failed with ", ea.Exception.GetType(), ": ", 
                     ea.Exception.Message), DateTime.Now);
-            DiscordEmbed embed = null;
+            DiscordEmbedBuilder embed = null;
 
             var ex = ea.Exception;
             while (ex is AggregateException)
@@ -243,11 +243,11 @@ namespace Emzi0767.CompanionCube
             if (ex is ChecksFailedException cfe)
             {
                 if (!cfe.FailedChecks.OfType<NotBlockedAttribute>().Any())
-                    embed = new DiscordEmbed
+                    embed = new DiscordEmbedBuilder
                     {
                         Title = "Permission denied",
                         Description = string.Concat(DiscordEmoji.FromName(ea.Context.Client, ":msraisedhand:"), " You lack permissions necessary to run this command."),
-                        Color = 0xFF0000
+                        Color = new DiscordColor(0xFF0000)
                     };
             }
             else if (ex is CommandNotFoundException)
@@ -256,16 +256,16 @@ namespace Emzi0767.CompanionCube
             }
             else
             {
-                embed = new DiscordEmbed
+                embed = new DiscordEmbedBuilder
                 {
                     Title = "An exception occured while executing the command",
                     Description = string.Concat(Formatter.InlineCode(ea.Command.QualifiedName), " threw an exception: `", ex.GetType(), ": ", ex.Message, "`"),
-                    Color = 0xFF0000
+                    Color = new DiscordColor(0xFF0000)
                 };
             }
 
             if (embed != null)
-                await ea.Context.RespondAsync("", embed: embed);
+                await ea.Context.RespondAsync("", embed: embed.Build());
         }
 
         private Task<int> PrefixPredicateAsync(DiscordMessage m)

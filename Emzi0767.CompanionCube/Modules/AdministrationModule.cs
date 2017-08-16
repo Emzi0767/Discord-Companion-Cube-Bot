@@ -53,27 +53,27 @@ namespace Emzi0767.CompanionCube.Modules
         public async Task SqlQueryAsync(CommandContext ctx, [RemainingText, Description("SQL query to execute.")] string query)
         {
             var dat = await this.Database.ExecuteRawQueryAsync(query).ConfigureAwait(false);
-            DiscordEmbed embed = null;
+            DiscordEmbedBuilder embed = null;
 
             if (!dat.Any() || !dat.First().Any())
             {
-                embed = new DiscordEmbed
+                embed = new DiscordEmbedBuilder
                 {
                     Title = "Given query produced no results.",
                     Description = string.Concat("Query: ", Formatter.InlineCode(query), "."),
-                    Color = 0x007FFF
+                    Color = new DiscordColor(0x007FFF)
                 };
-                await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
                 return;
             }
 
             var d0 = dat.First().Select(xd => xd.Key).OrderByDescending(xs => xs.Length).First().Length + 1;
 
-            embed = new DiscordEmbed
+            embed = new DiscordEmbedBuilder
             { 
                 Title = string.Concat("Results: ", dat.Count.ToString("#,##0")), 
                 Description = string.Concat("Showing ", dat.Count > 24 ? "first 24" : "all", " results for query ", Formatter.InlineCode(query), ":"), 
-                Color = 0x007FFF
+                Color = new DiscordColor(0x007FFF)
             };
             var adat = dat.Take(24);
 
@@ -85,23 +85,13 @@ namespace Emzi0767.CompanionCube.Modules
                 foreach (var (k, v) in xdat)
                     sb.Append(k).Append(new string(' ', d0 - k.Length)).Append("| ").AppendLine(v);
 
-                embed.Fields.Add(new DiscordEmbedField
-                {
-                    Name = string.Concat("Result #", i++),
-                    Value = Formatter.BlockCode(sb.ToString()),
-                    Inline = false
-                });
+                embed.AddField(string.Concat("Result #", i++), Formatter.BlockCode(sb.ToString()), false);
             }
 
             if (dat.Count > 24)
-                embed.Fields.Add(new DiscordEmbedField 
-                { 
-                    Name = "Display incomplete", 
-                    Value = string.Concat((dat.Count - 24).ToString("#,##0"), " results were omitted."), 
-                    Inline = false 
-                });
+                embed.AddField("Display incomplete", string.Concat((dat.Count - 24).ToString("#,##0"), " results were omitted."), false);
             
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
         [Command("eval"), Description("Evaluates a snippet of C# code, in context."), Hidden, RequireOwner]
@@ -116,12 +106,12 @@ namespace Emzi0767.CompanionCube.Modules
 
             code = code.Substring(cs1, cs2 - cs1);
 
-            var embed = new DiscordEmbed
+            var embed = new DiscordEmbedBuilder
             {
                 Title = "Evaluating...",
-                Color = 0xD091B2
+                Color = new DiscordColor(0xD091B2)
             };
-            var msg = await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            var msg = await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
 
             var globals = new EvaluationEnvironment(ctx);
             var sopts = ScriptOptions.Default
@@ -136,33 +126,22 @@ namespace Emzi0767.CompanionCube.Modules
             
             if (csc.Any(xd => xd.Severity == DiagnosticSeverity.Error))
             {
-                embed = new DiscordEmbed
+                embed = new DiscordEmbedBuilder
                 {
                     Title = "Compilation failed",
                     Description = string.Concat("Compilation failed after ", sw1.ElapsedMilliseconds.ToString("#,##0"), "ms with ", csc.Length.ToString("#,##0"), " errors."),
-                    Color = 0xD091B2,
-                    Fields = new List<DiscordEmbedField>()
+                    Color = new DiscordColor(0xD091B2)
                 };
                 foreach (var xd in csc.Take(3))
                 {
                     var ls = xd.Location.GetLineSpan();
-                    embed.Fields.Add(new DiscordEmbedField
-                    {
-                        Name = string.Concat("Error at ", ls.StartLinePosition.Line.ToString("#,##0"), ", ", ls.StartLinePosition.Character.ToString("#,##0")),
-                        Value = Formatter.InlineCode(xd.GetMessage()),
-                        Inline = false
-                    });
+                    embed.AddField(string.Concat("Error at ", ls.StartLinePosition.Line.ToString("#,##0"), ", ", ls.StartLinePosition.Character.ToString("#,##0")), Formatter.InlineCode(xd.GetMessage()), false);
                 }
                 if (csc.Length > 3)
                 {
-                    embed.Fields.Add(new DiscordEmbedField
-                    {
-                        Name = "Some errors ommited",
-                        Value = string.Concat((csc.Length - 3).ToString("#,##0"), " more errors not displayed"),
-                        Inline = false
-                    });
+                    embed.AddField("Some errors ommited", string.Concat((csc.Length - 3).ToString("#,##0"), " more errors not displayed"), false);
                 }
-                await msg.EditAsync(embed: embed).ConfigureAwait(false);
+                await msg.EditAsync(embed: embed.Build()).ConfigureAwait(false);
                 return;
             }
 
@@ -182,53 +161,31 @@ namespace Emzi0767.CompanionCube.Modules
 
             if (rex != null)
             {
-                embed = new DiscordEmbed
+                embed = new DiscordEmbedBuilder
                 {
                     Title = "Execution failed",
                     Description = string.Concat("Execution failed after ", sw2.ElapsedMilliseconds.ToString("#,##0"), "ms with `", rex.GetType(), ": ", rex.Message, "`."),
-                    Color = 0xD091B2,
+                    Color = new DiscordColor(0xD091B2),
                 };
-                await msg.EditAsync(embed: embed).ConfigureAwait(false);
+                await msg.EditAsync(embed: embed.Build()).ConfigureAwait(false);
                 return;
             }
 
             // execution succeeded
-            embed = new DiscordEmbed
+            embed = new DiscordEmbedBuilder
             {
                 Title = "Evaluation successful",
-                Color = 0xD091B2,
-                Fields = new List<DiscordEmbedField>()
-                {
-                    new DiscordEmbedField
-                    {
-                        Name = "Result",
-                        Value = css.ReturnValue != null ? css.ReturnValue.ToString() : "No value returned",
-                        Inline = false
-                    },
-                    new DiscordEmbedField
-                    {
-                        Name = "Compilation time",
-                        Value = string.Concat(sw1.ElapsedMilliseconds.ToString("#,##0"), "ms"),
-                        Inline = true
-                    },
-                    new DiscordEmbedField
-                    {
-                        Name = "Execution time",
-                        Value = string.Concat(sw2.ElapsedMilliseconds.ToString("#,##0"), "ms"),
-                        Inline = true
-                    }
-                }
+                Color = new DiscordColor(0xD091B2),
             };
+
+            embed.AddField("Result", css.ReturnValue != null ? css.ReturnValue.ToString() : "No value returned", false)
+                .AddField("Compilation time", string.Concat(sw1.ElapsedMilliseconds.ToString("#,##0"), "ms"), true)
+                .AddField("Execution time", string.Concat(sw2.ElapsedMilliseconds.ToString("#,##0"), "ms"), true);
+
             if (css.ReturnValue != null)
-            {
-                embed.Fields.Add(new DiscordEmbedField
-                {
-                    Name = "Return type",
-                    Value = css.ReturnValue.GetType().ToString(),
-                    Inline = true
-                });
-            }
-            await msg.EditAsync(embed: embed).ConfigureAwait(false);
+                embed.AddField("Return type", css.ReturnValue.GetType().ToString(), true);
+
+            await msg.EditAsync(embed: embed.Build()).ConfigureAwait(false);
         }
 
         [Command("nick"), Aliases("nickname"), Description("Changes the bot's nickname."), OwnerOrPermission(Permissions.ManageNicknames)]

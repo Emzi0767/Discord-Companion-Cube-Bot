@@ -43,41 +43,41 @@ namespace Emzi0767.CompanionCube.Modules
         [Command("send"), Aliases("transfer", "wire"), Description("Sends specified amount of currency to another user.")]
         public async Task SendAsync(CommandContext ctx, [Description("Member to send currency to.")] DiscordMember target, [Description("Amount of currency to send.")] long amount)
         {
-            DiscordEmbed embed;
+            DiscordEmbedBuilder embed = null;
 
             if (target.IsBot)
             {
-                embed = new DiscordEmbed
+                embed = new DiscordEmbedBuilder
                 {
                     Title = string.Concat("Currency transfer error."),
                     Description = string.Concat("Bots cannot own currency."),
-                    Color = 0x628958
+                    Color = new DiscordColor(0x628958)
                 };
-                await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
                 return;
             }
 
             if (target.Id == ctx.User.Id)
             {
-                embed = new DiscordEmbed
+                embed = new DiscordEmbedBuilder
                 {
                     Title = string.Concat("Currency transfer error."),
                     Description = string.Concat("Cannot send currency to yourself."),
-                    Color = 0x628958
+                    Color = new DiscordColor(0x628958)
                 };
-                await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
                 return;
             }
 
             if (amount <= 0)
             {
-                embed = new DiscordEmbed
+                embed = new DiscordEmbedBuilder
                 {
                     Title = string.Concat("Currency transfer error."),
                     Description = string.Concat("You need to send at least ", this.Shared.CurrencySymbol, " 1."),
-                    Color = 0x628958
+                    Color = new DiscordColor(0x628958)
                 };
-                await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
                 return;
             }
 
@@ -87,23 +87,23 @@ namespace Emzi0767.CompanionCube.Modules
             }
             catch (CurrencyException ex)
             {
-                embed = new DiscordEmbed
+                embed = new DiscordEmbedBuilder
                 {
                     Title = string.Concat("Currency transfer error."),
                     Description = string.Concat("An error occured when transferring currency: ", ex.Message),
-                    Color = 0x628958
+                    Color = new DiscordColor(0x628958)
                 };
-                await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
                 return;
             }
 
-            embed = new DiscordEmbed
+            embed = new DiscordEmbedBuilder
             {
                 Title = string.Concat("Currency transfer successful."),
                 Description = string.Concat("You sent ", this.Shared.CurrencySymbol, " ", amount.ToString("#,##0"), " to ", target.Mention, "!"),
-                Color = 0x628958
+                Color = new DiscordColor(0x628958)
             };
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
         [Command("grant"), Description("Grants specified user a specified amount of money."), Hidden, RequireOwner]
@@ -111,41 +111,41 @@ namespace Emzi0767.CompanionCube.Modules
         {
             await this.Database.IssueCurrencyAsync(target.Id, amount).ConfigureAwait(false);
 
-            var embed = new DiscordEmbed
+            var embed = new DiscordEmbedBuilder
             {
                 Title = string.Concat("Currency grant successful."),
                 Description = string.Concat(this.Shared.CurrencySymbol, " ", amount.ToString("#,##0"), amount >= 0 ? " granted to " : " removed from ", target.Mention, "!"),
-                Color = 0x628958
+                Color = new DiscordColor(0x628958)
             };
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
         public async Task ExecuteGroupAsync(CommandContext ctx, [Description("Member to check balance for. If not specified, defaults to invoker.")] DiscordMember mbr = null)
         {
             var usr = mbr ?? ctx.Member;
-            DiscordEmbed embed = null;
+            DiscordEmbedBuilder embed = null;
 
             if (usr.IsBot)
             {
-                embed = new DiscordEmbed
+                embed = new DiscordEmbedBuilder
                 {
                     Title = string.Concat("Currency check error."),
                     Description = string.Concat("Bots cannot own currency."),
-                    Color = 0x628958
+                    Color = new DiscordColor(0x628958)
                 };
-                await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
                 return;
             }
 
             var shekels = await this.Database.GetCurrencyAsync(usr.Id).ConfigureAwait(false);
 
-            embed = new DiscordEmbed
+            embed = new DiscordEmbedBuilder
             {
                 Title = string.Concat("Account balance for ", usr.DisplayName),
                 Description = string.Concat(this.Shared.CurrencySymbol, " ", shekels.ToString("#,##0")),
-                Color = 0x628958
+                Color = new DiscordColor(0x628958)
             };
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
         [Group("gamble"), Aliases("gambling"), Description("Lets you gamble your life's savings.")]
@@ -194,7 +194,7 @@ namespace Emzi0767.CompanionCube.Modules
                 var buff = new byte[8];
                 using (var rng = RandomNumberGenerator.Create())
                     rng.GetBytes(buff);
-                rpsr = (int)((BitConverter.ToUInt64(buff, 0) % 30) / 30) + 1;
+                
                 
                 var msg = await ctx.RespondAsync("React with one of :fist:, :left_facing_fist:, :right_facing_fist:, :punch:, :hand_splayed:, :raised_hand:, :raised_back_of_hand:, or :v: to this message within 30s.").ConfigureAwait(false);
 

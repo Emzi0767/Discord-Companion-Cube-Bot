@@ -47,8 +47,15 @@ namespace Emzi0767.CompanionCube.Modules
             var ccv = typeof(CompanionCubeCore)
                 .GetTypeInfo()
                 .Assembly
+                ?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ??
+
+                typeof(CompanionCubeCore)
+                .GetTypeInfo()
+                .Assembly
                 .GetName()
-                .Version;
+                .Version
+                .ToString(3);
             
             var dsv = ctx.Client.VersionString;
             var ncv = PlatformServices.Default
@@ -73,38 +80,22 @@ namespace Emzi0767.CompanionCube.Modules
 
             var invuri = string.Concat("https://discordapp.com/oauth2/authorize?scope=bot&permissions=0&client_id=", ctx.Client.CurrentApplication.Id);
 
-            var embed = new DiscordEmbed
+            var embed = new DiscordEmbedBuilder
             {
                 Title = "About Companion Cube",
                 Url = "https://emzi0767.com/bots/companion_cube",
-                Description = string.Concat("Companion Cube is a bot made by Emzi0767#1837 (<@!181875147148361728>). The source code is available on ", Formatter.MaskedUrl("Emzi's GitHub", 
-                        new Uri("https://github.com/Emzi0767/Discord-Companion-Cube-Bot"), "Companion Cube's source code on GitHub"), 
-                    ".\n\nThis shard is currently servicing ", ctx.Client.Guilds.Count.ToString("#,##0"), 
+                Description = string.Concat("Companion Cube is a bot made by Emzi0767#1837 (<@!181875147148361728>). The source code is available on ", Formatter.MaskedUrl("Emzi's GitHub",
+                        new Uri("https://github.com/Emzi0767/Discord-Companion-Cube-Bot"), "Companion Cube's source code on GitHub"),
+                    ".\n\nThis shard is currently servicing ", ctx.Client.Guilds.Count.ToString("#,##0"),
                     " guilds.\n\nClick ", Formatter.MaskedUrl("this invite link", new Uri(invuri), "Companion Cube invite link"), " to invite me to your guild!"),
-                Color = 0xD091B2,
-                Fields = new List<DiscordEmbedField>()
-                {
-                    new DiscordEmbedField
-                    {
-                        Name = "Bot Version",
-                        Value = string.Concat(DiscordEmoji.FromName(ctx.Client, ":companion_cube:"), " ", Formatter.Bold(ccv.ToString(3))),
-                        Inline = true
-                    },
-                    new DiscordEmbedField
-                    {
-                        Name = "DSharpPlus Version",
-                        Value = string.Concat(DiscordEmoji.FromName(ctx.Client, ":dsplus:"), " ", Formatter.Bold(dsv)),
-                        Inline = true
-                    },
-                    new DiscordEmbedField
-                    {
-                        Name = ".NET Core Version",
-                        Value = string.Concat(DiscordEmoji.FromName(ctx.Client, ":dotnet:"), " ", Formatter.Bold(ncv)),
-                        Inline = true
-                    }
-                }
+                Color = new DiscordColor(0xD091B2)
             };
-            await ctx.RespondAsync("", embed: embed).ConfigureAwait(false);
+
+            embed.AddField("Bot Version", string.Concat(DiscordEmoji.FromName(ctx.Client, ":companion_cube:"), " ", Formatter.Bold(ccv)), true)
+                .AddField("DSharpPlus Version", string.Concat(DiscordEmoji.FromName(ctx.Client, ":dsplus:"), " ", Formatter.Bold(dsv)), true)
+                .AddField(".NET Core Version", string.Concat(DiscordEmoji.FromName(ctx.Client, ":dotnet:"), " ", Formatter.Bold(ncv)), true);
+
+            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
         [Command("uptime"), Description("Display bot's uptime.")]
