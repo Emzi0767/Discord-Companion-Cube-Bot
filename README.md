@@ -10,15 +10,15 @@ More information is available on [its GitHub page](https://emzi0767.github.io/di
 
 ## BUILDING
 
-You need .NET Core SDK 2.0 Preview 2 to build the project, and .NET Core 2.0.0-preview3-25518-01 runtime to run it.
+You need .NET Core SDK 2.0 to build the project, and .NET Core 2.0.0 runtime to run it.
 
 1. In order to build this project, you will need to add the following package sources to your NuGet:
    * `https://www.myget.org/F/dsharpplus-nightly/api/v3/index.json`
    * `https://dotnet.myget.org/F/roslyn/api/v3/index.json`
-   * `https://dotnet.myget.org/F/dotnet-core/api/v3/index.json`
 2. Next, you must restore all NuGet packages (`dotnet restore`).
 3. Then build the code in Release mode (`dotnet build -c Release`).
-4. Finally publish the bot (`dotnet publish -c Release -f netcoreapp2.0`).
+4. Finally publish the bot (`dotnet publish -c Release`).
+   * You can optionally package it as a self-contained application by specifying target RID such as `linux-x64` or `linux-arm` (`dotnet publish -c Release -r linux-x64`).
 
 ## SETUP
 
@@ -37,6 +37,7 @@ In order for bot to run, you will need to set up your environment.
 1. Create a directory for the bot.
 2. Copy the publish results to the directory.
 3. Run the bot (`dotnet Emzi0767.CompanionCube.dll`). This will generate an empty config file.
+   * If you packaged the bot as a self-contained app, you will need to run the bot's executable. That is `Emzi0767.CompanionCube.exe` for Windows, or `./Emzi0767.CompanionCube` for GNU/Linux.
 4. Fill the config file with proper values.
 
 ## RUNNING THE BOT
