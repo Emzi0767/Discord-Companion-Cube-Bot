@@ -194,14 +194,6 @@ namespace Emzi0767.CompanionCube
                 await this.Database.IssueCurrencyAsync(ea.Author.Id, 1);
         }
 
-        private Task OnCommandExecuted(CommandExecutedEventArgs ea)
-        {
-            ea.Context.Client.DebugLogger.LogMessage(LogLevel.Info, LOG_TAG, 
-                string.Concat("User '", ea.Context.User.Username, "#", ea.Context.User.Discriminator, "' (", ea.Context.User.Id, ") executed '", ea.Command.QualifiedName, "' in #", 
-                    ea.Context.Channel.Name, " (", ea.Context.Channel.Id, ")"), DateTime.Now);
-            return Task.CompletedTask;
-        }
-
         private Task OnClientError(ClientErrorEventArgs ea)
         {
             var ex = ea.Exception;
@@ -225,6 +217,14 @@ namespace Emzi0767.CompanionCube
         private Task OnReady(ReadyEventArgs ea)
         {
             this.GameTimer = new Timer(this.GameTimerCallback, ea.Client, TimeSpan.Zero, TimeSpan.FromMinutes(15));
+            return Task.CompletedTask;
+        }
+
+        private Task OnCommandExecuted(CommandExecutedEventArgs ea)
+        {
+            ea.Context.Client.DebugLogger.LogMessage(LogLevel.Info, LOG_TAG,
+                string.Concat("User '", ea.Context.User.Username, "#", ea.Context.User.Discriminator, "' (", ea.Context.User.Id, ") executed '", ea.Command.QualifiedName, "' in #",
+                    ea.Context.Channel.Name, " (", ea.Context.Channel.Id, ")"), DateTime.Now);
             return Task.CompletedTask;
         }
 
