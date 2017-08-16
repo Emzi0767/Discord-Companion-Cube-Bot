@@ -44,7 +44,7 @@ In order for bot to run, you will need to set up your environment.
 
 Execute `dotnet Emzi0767.CompanionCube.dll`. That's it, the bot is running.
 
-If you packaged the bot as a self-contained app, you will need to run the bot's executable. That is `Emzi0767.Devi.exe` for Windows, or `./Emzi0767.Devi` for GNU/Linux.
+If you packaged the bot as a self-contained app, you will need to run the bot's executable. That is `Emzi0767.CompanionCube.exe` for Windows, or `./Emzi0767.CompanionCube` for GNU/Linux.
 
 It is recommended you run the bot in a terminal multiplexer, such as `screen` or `tmux` when running on GNU/Linux.
 
