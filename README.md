@@ -10,7 +10,7 @@ More information is available on [its GitHub page](https://emzi0767.github.io/di
 
 ## BUILDING
 
-You need .NET Core SDK 2.0 to build the project, and .NET Core 2.0.0 runtime to run it.
+You need .NET Core SDK 2.0 to build the project, and .NET Core 2.0.0 runtime to run it. Both are available [here](https://www.microsoft.com/net/download/core ".NET Core download page").
 
 1. In order to build this project, you will need to add the following package sources to your NuGet:
    * `https://www.myget.org/F/dsharpplus-nightly/api/v3/index.json`
