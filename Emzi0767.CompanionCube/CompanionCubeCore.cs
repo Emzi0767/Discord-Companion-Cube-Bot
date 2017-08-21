@@ -15,13 +15,14 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Interactivity;
 using Emzi0767.CompanionCube.Modules;
@@ -89,6 +90,7 @@ namespace Emzi0767.CompanionCube
                 EnableDefaultHelp = true,
                 EnableDms = false,
                 SelfBot = false,
+                DefaultHelpChecks = new List<CheckBaseAttribute>() { new NotBlockedAttribute() },
 
                 Dependencies = deps.Build(),
                 CustomPrefixPredicate = this.PrefixPredicateAsync,
@@ -102,6 +104,9 @@ namespace Emzi0767.CompanionCube
             this.CommandsNext.RegisterCommands<TagModule>();
             this.CommandsNext.RegisterCommands<TagsModule>();
             this.CommandsNext.RegisterCommands<MiscCommandsModule>();
+
+            // hook help formatter
+            this.CommandsNext.SetHelpFormatter<CompanionCubeHelpFormatter>();
 
             // initialize interactivity
             this.Interactivity = this.Client.UseInteractivity();
