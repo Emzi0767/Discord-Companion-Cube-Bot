@@ -98,7 +98,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Title = "Tag not found";
                 if (res.SuggestedTags != null && res.SuggestedTags.Any())
                 {
-                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs).Select(xt => Formatter.InlineCode(xt.Name)));
+                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs.Name).Select(xt => Formatter.InlineCode(xt.Name)));
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found. Here are some suggestions:\n\n", sugs);
                 }
                 else
@@ -138,7 +138,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Title = "Tag not found";
                 if (res.SuggestedTags != null && res.SuggestedTags.Any())
                 {
-                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs).Select(xt => Formatter.InlineCode(xt.Name)));
+                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs.Name).Select(xt => Formatter.InlineCode(xt.Name)));
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found. Here are some suggestions:\n\n", sugs);
                 }
                 else
@@ -184,7 +184,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Title = "Tag not found";
                 if (res.SuggestedTags != null && res.SuggestedTags.Any())
                 {
-                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs).Select(xt => Formatter.InlineCode(xt.Name)));
+                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs.Name).Select(xt => Formatter.InlineCode(xt.Name)));
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found. Here are some suggestions:\n\n", sugs);
                 }
                 else
@@ -230,7 +230,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Title = "Tag not found";
                 if (res.SuggestedTags != null && res.SuggestedTags.Any())
                 {
-                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs).Select(xt => Formatter.InlineCode(xt.Name)));
+                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs.Name).Select(xt => Formatter.InlineCode(xt.Name)));
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found. Here are some suggestions:\n\n", sugs);
                 }
                 else
@@ -271,7 +271,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Title = "Tag not found";
                 if (res.SuggestedTags != null && res.SuggestedTags.Any())
                 {
-                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs).Select(xt => Formatter.InlineCode(xt.Name)));
+                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs.Name).Select(xt => Formatter.InlineCode(xt.Name)));
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found. Here are some suggestions:\n\n", sugs);
                 }
                 else
@@ -310,7 +310,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Title = "Tag not found";
                 if (res.SuggestedTags != null && res.SuggestedTags.Any())
                 {
-                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs).Select(xt => Formatter.InlineCode(xt.Name)));
+                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs.Name).Select(xt => Formatter.InlineCode(xt.Name)));
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found. Here are some suggestions:\n\n", sugs);
                 }
                 else
@@ -353,7 +353,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Title = "Tag not found";
                 if (res.SuggestedTags != null && res.SuggestedTags.Any())
                 {
-                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs).Select(xt => Formatter.InlineCode(xt.Name)));
+                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs.Name).Select(xt => Formatter.InlineCode(xt.Name)));
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found. Here are some suggestions:\n\n", sugs);
                 }
                 else
@@ -402,7 +402,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Title = "Tag not found";
                 if (res.SuggestedTags != null && res.SuggestedTags.Any())
                 {
-                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs).Select(xt => Formatter.InlineCode(xt.Name)));
+                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs.Name).Select(xt => Formatter.InlineCode(xt.Name)));
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found. Here are some suggestions:\n\n", sugs);
                 }
                 else
@@ -450,7 +450,7 @@ namespace Emzi0767.CompanionCube.Modules
             var embed = new DiscordEmbedBuilder();
             if (res.SuggestedTags != null && res.SuggestedTags.Any())
             {
-                var tstr = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs).Select(xt => Formatter.InlineCode(xt.Name)));
+                var tstr = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs.Name).Select(xt => Formatter.InlineCode(xt.Name)));
 
                 embed.Title = "Tag list";
                 embed.Description = string.Concat("Following tags matching your query were found:\n\n", tstr);
@@ -491,7 +491,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Title = "Tag not found";
                 if (res.SuggestedTags != null && res.SuggestedTags.Any())
                 {
-                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs).Select(xt => Formatter.InlineCode(xt.Name)));
+                    var sugs = string.Join(", ", res.SuggestedTags.OrderBy(xs => xs.Name).Select(xt => Formatter.InlineCode(xt.Name)));
                     embed.Description = string.Concat("Tag with the name ", Formatter.InlineCode(name), " was not found. Here are some suggestions:\n\n", sugs);
                 }
                 else
