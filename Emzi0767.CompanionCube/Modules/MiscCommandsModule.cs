@@ -129,7 +129,7 @@ namespace Emzi0767.CompanionCube.Modules
                 }
                 catch (UnauthorizedException)
                 {
-                    foreach (var xmsg in msgs)
+                    foreach (var xmsg in msgsf)
                         await xmsg.DeleteAsync();
                 }
             }

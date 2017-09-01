@@ -173,6 +173,8 @@ namespace Emzi0767.CompanionCube.Services
 
                 cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
                 cmd.Parameters.AddWithValue("prefix", NpgsqlDbType.Text, prefix);
+
+                await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
 
             this.Semaphore.Release();
@@ -192,6 +194,8 @@ namespace Emzi0767.CompanionCube.Services
 
                 cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guild_id);
                 cmd.Parameters.AddWithValue("prefix", NpgsqlDbType.Text, prefix);
+
+                await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
 
             this.Semaphore.Release();
@@ -210,6 +214,8 @@ namespace Emzi0767.CompanionCube.Services
                 cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WJERE channel_id = @channel_id;");
 
                 cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
+
+                await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
 
             this.Semaphore.Release();
@@ -228,6 +234,8 @@ namespace Emzi0767.CompanionCube.Services
                 cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WJERE guild_id = @guild_id;");
 
                 cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guild_id);
+
+                await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
 
             this.Semaphore.Release();
