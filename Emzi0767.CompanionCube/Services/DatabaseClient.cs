@@ -211,7 +211,7 @@ namespace Emzi0767.CompanionCube.Services
                 await con.OpenAsync().ConfigureAwait(false);
 
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "prefixes");
-                cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WJERE channel_id = @channel_id;");
+                cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WHERE channel_id = @channel_id;");
 
                 cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
 
@@ -231,7 +231,7 @@ namespace Emzi0767.CompanionCube.Services
                 await con.OpenAsync().ConfigureAwait(false);
 
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "prefixes");
-                cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WJERE guild_id = @guild_id;");
+                cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WHERE guild_id = @guild_id;");
 
                 cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guild_id);
 
