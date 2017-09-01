@@ -3,15 +3,15 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.4.1</Version>
-    <AssemblyVersion>1.4.1.0</AssemblyVersion>
-    <FileVersion>1.4.1.0</FileVersion>
+    <Version>1.4.2</Version>
+    <AssemblyVersion>1.4.2.0</AssemblyVersion>
+    <FileVersion>1.4.2.0</FileVersion>
     <AssemblyTitle>Companion Cube</AssemblyTitle>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="3.0.0-beta-00228" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="3.0.0-beta-00228" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="3.0.0-beta-00228" />
+    <PackageReference Include="DSharpPlus" Version="3.0.0-beta-00230" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="3.0.0-beta-00230" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="3.0.0-beta-00230" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Npgsql" Version="3.2.5" />
