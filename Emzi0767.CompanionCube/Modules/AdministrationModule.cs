@@ -15,15 +15,14 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using Emzi0767.CompanionCube.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -141,7 +140,7 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.AddField("Some errors ommited", string.Concat((csc.Length - 3).ToString("#,##0"), " more errors not displayed"), false);
                 }
-                await msg.EditAsync(embed: embed.Build()).ConfigureAwait(false);
+                await msg.ModifyAsync(embed: embed.Build()).ConfigureAwait(false);
                 return;
             }
 
@@ -167,7 +166,7 @@ namespace Emzi0767.CompanionCube.Modules
                     Description = string.Concat("Execution failed after ", sw2.ElapsedMilliseconds.ToString("#,##0"), "ms with `", rex.GetType(), ": ", rex.Message, "`."),
                     Color = new DiscordColor(0xD091B2),
                 };
-                await msg.EditAsync(embed: embed.Build()).ConfigureAwait(false);
+                await msg.ModifyAsync(embed: embed.Build()).ConfigureAwait(false);
                 return;
             }
 
@@ -185,7 +184,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (css.ReturnValue != null)
                 embed.AddField("Return type", css.ReturnValue.GetType().ToString(), true);
 
-            await msg.EditAsync(embed: embed.Build()).ConfigureAwait(false);
+            await msg.ModifyAsync(embed: embed.Build()).ConfigureAwait(false);
         }
 
         [Command("nick"), Aliases("nickname"), Description("Changes the bot's nickname."), OwnerOrPermission(Permissions.ManageNicknames)]

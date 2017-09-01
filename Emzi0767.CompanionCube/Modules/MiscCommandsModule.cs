@@ -24,6 +24,8 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
+using DSharpPlus.Exceptions;
 using Emzi0767.CompanionCube.Services;
 using Microsoft.Extensions.PlatformAbstractions;
 
@@ -121,10 +123,19 @@ namespace Emzi0767.CompanionCube.Modules
 
                 lid = lmsg.Id;
 
-                await ctx.Channel.DeleteMessagesAsync(msgsf).ConfigureAwait(false);
+                try
+                {
+                    await ctx.Channel.DeleteMessagesAsync(msgsf).ConfigureAwait(false);
+                }
+                catch (UnauthorizedException)
+                {
+                    foreach (var xmsg in msgs)
+                        await xmsg.DeleteAsync();
+                }
             }
 
-            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+            var msg = await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+            await Task.Delay(2500).ContinueWith(t => msg.DeleteAsync());
         }
     }
 }

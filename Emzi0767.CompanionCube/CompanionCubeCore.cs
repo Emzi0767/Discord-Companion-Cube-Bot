@@ -24,6 +24,8 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.CommandsNext.Exceptions;
+using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using Emzi0767.CompanionCube.Modules;
 using Emzi0767.CompanionCube.Services;
@@ -62,7 +64,6 @@ namespace Emzi0767.CompanionCube
             var dcfg = new DiscordConfig
             {
                 AutoReconnect = true,
-                DiscordBranch = Branch.Stable,
                 EnableCompression = true,
                 LargeThreshold = 250,
                 LogLevel = LogLevel.Debug,
@@ -116,8 +117,8 @@ namespace Emzi0767.CompanionCube
 
             this.Client.GuildAvailable += this.OnGuildAvailable;
             this.Client.MessageCreated += this.OnMessageCreated;
-            this.Client.ClientError += this.OnClientError;
-            this.Client.SocketError += this.OnSocketError;
+            this.Client.ClientErrored += this.OnClientErrored;
+            this.Client.SocketErrored += this.OnSocketErrored;
             this.Client.Ready += this.OnReady;
 
             this.CommandsNext.CommandExecuted += this.OnCommandExecuted;
@@ -199,7 +200,7 @@ namespace Emzi0767.CompanionCube
                 await this.Database.IssueCurrencyAsync(ea.Author.Id, 1);
         }
 
-        private Task OnClientError(ClientErrorEventArgs ea)
+        private Task OnClientErrored(ClientErrorEventArgs ea)
         {
             var ex = ea.Exception;
             while (ex is AggregateException)
@@ -209,7 +210,7 @@ namespace Emzi0767.CompanionCube
             return Task.CompletedTask;
         }
 
-        private Task OnSocketError(SocketErrorEventArgs ea)
+        private Task OnSocketErrored(SocketErrorEventArgs ea)
         {
             var ex = ea.Exception;
             while (ex is AggregateException)
@@ -225,7 +226,7 @@ namespace Emzi0767.CompanionCube
             return Task.CompletedTask;
         }
 
-        private Task OnCommandExecuted(CommandExecutedEventArgs ea)
+        private Task OnCommandExecuted(CommandExecutionEventArgs ea)
         {
             ea.Context.Client.DebugLogger.LogMessage(LogLevel.Info, LOG_TAG,
                 string.Concat("User '", ea.Context.User.Username, "#", ea.Context.User.Discriminator, "' (", ea.Context.User.Id, ") executed '", ea.Command.QualifiedName, "' in #",

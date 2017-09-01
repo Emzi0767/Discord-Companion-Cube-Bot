@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using Emzi0767.CompanionCube.Exceptions;
 using Emzi0767.CompanionCube.Services;
@@ -205,7 +206,7 @@ namespace Emzi0767.CompanionCube.Modules
                     return;
                 }
 
-                var usrr = this.RpsResponses[em];
+                var usrr = this.RpsResponses[em.Emoji];
                 var usrt = usrr.Type;
 
                 var t1 = rpsr;

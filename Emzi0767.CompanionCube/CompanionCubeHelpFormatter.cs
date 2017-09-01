@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.CommandsNext.Entities;
+using DSharpPlus.Entities;
 
 namespace Emzi0767.CompanionCube
 {

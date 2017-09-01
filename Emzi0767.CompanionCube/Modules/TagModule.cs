@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using Emzi0767.CompanionCube.Services;
 
 namespace Emzi0767.CompanionCube.Modules
@@ -389,8 +390,8 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Title = tag.Name;
                 embed.Color = new DiscordColor(0xD091B2);
                 embed.Timestamp = tag.Edits.LastOrDefault();
-                embed.WithFooter("Creation date");
-                embed.WithAuthor(usr is DiscordMember mbr ? mbr.DisplayName : usr.Username, null, usr.AvatarUrl);
+                embed.Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Creation date" };
+                embed.Author = new DiscordEmbedBuilder.EmbedAuthor { Name = usr is DiscordMember mbr ? mbr.DisplayName : usr.Username, IconUrl = usr.AvatarUrl };
                 embed.AddField("Originally created", tag.Edits.First().ToString("yyyy-MM-dd HH:mm:ss zzz"), false)
                     .AddField("Latest version from", tag.Edits.Last().ToString("yyyy-MM-dd HH:mm:ss zzz"), false)
                     .AddField("Version count", tag.Edits.Count.ToString("#,##0"), false)
