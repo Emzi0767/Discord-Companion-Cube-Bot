@@ -61,7 +61,7 @@ namespace Emzi0767.CompanionCube
         public void Initialize()
         {
             // initialize the client
-            var dcfg = new DiscordConfig
+            var dcfg = new DiscordConfiguration
             {
                 AutoReconnect = true,
                 EnableCompression = true,

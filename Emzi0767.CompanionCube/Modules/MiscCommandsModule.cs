@@ -85,7 +85,7 @@ namespace Emzi0767.CompanionCube.Modules
             var embed = new DiscordEmbedBuilder
             {
                 Title = "About Companion Cube",
-                Url = "https://emzi0767.com/bots/companion_cube",
+                Url = "https://emzi0767.com/Discord/CompanionCube",
                 Description = string.Concat("Companion Cube is a bot made by Emzi0767#1837 (<@!181875147148361728>). The source code is available on ", Formatter.MaskedUrl("Emzi's GitHub",
                         new Uri("https://github.com/Emzi0767/Discord-Companion-Cube-Bot"), "Companion Cube's source code on GitHub"),
                     ".\n\nThis shard is currently servicing ", ctx.Client.Guilds.Count.ToString("#,##0"),
