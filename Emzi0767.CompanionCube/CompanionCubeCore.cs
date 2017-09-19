@@ -105,6 +105,7 @@ namespace Emzi0767.CompanionCube
             this.CommandsNext.RegisterCommands<TagModule>();
             this.CommandsNext.RegisterCommands<TagsModule>();
             this.CommandsNext.RegisterCommands<MiscCommandsModule>();
+            this.CommandsNext.RegisterCommands<FunCommandsModule>();
 
             // hook help formatter
             this.CommandsNext.SetHelpFormatter<CompanionCubeHelpFormatter>();

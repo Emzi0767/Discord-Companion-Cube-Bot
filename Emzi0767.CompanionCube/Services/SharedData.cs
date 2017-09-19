@@ -18,6 +18,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 
 namespace Emzi0767.CompanionCube.Services
 {
@@ -31,6 +32,7 @@ namespace Emzi0767.CompanionCube.Services
         public string CurrencySymbol { get; }
         public DateTime ProcessStarted { get; }
         public string Game { get; }
+        public HttpClient Http { get; }
 
         public SharedData(ConcurrentDictionary<ulong, string> cprefixes, ConcurrentDictionary<ulong, string> gprefixes, ConcurrentHashSet<ulong> blocked_users, ConcurrentHashSet<ulong> blocked_channels, 
             ConcurrentHashSet<ulong> blocked_guilds, string currency_symbol, DateTime process_started, string game)
@@ -43,6 +45,7 @@ namespace Emzi0767.CompanionCube.Services
             this.CurrencySymbol = currency_symbol;
             this.ProcessStarted = process_started;
             this.Game = game;
+            this.Http = new HttpClient();
         }
 
         public string TimeSpanToString(TimeSpan ts)

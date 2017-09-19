@@ -114,8 +114,9 @@ namespace Emzi0767.CompanionCube.Modules
 
             var globals = new EvaluationEnvironment(ctx);
             var sopts = ScriptOptions.Default
-                .WithImports("System", "System.Collections.Generic", "System.Linq", "System.Net.Http", "System.Net.Http.Headers", "System.Reflection", "System.Text", "System.Threading.Tasks", 
-                    "DSharpPlus", "DSharpPlus.CommandsNext", "Emzi0767.CompanionCube", "Emzi0767.CompanionCube.Modules", "Emzi0767.CompanionCube.Services")
+                .WithImports("System", "System.Collections.Generic", "System.Diagnostics", "System.Linq", "System.Net.Http", "System.Net.Http.Headers", "System.Reflection", "System.Text", 
+                             "System.Threading.Tasks", "DSharpPlus", "DSharpPlus.CommandsNext", "DSharpPlus.Entities", "DSharpPlus.EventArgs", "DSharpPlus.Exceptions", "Emzi0767.CompanionCube", 
+                             "Emzi0767.CompanionCube.Modules", "Emzi0767.CompanionCube.Services")
                 .WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
             
             var sw1 = Stopwatch.StartNew();
