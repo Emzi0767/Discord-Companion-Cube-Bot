@@ -20,7 +20,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Transactions;
 using Emzi0767.CompanionCube.Exceptions;
 using Emzi0767.CompanionCube.Modules;
 using Npgsql;

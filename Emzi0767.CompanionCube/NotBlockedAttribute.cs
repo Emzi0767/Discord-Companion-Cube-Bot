@@ -26,7 +26,7 @@ namespace Emzi0767.CompanionCube
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public sealed class NotBlockedAttribute : CheckBaseAttribute
     {
-        public override Task<bool> CanExecute(CommandContext ctx)
+        public override Task<bool> CanExecute(CommandContext ctx, bool help)
         {
             var shared = ctx.Dependencies.GetDependency<SharedData>();
 

@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +28,6 @@ using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
-using Emzi0767.CompanionCube.Modules;
 using Emzi0767.CompanionCube.Services;
 
 namespace Emzi0767.CompanionCube
@@ -44,8 +44,8 @@ namespace Emzi0767.CompanionCube
         private Timer GameTimer { get; set; }
 
         public DiscordClient Client { get; private set; }
-        public CommandsNextModule CommandsNext { get; private set; }
-        public InteractivityModule Interactivity { get; private set; }
+        public CommandsNextExtension CommandsNext { get; private set; }
+        public InteractivityExtension Interactivity { get; private set; }
         public DatabaseClient Database { get; }
 
         public CompanionCubeCore(CompanionCubeConfig config, int shard_id, DatabaseClient database, SharedData shared_data)
@@ -64,7 +64,7 @@ namespace Emzi0767.CompanionCube
             var dcfg = new DiscordConfiguration
             {
                 AutoReconnect = true,
-                EnableCompression = true,
+                GatewayCompressionLevel = GatewayCompressionLevel.Stream,
                 LargeThreshold = 250,
                 LogLevel = LogLevel.Debug,
 
@@ -90,7 +90,6 @@ namespace Emzi0767.CompanionCube
                 CaseSensitive = false,
                 EnableDefaultHelp = true,
                 EnableDms = false,
-                SelfBot = false,
                 DefaultHelpChecks = new List<CheckBaseAttribute>() { new NotBlockedAttribute() },
 
                 Dependencies = deps.Build(),
@@ -100,18 +99,13 @@ namespace Emzi0767.CompanionCube
             this.CommandsNext = this.Client.UseCommandsNext(ccfg);
 
             // hook commands
-            this.CommandsNext.RegisterCommands<CurrencyModule>();
-            this.CommandsNext.RegisterCommands<AdministrationModule>();
-            this.CommandsNext.RegisterCommands<TagModule>();
-            this.CommandsNext.RegisterCommands<TagsModule>();
-            this.CommandsNext.RegisterCommands<MiscCommandsModule>();
-            this.CommandsNext.RegisterCommands<FunCommandsModule>();
+            this.CommandsNext.RegisterCommands(Assembly.GetExecutingAssembly());
 
             // hook help formatter
             this.CommandsNext.SetHelpFormatter<CompanionCubeHelpFormatter>();
 
             // initialize interactivity
-            this.Interactivity = this.Client.UseInteractivity();
+            this.Interactivity = this.Client.UseInteractivity(new InteractivityConfiguration());
 
             // hook events
             this.Client.DebugLogger.LogMessageReceived += this.LogMessageHandler;
@@ -287,7 +281,7 @@ namespace Emzi0767.CompanionCube
             var client = _ as DiscordClient;
             try
             {
-                client.UpdateStatusAsync(new Game(this.Shared.Game)).ConfigureAwait(false).GetAwaiter().GetResult();
+                client.UpdateStatusAsync(new DiscordGame(this.Shared.Game)).ConfigureAwait(false).GetAwaiter().GetResult();
                 client.DebugLogger.LogMessage(LogLevel.Info, LOG_TAG, "Presence updated", DateTime.Now);
             }
             catch (Exception) 
