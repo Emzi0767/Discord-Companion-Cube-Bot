@@ -260,5 +260,13 @@ paket-files/
 __pycache__/
 *.pyc
 
+# VS Code
+.vscode
+
 # Config files
 Emzi0767.CompanionCube/config.json
+
+# Unicode data
+Tools/UnicodeData.txt
+Tools/Blocks.txt
+unicode_data.json.gz

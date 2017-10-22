@@ -1,9 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emzi0767.CompanionCube", "Emzi0767.CompanionCube\Emzi0767.CompanionCube.csproj", "{7C0CA161-8E79-4DC5-8FA6-D0E2FDB23620}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emzi0767.CompanionCube", "Emzi0767.CompanionCube\Emzi0767.CompanionCube.csproj", "{7C0CA161-8E79-4DC5-8FA6-D0E2FDB23620}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{63B28BED-05C3-4E4B-9784-BB33DC5CA710}"
+	ProjectSection(SolutionItems) = preProject
+		Tools\mkdb.py = Tools\mkdb.py
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{788070A1-811E-4B47-B1B8-811A0C600C78}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		NOTICE = NOTICE
+		README.md = README.md
+		schema_v1.sql = schema_v1.sql
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +31,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {89C4223B-81EE-4795-8CC3-B4E633A7B159}
 	EndGlobalSection
 EndGlobal

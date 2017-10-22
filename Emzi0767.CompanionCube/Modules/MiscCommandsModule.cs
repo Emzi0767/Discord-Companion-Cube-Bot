@@ -15,7 +15,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -106,6 +105,12 @@ namespace Emzi0767.CompanionCube.Modules
             var upt = DateTime.Now - this.Shared.ProcessStarted;
             var ups = this.Shared.TimeSpanToString(upt);
             await ctx.RespondAsync(string.Concat("\u200b", DiscordEmoji.FromName(ctx.Client, ":companion_cube:"), " The bot has been running for ", Formatter.Bold(ups), ".")).ConfigureAwait(false);
+        }
+
+        [Command("ping"), Description("Displays this shard's WebSocket latency.")]
+        public async Task PingAsync(CommandContext ctx)
+        {
+            await ctx.RespondAsync(string.Concat("\u200b", DiscordEmoji.FromName(ctx.Client, ":ping_pong:"), " WebSocket latency: ", ctx.Client.Ping.ToString("#,##0"), "ms.")).ConfigureAwait(false);
         }
 
         [Command("cleanup")]
