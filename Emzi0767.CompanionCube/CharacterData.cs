@@ -1723,7 +1723,7 @@ namespace Emzi0767.CompanionCube
             foreach (var xm in missing)
             {
                 var blk = UnicodeBlock.GetBlockFor(xm);
-                cps[xm] = new UnicodeCodepoint(xm, string.Concat(blk.Name, " - ", xm), UnicodeCategory.Unknown, UnicodeCombiningClass.NotReordered, UnicodeBidirectionalityClass.Unknown, 
+                cps[xm] = new UnicodeCodepoint(xm, string.Concat(blk.Name.ToUpperInvariant(), " - ", xm), UnicodeCategory.Unknown, UnicodeCombiningClass.NotReordered, UnicodeBidirectionalityClass.Unknown, 
                     new UnicodeDecomposition(UnicodeDecompositionType.Unspecified, new string[0]), null, false, null, null, null, null, blk.Name, hans[xm]);
             }
             
