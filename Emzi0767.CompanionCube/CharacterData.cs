@@ -29,6 +29,130 @@ using Newtonsoft.Json;
 namespace Emzi0767.CompanionCube
 {
     /// <summary>
+    /// Raw unicode block data.
+    /// </summary>
+    public struct RawBlockData
+    {
+        /// <summary>
+        /// Gets the start codepoint of this character block.
+        /// </summary>
+        [JsonProperty("start_codepoint")]
+        public string StartCodepoint { get; private set; }
+
+        /// <summary>
+        /// Gets the start of this character block.
+        /// </summary>
+        [JsonProperty("start")]
+        public uint Start { get; private set; }
+
+        /// <summary>
+        /// Gets the end codepoint of this character block.
+        /// </summary>
+        [JsonProperty("end_codepoint")]
+        public string EndCodepoint { get; private set; }
+
+        /// <summary>
+        /// Gets the end of this character block.
+        /// </summary>
+        [JsonProperty("end")]
+        public uint End { get; private set; }
+
+        /// <summary>
+        /// Gets the name of this character block.
+        /// </summary>
+        [JsonProperty("name")]
+        public string Name { get; private set; }
+    }
+
+    /// <summary>
+    /// Raw unihan character data.
+    /// </summary>
+    public struct RawUnihanData
+    {
+        /// <summary>
+        /// Gets the codepoint corresponding to this unihan character.
+        /// </summary>
+        [JsonProperty("codepoint")]
+        public string Codepoint { get; private set; }
+
+        /// <summary>
+        /// Gets the cantonese pronounciation for this character using the jyutping romanization.
+        /// </summary>
+        [JsonProperty("cantonese")]
+        public string Cantonese { get; private set; }
+
+        /// <summary>
+        /// Gets an English definition for this character. Definitions are for modern written Chinese and are usually (but not always) the same as the definition in other Chinese 
+        /// dialects or non-Chinese languages. In some cases, synonyms are indicated. Fuller variant information can be found using the various variant fields.
+        /// </summary>
+        [JsonProperty("definition")]
+        public string Definition { get; private set; }
+
+        /// <summary>
+        /// Gets the modern Korean pronunciation(s) for this character in Hangul.
+        /// </summary>
+        [JsonProperty("hangul")]
+        public string Hangul { get; private set; }
+
+        /// <summary>
+        /// Gets the pronunciations and frequencies of this character, based in part on those appearing in Xiandai Hanyu Pinlu Cidian.
+        /// </summary>
+        [JsonProperty("hanyu_pinlu")]
+        public string HanyuPinlu { get; private set; }
+
+        /// <summary>
+        /// Gets the pronunciations and frequencies of this character, based in part on those appearing in HDZ.
+        /// </summary>
+        [JsonProperty("hanyu_pinyin")]
+        public string HanyuPinyin { get; private set; }
+
+        /// <summary>
+        /// Gets the Japanese pronunciation(s) of this character.
+        /// </summary>
+        [JsonProperty("japanese_kun")]
+        public string JapaneseKun { get; private set; }
+
+        /// <summary>
+        /// Gets the Sino-Japanese pronunciation(s) of this character.
+        /// </summary>
+        [JsonProperty("japanese_on")]
+        public string JapaneseOn { get; private set; }
+
+        /// <summary>
+        /// Gets the Korean pronunciation(s) of this character, using the Yale romanization system.
+        /// </summary>
+        [JsonProperty("korean")]
+        public string Korean { get; private set; }
+
+        /// <summary>
+        /// Gets the most customary pinyin reading for this character. When there are two values, then the first is preferred for zh-Hans (CN) and the second is preferred for 
+        /// zh-Hant (TW). When there is only one value, it is appropriate for both.
+        /// </summary>
+        [JsonProperty("mandarin")]
+        public string Mandarin { get; private set; }
+
+        /// <summary>
+        /// Gets the Tang dynasty pronunciation(s) of this character, derived from or consistent with T’ang Poetic Vocabulary by Hugh M. Stimson, Far Eastern Publications, Yale 
+        /// Univ. 1976. An asterisk indicates that the word or morpheme represented in toto or in part by the given character with the given reading occurs more than four times 
+        /// in the seven hundred poems covered.
+        /// </summary>
+        [JsonProperty("tang")]
+        public string Tang { get; private set; }
+
+        /// <summary>
+        /// Gets the character’s pronunciation(s) in Quốc ngữ.
+        /// </summary>
+        [JsonProperty("vietnamese")]
+        public string Vietnamese { get; private set; }
+
+        /// <summary>
+        /// Gets one or more Hànyǔ Pīnyīn readings as given in the Xiàndài Hànyǔ Cídiǎn.
+        /// </summary>
+        [JsonProperty("xhc1983")]
+        public string Xhc1983 { get; private set; }
+    }
+
+    /// <summary>
     /// Raw unicode character data.
     /// </summary>
     public struct RawCharacterData
@@ -83,6 +207,30 @@ namespace Emzi0767.CompanionCube
 
         [JsonProperty("block_name")]
         public string BlockName { get; private set; }
+    }
+
+    /// <summary>
+    /// Raw unicode data.
+    /// </summary>
+    public struct RawUnicodeData
+    {
+        /// <summary>
+        /// Gets the blocks in this dataset.
+        /// </summary>
+        [JsonProperty("blocks")]
+        public IEnumerable<RawBlockData> Blocks { get; private set; }
+
+        /// <summary>
+        /// Gets the unihan data in this dataset.
+        /// </summary>
+        [JsonProperty("unihan")]
+        public IEnumerable<RawUnihanData> Unihan { get; private set; }
+
+        /// <summary>
+        /// Gets the characters in this dataset.
+        /// </summary>
+        [JsonProperty("characters")]
+        public IEnumerable<RawCharacterData> Characters { get; private set; }
     }
 
     /// <summary>
@@ -1078,6 +1226,184 @@ namespace Emzi0767.CompanionCube
     }
 
     /// <summary>
+    /// Represents information about unicode character block.
+    /// </summary>
+    public struct UnicodeBlock
+    {
+        /// <summary>
+        /// Gets the collection of unicode blocks.
+        /// </summary>
+        public static ImmutableList<UnicodeBlock> Blocks { get; private set; }
+
+        /// <summary>
+        /// Gets the start of this character block.
+        /// </summary>
+        public uint Start { get; }
+
+        /// <summary>
+        /// Gets the end of this character block.
+        /// </summary>
+        public uint End { get; }
+
+        /// <summary>
+        /// Gets the name 
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Constructs information about a unicode character block.
+        /// </summary>
+        /// <param name="start">Start of this character block.</param>
+        /// <param name="end">End of this character block.</param>
+        /// <param name="name">Name of this character block.</param>
+        public UnicodeBlock(uint start, uint end, string name)
+        {
+            this.Start = start;
+            this.End = end;
+            this.Name = name;
+        }
+
+        /// <summary>
+        /// Loads new block information.
+        /// </summary>
+        /// <param name="blocks">Block information to load.</param>
+        public static void SetBlocks(ImmutableList<UnicodeBlock> blocks)
+        {
+            Blocks = blocks;
+        }
+
+        /// <summary>
+        /// Gets the block to which the supplied codepoint belongs.
+        /// </summary>
+        /// <param name="codepoint">Codepoint to get the block for.</param>
+        /// <returns>Requested character block.</returns>
+        public static UnicodeBlock GetBlockFor(UnicodeCodepoint codepoint)
+        {
+            return GetBlockFor(codepoint.CodepointValue);
+        }
+
+        /// <summary>
+        /// Gets the block to which the supplied codepoint belongs.
+        /// </summary>
+        /// <param name="codepoint">Codepoint to get the block for.</param>
+        /// <returns>Requested character block.</returns>
+        public static UnicodeBlock GetBlockFor(string codepoint)
+        {
+            if (uint.TryParse(codepoint, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var cp))
+                return GetBlockFor(cp);
+
+            throw new ArgumentException("Invalid codepoint supplied.", nameof(codepoint));
+        }
+
+        /// <summary>
+        /// Gets the block to which the supplied codepoint belongs.
+        /// </summary>
+        /// <param name="codepoint">Codepoint to get the block for.</param>
+        /// <returns>Requested character block.</returns>
+        public static UnicodeBlock GetBlockFor(uint codepoint)
+        {
+            return Blocks.FirstOrDefault(xb => xb.Start <= codepoint && xb.End >= codepoint);
+        }
+    }
+
+    /// <summary>
+    /// Represents informatio about a single unihan codepoint.
+    /// </summary>
+    public struct UnihanData
+    {
+        /// <summary>
+        /// Gets whether this character is a unihan character.
+        /// </summary>
+        public bool IsUnihan { get; }
+
+        /// <summary>
+        /// Gets the cantonese pronounciation for this character using the jyutping romanization.
+        /// </summary>
+        public string Cantonese { get; private set; }
+
+        /// <summary>
+        /// Gets an English definition for this character. Definitions are for modern written Chinese and are usually (but not always) the same as the definition in other Chinese 
+        /// dialects or non-Chinese languages. In some cases, synonyms are indicated. Fuller variant information can be found using the various variant fields.
+        /// </summary>
+        public string Definition { get; private set; }
+
+        /// <summary>
+        /// Gets the modern Korean pronunciation(s) for this character in Hangul.
+        /// </summary>
+        public string Hangul { get; private set; }
+
+        /// <summary>
+        /// Gets the pronunciations and frequencies of this character, based in part on those appearing in Xiandai Hanyu Pinlu Cidian.
+        /// </summary>
+        public string HanyuPinlu { get; private set; }
+
+        /// <summary>
+        /// Gets the pronunciations and frequencies of this character, based in part on those appearing in HDZ.
+        /// </summary>
+        public string HanyuPinyin { get; private set; }
+
+        /// <summary>
+        /// Gets the Japanese pronunciation(s) of this character.
+        /// </summary>
+        public string JapaneseKun { get; private set; }
+
+        /// <summary>
+        /// Gets the Sino-Japanese pronunciation(s) of this character.
+        /// </summary>
+        public string JapaneseOn { get; private set; }
+
+        /// <summary>
+        /// Gets the Korean pronunciation(s) of this character, using the Yale romanization system.
+        /// </summary>
+        public string Korean { get; private set; }
+
+        /// <summary>
+        /// Gets the most customary pinyin reading for this character. When there are two values, then the first is preferred for zh-Hans (CN) and the second is preferred for 
+        /// zh-Hant (TW). When there is only one value, it is appropriate for both.
+        /// </summary>
+        public string Mandarin { get; private set; }
+
+        /// <summary>
+        /// Gets the Tang dynasty pronunciation(s) of this character, derived from or consistent with T’ang Poetic Vocabulary by Hugh M. Stimson, Far Eastern Publications, Yale 
+        /// Univ. 1976. An asterisk indicates that the word or morpheme represented in toto or in part by the given character with the given reading occurs more than four times 
+        /// in the seven hundred poems covered.
+        /// </summary>
+        public string Tang { get; private set; }
+
+        /// <summary>
+        /// Gets the character’s pronunciation(s) in Quốc ngữ.
+        /// </summary>
+        public string Vietnamese { get; private set; }
+
+        /// <summary>
+        /// Gets one or more Hànyǔ Pīnyīn readings as given in the Xiàndài Hànyǔ Cídiǎn.
+        /// </summary>
+        public string Xhc1983 { get; private set; }
+
+        /// <summary>
+        /// Constructs information about this unihan character.
+        /// </summary>
+        /// <param name="definition">Unihan definition for this character.</param>
+        public UnihanData(string definition, string cantonese, string hangul, string hanyu_pinlu, string hanyu_pinyin, string japanese_kun, string japanese_on, string korean, string mandarin,
+            string tang, string vietnamese, string xhc1983)
+        {
+            this.IsUnihan = true;
+            this.Definition = definition;
+            this.Cantonese = cantonese;
+            this.Hangul = hangul;
+            this.HanyuPinlu = hanyu_pinlu;
+            this.HanyuPinyin = hanyu_pinyin;
+            this.JapaneseKun = japanese_kun;
+            this.JapaneseOn = japanese_on;
+            this.Korean = korean;
+            this.Mandarin = mandarin;
+            this.Tang = tang;
+            this.Vietnamese = vietnamese;
+            this.Xhc1983 = xhc1983;
+        }
+    }
+
+    /// <summary>
     /// Represents information about a single unicode codepoint.
     /// </summary>
     public struct UnicodeCodepoint
@@ -1178,9 +1504,19 @@ namespace Emzi0767.CompanionCube
         private string PrivateSimpleTitlecaseMapping { get; }
 
         /// <summary>
+        /// Gets the Unicode block to which this codepoint belongs.
+        /// </summary>
+        public UnicodeBlock Block { get { return UnicodeBlock.GetBlockFor(this); } }
+
+        /// <summary>
         /// Gets the name of the Unicode block to which this codepoint belongs.
         /// </summary>
-        public string Block { get; }
+        private string PrivateBlock { get; }
+
+        /// <summary>
+        /// Gets unihan data associated with this character.
+        /// </summary>
+        public UnihanData UnihanData { get; }
 
         /// <summary>
         /// Constructs information about a unicode codepoint.
@@ -1198,8 +1534,9 @@ namespace Emzi0767.CompanionCube
         /// <param name="lowermap">Lowercase mapping for this codepoint.</param>
         /// <param name="titlemap">Titlecase mapping for this codepoint.</param>
         /// <param name="block_name">Name of unicode block to which this codepoint belongs.</param>
+        /// <param name="unihan">Unihan data associated with this unicode codepoint.</param>
         public UnicodeCodepoint(string codepoint, string name, UnicodeCategory category, UnicodeCombiningClass combining_class, UnicodeBidirectionalityClass bidi_class, UnicodeDecomposition decomposition,
-            UnicodeNumericValue? numeric_value, bool bidi_mirrored, string old_name, string uppermap, string lowermap, string titlemap, string block_name)
+            UnicodeNumericValue? numeric_value, bool bidi_mirrored, string old_name, string uppermap, string lowermap, string titlemap, string block_name, UnihanData unihan)
         {
             this.Codepoint = codepoint;
             this.CodepointValue = uint.Parse(codepoint, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
@@ -1215,7 +1552,8 @@ namespace Emzi0767.CompanionCube
             this.PrivateSimpleUppercaseMapping = !string.IsNullOrWhiteSpace(uppermap) ? uppermap : null;
             this.PrivateSimpleLowercaseMapping = !string.IsNullOrWhiteSpace(lowermap) ? lowermap : null;
             this.PrivateSimpleTitlecaseMapping = !string.IsNullOrWhiteSpace(titlemap) ? titlemap : null;
-            this.Block = block_name;
+            this.PrivateBlock = block_name;
+            this.UnihanData = unihan;
         }
 
         /// <summary>
@@ -1225,6 +1563,33 @@ namespace Emzi0767.CompanionCube
         public static void SetCodepoints(ImmutableDictionary<string, UnicodeCodepoint> codepoints)
         {
             Codepoints = codepoints;
+        }
+
+        /// <summary>
+        /// Gets a codepoint by its value.
+        /// </summary>
+        /// <param name="codepoint">Value of the codepoint to get.</param>
+        /// <returns>Requested codepoint.</returns>
+        public static UnicodeCodepoint GetCodepoint(uint codepoint)
+        {
+            return GetCodepoint(codepoint.ToString("X4"));
+        }
+
+        /// <summary>
+        /// Gets a codepoint by its representation.
+        /// </summary>
+        /// <param name="codepoint">Representation of codepoint to get.</param>
+        /// <returns>Requested codepoint.</returns>
+        public static UnicodeCodepoint GetCodepoint(string codepoint)
+        {
+            codepoint = codepoint.ToUpperInvariant();
+
+            if (Codepoints.TryGetValue(codepoint, out var cp))
+                return cp;
+
+            var blk = UnicodeBlock.GetBlockFor(codepoint);
+            return new UnicodeCodepoint(codepoint, string.Concat(blk.Name.ToUpperInvariant(), " - ", codepoint), UnicodeCategory.Unknown, UnicodeCombiningClass.NotReordered, 
+                UnicodeBidirectionalityClass.Unknown, new UnicodeDecomposition(UnicodeDecompositionType.Unspecified, new string[0]), null, false, null, null, null, null, blk.Name, default);
         }
     }
 
@@ -1294,7 +1659,23 @@ namespace Emzi0767.CompanionCube
             var utf8 = new UTF8Encoding(false);
             var json = utf8.GetString(buff);
 
-            var rawcps = JsonConvert.DeserializeObject<IEnumerable<RawCharacterData>>(json);
+            var rawdat = JsonConvert.DeserializeObject<RawUnicodeData>(json);
+
+            var rawblk = rawdat.Blocks;
+            var blks = ImmutableList.CreateBuilder<UnicodeBlock>();
+            foreach (var xrblk in rawblk)
+                blks.Add(new UnicodeBlock(xrblk.Start, xrblk.End, xrblk.Name));
+
+            UnicodeBlock.SetBlocks(blks.ToImmutable());
+
+            // TODO: Unihan
+            var rawhan = rawdat.Unihan;
+            var hans = new Dictionary<string, UnihanData>();
+            foreach (var xhan in rawhan)
+                hans[xhan.Codepoint] = new UnihanData(xhan.Definition, xhan.Cantonese, xhan.Hangul, xhan.HanyuPinlu, xhan.HanyuPinyin, xhan.JapaneseKun, xhan.JapaneseOn, xhan.Korean, xhan.Mandarin,
+                    xhan.Tang, xhan.Vietnamese, xhan.Xhc1983);
+
+            var rawcps = rawdat.Characters;
             var cps = ImmutableDictionary.CreateBuilder<string, UnicodeCodepoint>();
             foreach (var xrcp in rawcps)
             {
@@ -1331,10 +1712,21 @@ namespace Emzi0767.CompanionCube
                     numval = new UnicodeNumericValue(dec, dig, num);
                 }
 
+                if (!hans.TryGetValue(xrcp.Codepoint, out var unihan))
+                    unihan = default;
+
                 cps[xrcp.Codepoint] = new UnicodeCodepoint(xrcp.Codepoint, xrcp.Name, cat, cmbc, bidic, unidec, numval, xrcp.BidiMirrored.ToLowerInvariant() == "Y", xrcp.OldUnicodeName, 
-                    xrcp.SimpleUppercaseMapping.Trim(), xrcp.SimpleLowercaseMapping.Trim(), xrcp.SimpleTitlecaseMapping.Trim(), xrcp.BlockName);
+                    xrcp.SimpleUppercaseMapping.Trim(), xrcp.SimpleLowercaseMapping.Trim(), xrcp.SimpleTitlecaseMapping.Trim(), xrcp.BlockName, unihan);
             }
 
+            var missing = hans.Keys.Except(cps.Keys);
+            foreach (var xm in missing)
+            {
+                var blk = UnicodeBlock.GetBlockFor(xm);
+                cps[xm] = new UnicodeCodepoint(xm, string.Concat(blk.Name, " - ", xm), UnicodeCategory.Unknown, UnicodeCombiningClass.NotReordered, UnicodeBidirectionalityClass.Unknown, 
+                    new UnicodeDecomposition(UnicodeDecompositionType.Unspecified, new string[0]), null, false, null, null, null, null, blk.Name, hans[xm]);
+            }
+            
             UnicodeCodepoint.SetCodepoints(cps.ToImmutable());
         }
 
@@ -1532,8 +1924,8 @@ namespace Emzi0767.CompanionCube
         {
             var bts = UTF32.GetBytes(s);
             return Enumerable.Range(0, bts.Length / 4)
-                .Select(xi => (bts[xi * 4] | bts[xi * 4 + 1] << 8 | bts[xi * 4 + 2] << 16 | bts[xi * 4 + 3]).ToString("X16").TrimStart('0').PadLeft(4, '0'))
-                .Select(xs => UnicodeCodepoint.Codepoints[xs]);
+                .Select(xi => (uint)(bts[xi * 4] | bts[xi * 4 + 1] << 8 | bts[xi * 4 + 2] << 16 | bts[xi * 4 + 3]))
+                .Select(xui => UnicodeCodepoint.GetCodepoint(xui));
         }
         
         public static ImmutableDictionary<string, UnicodeCategory> BuildCategoryMap()

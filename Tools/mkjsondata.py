@@ -20,14 +20,18 @@
 # This requires UnicodeData.txt and Blocks.txt files from:
 # https://unicode.org/Public/10.0.0/ucd/UCD.zip
 #
+# It also requires Unihan_Readings.txt file from:
+# https://unicode.org/Public/10.0.0/ucd/Unihan.zip
+#
 # You can check for newer versions here:
 # https://unicode.org/Public/
 #
 # Place the required files in the same directory as the script and run it.
-# The generated unicode_data.json.gz will be placed in the directory the 
+# The generated unicode_data.json.gz will be placed in the directory the
 # script was ran form.
 
 from typing import List, Dict, Any
+from re import compile as re_compile
 from json import dumps
 from gzip import open as gzopen
 
@@ -86,6 +90,33 @@ class UnicodeCodepoint:
 
         return d
 
+class UnihanData:
+    def __init__(self, codepoint: str):
+        self.__slots__ = ["codepoint", "cantonese", "definition", "hangul", "hanyu_pinlu", "hanyu_pinyin", 
+		"japanese_kun", "japanese_on", "korean", "mandarin", "tang", "vietnamese", "xhc1983"]
+
+        self.codepoint = codepoint
+
+        self.cantonese = None
+        self.definition = None
+        self.hangul = None
+        self.hanyu_pinlu = None
+        self.hanyu_pinyin = None
+        self.japanese_kun = None
+        self.japanese_on = None
+        self.korean = None
+        self.mandarin = None
+        self.tang = None
+        self.vietnamese = None
+        self.xhc1983 = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        d = {}
+        for slot in self.__slots__:
+            d[slot] = getattr(self, slot)
+
+        return d
+
 
 def json_callback(x):
     return x.to_dict()
@@ -104,6 +135,23 @@ def main():
 
             blocks.append(UnicodeBlock(bdata1[0], bdata1[1], bdata0[1]))
 
+    han_re = re_compile(r"[A-Z]")
+    unihan = {}
+    with open("Unihan_Readings.txt", "r", encoding="utf-8") as f:
+        for line in f:
+            if not line.strip() or line[0] == "#":
+                continue
+
+            bdata0 = line.split("\t")
+            cp = bdata0[0][2:]
+            if cp not in unihan:
+                unihan[cp] = UnihanData(cp)
+
+            prop = bdata0[1][1:]
+            prop = han_re.sub(lambda m: "_" + m.group(0).lower(), prop)[1:]
+
+            setattr(unihan[cp], prop, bdata0[2].strip())
+
     data = []
     with open("UnicodeData.txt", "r", encoding="utf-8") as f:
         for line in f:
@@ -116,14 +164,15 @@ def main():
             for block in blocks:
                 if block.start <= uval and block.end >= uval:
                     tblock = block
-					break
+                    break
 
             data.append(UnicodeCodepoint(udata, tblock))
 
-    data_json = dumps(data, default=json_callback)
+    unidata = {"blocks": blocks, "unihan": list(unihan.values()), "characters": data}
+    unidata_json = dumps(unidata, default=json_callback)
 
     with gzopen("unicode_data.json.gz", "wb") as f:
-        f.write(data_json.encode("utf-8"))
+        f.write(unidata_json.encode("utf-8"))
 
 
 if __name__ == "__main__":

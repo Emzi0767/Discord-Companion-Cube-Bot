@@ -32,7 +32,7 @@ namespace Emzi0767.CompanionCube
             this.Permissions = permissions;
         }
 
-        public override async Task<bool> CanExecute(CommandContext ctx, bool help)
+        public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
         {
             var app = ctx.Client.CurrentApplication;
             var me = ctx.Client.CurrentUser;

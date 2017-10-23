@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -38,7 +39,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrEmpty(text))
                 throw new ArgumentNullException("You need to supply a non-null string.");
 
-            var cps = text.ToCodepoints().Select(xcp => string.Concat("`0x", xcp.Codepoint, "` (", xcp.Name, ") - ", xcp.CodepointString, " - <http://www.fileformat.info/info/unicode/char/", xcp.Codepoint, ">"));
+            var cps = text.ToCodepoints().Select(xcp => string.Concat("`0x", xcp.Codepoint, "` (", xcp.UnihanData.IsUnihan ? xcp.UnihanData.Definition ?? xcp.Name : xcp.Name, ") - ", Formatter.Sanitize(xcp.CodepointString), " - <http://www.fileformat.info/info/unicode/char/", xcp.Codepoint, ">"));
             var pgs = new List<Page>();
             var pn = 1;
             var sb = new StringBuilder();
@@ -89,7 +90,7 @@ namespace Emzi0767.CompanionCube.Modules
                 var xcp = cps[i];
                 var embed = new DiscordEmbedBuilder
                 {
-                    Title = string.Concat("`", xcp.Codepoint, "` - ", xcp.Name),
+                    Title = string.Concat("`", xcp.Codepoint, "` - ", xcp.UnihanData.IsUnihan ? xcp.UnihanData.Definition ?? xcp.Name : xcp.Name),
                     Color = new DiscordColor(0xD091B2),
                     // they watermark
                     //ThumbnailUrl = string.Concat("http://www.fileformat.info/info/unicode/char/", xcp.Codepoint.ToLower(), "/", SeparatorReplacementRegex.Replace(xcp.Name, "_").ToLower(), ".png"),
@@ -102,11 +103,14 @@ namespace Emzi0767.CompanionCube.Modules
                 if (!string.IsNullOrWhiteSpace(xcp.CodepointString))
                     embed.Description = xcp.CodepointString;
 
-                embed.AddField("Unicode Block", xcp.Block)
+                embed.AddField("Unicode Block", xcp.Block.Name)
                     .AddField("Unicode Category", xcp.Category.ToDescription())
                     .AddField("Combining Class", xcp.CombiningClass.ToDescription())
                     .AddField("Bidirectionality Class", xcp.BidirectionalClass.ToDescription())
                     .AddField("Bidirectional Mirrored?", xcp.BidirectionalMirrored ? "Yes" : "No");
+
+                if (xcp.UnihanData.IsUnihan)
+                    embed.AddField("Unihan", "This is a Unihan character");
 
                 if (!string.IsNullOrWhiteSpace(xcp.OldUnicodeName))
                     embed.AddField("Unicode 1.0 Name", xcp.OldUnicodeName);
