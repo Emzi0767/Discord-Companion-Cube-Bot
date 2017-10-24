@@ -39,7 +39,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrEmpty(text))
                 throw new ArgumentNullException("You need to supply a non-null string.");
 
-            var cps = text.ToCodepoints().Select(xcp => string.Concat("`0x", xcp.Codepoint, "` (", xcp.Name, (xcp.UnihanData.IsUnihan ? string.Concat(" / ", xcp.UnihanData.Definition) : ""), ") - ", Formatter.Sanitize(xcp.CodepointString), " - <http://www.fileformat.info/info/unicode/char/", xcp.Codepoint, ">"));
+            var cps = text.ToCodepoints().Select(xcp => string.Concat("`U+", xcp.Codepoint, "` (", xcp.Name, (xcp.UnihanData.IsUnihan ? string.Concat(" / ", xcp.UnihanData.Definition) : ""), ") - ", Formatter.Sanitize(xcp.CodepointString), " - <http://www.fileformat.info/info/unicode/char/", xcp.Codepoint, ">"));
             var pgs = new List<Page>();
             var pn = 1;
             var sb = new StringBuilder();
@@ -90,7 +90,7 @@ namespace Emzi0767.CompanionCube.Modules
                 var xcp = cps[i];
                 var embed = new DiscordEmbedBuilder
                 {
-                    Title = string.Concat("`", xcp.Codepoint, "` - ", xcp.Name),
+                    Title = string.Concat("`U+", xcp.Codepoint, "` - ", xcp.Name),
                     Color = new DiscordColor(0xD091B2),
                     // they watermark
                     //ThumbnailUrl = string.Concat("http://www.fileformat.info/info/unicode/char/", xcp.Codepoint.ToLower(), "/", SeparatorReplacementRegex.Replace(xcp.Name, "_").ToLower(), ".png"),
