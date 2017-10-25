@@ -26,6 +26,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
+// all stuff below is done by hand
+// hours of work
 namespace Emzi0767.CompanionCube
 {
     /// <summary>

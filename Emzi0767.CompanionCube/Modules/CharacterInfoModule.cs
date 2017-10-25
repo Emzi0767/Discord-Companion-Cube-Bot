@@ -123,7 +123,7 @@ namespace Emzi0767.CompanionCube.Modules
 
                 if (xcp.Decomposition.Codepoints.Any())
                 {
-                    var dcps = xcp.Decomposition.Codepoints.Select(xxcp => string.Concat("`", xxcp.Codepoint, "` (", xxcp.Name, ") = ", xxcp.CodepointString));
+                    var dcps = xcp.Decomposition.Codepoints.Select(xxcp => string.Concat("`U+", xxcp.Codepoint, "` (", xxcp.Name, ") = ", xxcp.CodepointString));
                     embed.AddField("Decomposition Type", xcp.Decomposition.Type.ToDescription())
                         .AddField("Decomposes Into", string.Join("\n", dcps));
                 }
@@ -147,13 +147,13 @@ namespace Emzi0767.CompanionCube.Modules
                 if (xcp.SimpleUppercaseMapping.Codepoint != null)
                 {
                     var ucm = xcp.SimpleUppercaseMapping;
-                    embed.AddField("Uppercase Mapping", string.Concat("`", ucm.Codepoint, "` (", ucm.Name, ") = ", ucm.CodepointString));
+                    embed.AddField("Uppercase Mapping", string.Concat("`U+", ucm.Codepoint, "` (", ucm.Name, ") = ", ucm.CodepointString));
                 }
 
                 if (xcp.SimpleLowercaseMapping.Codepoint != null)
                 {
                     var lcm = xcp.SimpleLowercaseMapping;
-                    embed.AddField("Lowercase Mapping", string.Concat("`", lcm.Codepoint, "` (", lcm.Name, ") = ", lcm.CodepointString));
+                    embed.AddField("Lowercase Mapping", string.Concat("`U+", lcm.Codepoint, "` (", lcm.Name, ") = ", lcm.CodepointString));
                 }
 
                 if (xcp.SimpleTitlecaseMapping.Codepoint != null)
@@ -162,7 +162,7 @@ namespace Emzi0767.CompanionCube.Modules
                     if (tcm.Codepoint == xcp.SimpleUppercaseMapping.Codepoint)
                         embed.AddField("Titlecase Mapping", "Same as uppercase", false);
                     else
-                        embed.AddField("Titlecase Mapping", string.Concat("`", tcm.Codepoint, "` (", tcm.Name, ") = ", tcm.CodepointString));
+                        embed.AddField("Titlecase Mapping", string.Concat("`U+", tcm.Codepoint, "` (", tcm.Name, ") = ", tcm.CodepointString));
                 }
                 else if (xcp.SimpleUppercaseMapping.Codepoint != null)
                 {
