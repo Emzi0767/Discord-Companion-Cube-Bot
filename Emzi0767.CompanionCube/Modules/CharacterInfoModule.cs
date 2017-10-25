@@ -28,10 +28,16 @@ using DSharpPlus.Interactivity;
 
 namespace Emzi0767.CompanionCube.Modules
 {
-    [Group("charinfo"), Aliases("utfinfo", "unicodeinfo", "chrinfo", "ucinfo"), Description("Provides commands for obtaining information about unicode strings."), NotBlocked]
+    [Group("charinfo", CanInvokeWithoutSubcommand = true)]
+    [Aliases("utfinfo", "unicodeinfo", "chrinfo", "ucinfo")]
+    [Description("Provides commands for obtaining information about unicode strings. Invoking without subcommand will display simplified character information.")]
+    [NotBlocked]
     public class CharacterInfoModule
     {
         private static Regex SeparatorReplacementRegex { get; } = new Regex(@"[\s\-,]");
+
+        public Task ExecuteGroupAsync(CommandContext ctx, [RemainingText, Description("String to analyze.")] string text)
+            => this.SimpleAsync(ctx, text);
 
         [Command("simple"), Aliases("short"), Description("Displays simplified unicode character information.")]
         public async Task SimpleAsync(CommandContext ctx, [RemainingText, Description("String to analyze.")] string text)
