@@ -55,7 +55,7 @@ namespace Emzi0767.CompanionCube
                     Token = "<insert token here>",
                     DefaultCommandPrefix = "cc!",
                     EnableMentionPrefix = true,
-                    MessageCacheSize = 50,
+                    MessageCacheSize = 1024,
                     ShardCount = 1,
                     Game = "with Portals",
                     CurrencySymbol = "<:comedy_chevron:338403292138962944>",

@@ -101,7 +101,7 @@ namespace Emzi0767.CompanionCube.Modules
             var cs2 = code.LastIndexOf("```");
 
             if (cs1 == -1 || cs2 == -1)
-                throw new ArgumentException("You need to wrap the code into a code block.");
+                throw new ArgumentException("You need to wrap the code into a code block.", nameof(code));
 
             code = code.Substring(cs1, cs2 - cs1);
 

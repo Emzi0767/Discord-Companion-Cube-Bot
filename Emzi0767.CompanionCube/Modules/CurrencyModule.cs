@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Emzi0767.CompanionCube.Exceptions;
 using Emzi0767.CompanionCube.Services;
 
 namespace Emzi0767.CompanionCube.Modules
@@ -41,57 +41,15 @@ namespace Emzi0767.CompanionCube.Modules
             DiscordEmbedBuilder embed = null;
 
             if (target.IsBot)
-            {
-                embed = new DiscordEmbedBuilder
-                {
-                    Title = string.Concat("Currency transfer error."),
-                    Description = string.Concat("Bots cannot own currency."),
-                    Color = new DiscordColor(0x628958)
-                };
-                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
-                return;
-            }
+                throw new ArgumentException("Bots cannot own currency.", nameof(target));
 
             if (target.Id == ctx.User.Id)
-            {
-                embed = new DiscordEmbedBuilder
-                {
-                    Title = string.Concat("Currency transfer error."),
-                    Description = string.Concat("Cannot send currency to yourself."),
-                    Color = new DiscordColor(0x628958)
-                };
-                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
-                return;
-            }
+                throw new ArgumentException("Cannot send currency to yourself.", nameof(target));
 
             if (amount <= 0)
-            {
-                embed = new DiscordEmbedBuilder
-                {
-                    Title = string.Concat("Currency transfer error."),
-                    Description = string.Concat("You need to send at least ", this.Shared.CurrencySymbol, " 1."),
-                    Color = new DiscordColor(0x628958)
-                };
-                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
-                return;
-            }
-
-            try
-            {
-                await this.Database.TransferCurrencyAsync(ctx.User.Id, target.Id, amount).ConfigureAwait(false);
-            }
-            catch (CurrencyException ex)
-            {
-                embed = new DiscordEmbedBuilder
-                {
-                    Title = string.Concat("Currency transfer error."),
-                    Description = string.Concat("An error occured when transferring currency: ", ex.Message),
-                    Color = new DiscordColor(0x628958)
-                };
-                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
-                return;
-            }
-
+                throw new ArgumentOutOfRangeException(nameof(amount), "The amount to send needs to be greater than 0.");
+            
+            await this.Database.TransferCurrencyAsync(ctx.User.Id, target.Id, amount).ConfigureAwait(false);
             embed = new DiscordEmbedBuilder
             {
                 Title = string.Concat("Currency transfer successful."),
@@ -121,19 +79,9 @@ namespace Emzi0767.CompanionCube.Modules
             DiscordEmbedBuilder embed = null;
 
             if (usr.IsBot)
-            {
-                embed = new DiscordEmbedBuilder
-                {
-                    Title = string.Concat("Currency check error."),
-                    Description = string.Concat("Bots cannot own currency."),
-                    Color = new DiscordColor(0x628958)
-                };
-                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
-                return;
-            }
+                throw new ArgumentException("Bots cannot own currency.", nameof(mbr));
 
             var shekels = await this.Database.GetCurrencyAsync(usr.Id).ConfigureAwait(false);
-
             embed = new DiscordEmbedBuilder
             {
                 Title = string.Concat("Account balance for ", usr.DisplayName),

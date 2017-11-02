@@ -259,7 +259,7 @@ namespace Emzi0767.CompanionCube
             {
                 embed = new DiscordEmbedBuilder
                 {
-                    Title = "An exception occured while executing the command",
+                    Title = "A problem occured while executing the command",
                     Description = string.Concat(Formatter.InlineCode(ea.Command.QualifiedName), " threw an exception: `", ex.GetType(), ": ", ex.Message, "`"),
                     Color = new DiscordColor(0xFF0000)
                 };

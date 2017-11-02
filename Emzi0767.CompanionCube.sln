@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emzi0767.CompanionCube", "E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{63B28BED-05C3-4E4B-9784-BB33DC5CA710}"
 	ProjectSection(SolutionItems) = preProject
-		Tools\mkdb.py = Tools\mkdb.py
+		Tools\mkjsondata.py = Tools\mkjsondata.py
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{788070A1-811E-4B47-B1B8-811A0C600C78}"

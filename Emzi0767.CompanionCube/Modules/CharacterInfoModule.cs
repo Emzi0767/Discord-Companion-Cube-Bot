@@ -43,7 +43,7 @@ namespace Emzi0767.CompanionCube.Modules
         public async Task SimpleAsync(CommandContext ctx, [RemainingText, Description("String to analyze.")] string text)
         {
             if (string.IsNullOrEmpty(text))
-                throw new ArgumentNullException("You need to supply a non-null string.");
+                throw new ArgumentNullException(nameof(text), "You need to supply a non-null string.");
 
             var cps = text.ToCodepoints().Select(xcp => string.Concat("`U+", xcp.Codepoint, "` (", xcp.Name, (xcp.UnihanData.IsUnihan ? string.Concat(" / ", xcp.UnihanData.Definition) : ""), ") - ", Formatter.Sanitize(xcp.CodepointString), " - <http://www.fileformat.info/info/unicode/char/", xcp.Codepoint, ">"));
             var pgs = new List<Page>();
@@ -84,11 +84,11 @@ namespace Emzi0767.CompanionCube.Modules
         public async Task DetailedAsync(CommandContext ctx, [RemainingText, Description("String to analyze. Up to 32 codepoints.")] string text)
         {
             if (string.IsNullOrEmpty(text))
-                throw new ArgumentNullException("You need to supply a non-null string.");
+                throw new ArgumentNullException(nameof(text), "You need to supply a non-null string.");
 
             var cps = text.ToCodepoints().ToArray();
             if (cps.Length > 32)
-                throw new ArgumentException("You can only specify up to 32 codepoints.");
+                throw new ArgumentException("You can only specify up to 32 codepoints.", nameof(text));
 
             var pgs = new List<Page>();
             for (var i = 0; i < cps.Length; i++)

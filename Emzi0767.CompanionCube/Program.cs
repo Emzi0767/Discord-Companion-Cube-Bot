@@ -40,7 +40,7 @@ namespace Emzi0767.CompanionCube
         private static async Task MainAsync(string[] args)
         {
             Console.WriteLine("Loading Companion Cube...");
-            Console.Write("[1/5] Loading configuration       ");
+            Console.Write("[1/5] Loading configuration        ");
 
             var json = "{}";
             var utf8 = new UTF8Encoding(false);
@@ -69,17 +69,17 @@ namespace Emzi0767.CompanionCube
                 json = await sr.ReadToEndAsync();
             var cfg = JsonConvert.DeserializeObject<CompanionCubeConfig>(json);
 
-            Console.Write("\r[2/5] Loading unicode data        ");
+            Console.Write("\r[2/5] Loading unicode data         ");
 
             using (var utfloader = new UnicodeDataLoader("unicode_data.json.gz"))
                 await utfloader.LoadCodepointsAsync().ConfigureAwait(false);
 
-            Console.Write("\r[3/5] Booting PostreSQL connection");
+            Console.Write("\r[3/5] Booting PostgreSQL connection");
 
             Database = new DatabaseClient(cfg.DatabaseConfig);
             await Database.InitializeAsync();
 
-            Console.Write("\r[4/5] Loading data from database  ");
+            Console.Write("\r[4/5] Loading data from database   ");
 
             var cpfixes_db = await Database.GetChannelPrefixesAsync();
             var cpfixes = new ConcurrentDictionary<ulong, string>();
@@ -110,7 +110,7 @@ namespace Emzi0767.CompanionCube
 
             Shared = new SharedData(cpfixes, gpfixes, busers, bchans, bguilds, cfg.CurrencySymbol, proc.StartTime, cfg.Game);
 
-            Console.Write("\r[5/5] Creating shards             ");
+            Console.Write("\r[5/5] Creating shards              ");
 
             Shards = new List<CompanionCubeCore>();
             for (var i = 0; i < cfg.ShardCount; i++)
