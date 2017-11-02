@@ -1590,7 +1590,7 @@ namespace Emzi0767.CompanionCube
                 return cp;
 
             var blk = UnicodeBlock.GetBlockFor(codepoint);
-            return new UnicodeCodepoint(codepoint, string.Concat(blk.Name.ToUpperInvariant(), " - ", codepoint), UnicodeCategory.Unknown, UnicodeCombiningClass.NotReordered, 
+            return new UnicodeCodepoint(codepoint, string.Concat(blk.Name.ToUpperInvariant(), " - ", codepoint), UnicodeCategory.Unknown, UnicodeCombiningClass.NotReordered,
                 UnicodeBidirectionalityClass.Unknown, new UnicodeDecomposition(UnicodeDecompositionType.Unspecified, new string[0]), null, false, null, null, null, null, blk.Name, default);
         }
     }
@@ -1609,6 +1609,7 @@ namespace Emzi0767.CompanionCube
         /// Gets the stream containing decompressed data.
         /// </summary>
         private GZipStream SourceDecompressedStream { get; }
+
         /// <summary>
         /// Gets the mapping of string values to categories.
         /// </summary>
@@ -1717,7 +1718,7 @@ namespace Emzi0767.CompanionCube
                 if (!hans.TryGetValue(xrcp.Codepoint, out var unihan))
                     unihan = default;
 
-                cps[xrcp.Codepoint] = new UnicodeCodepoint(xrcp.Codepoint, xrcp.Name, cat, cmbc, bidic, unidec, numval, xrcp.BidiMirrored.ToLowerInvariant() == "Y", xrcp.OldUnicodeName, 
+                cps[xrcp.Codepoint] = new UnicodeCodepoint(xrcp.Codepoint, xrcp.Name, cat, cmbc, bidic, unidec, numval, xrcp.BidiMirrored.ToLowerInvariant() == "Y", xrcp.OldUnicodeName,
                     xrcp.SimpleUppercaseMapping.Trim(), xrcp.SimpleLowercaseMapping.Trim(), xrcp.SimpleTitlecaseMapping.Trim(), xrcp.BlockName, unihan);
             }
 
@@ -1725,10 +1726,10 @@ namespace Emzi0767.CompanionCube
             foreach (var xm in missing)
             {
                 var blk = UnicodeBlock.GetBlockFor(xm);
-                cps[xm] = new UnicodeCodepoint(xm, string.Concat(blk.Name.ToUpperInvariant(), " - ", xm), UnicodeCategory.Unknown, UnicodeCombiningClass.NotReordered, UnicodeBidirectionalityClass.Unknown, 
+                cps[xm] = new UnicodeCodepoint(xm, string.Concat(blk.Name.ToUpperInvariant(), " - ", xm), UnicodeCategory.Unknown, UnicodeCombiningClass.NotReordered, UnicodeBidirectionalityClass.Unknown,
                     new UnicodeDecomposition(UnicodeDecompositionType.Unspecified, new string[0]), null, false, null, null, null, null, blk.Name, hans[xm]);
             }
-            
+
             UnicodeCodepoint.SetCodepoints(cps.ToImmutable());
         }
 
@@ -1929,7 +1930,7 @@ namespace Emzi0767.CompanionCube
                 .Select(xi => (uint)(bts[xi * 4] | bts[xi * 4 + 1] << 8 | bts[xi * 4 + 2] << 16 | bts[xi * 4 + 3]))
                 .Select(xui => UnicodeCodepoint.GetCodepoint(xui));
         }
-        
+
         public static ImmutableDictionary<string, UnicodeCategory> BuildCategoryMap()
         {
             var db = ImmutableDictionary.CreateBuilder<string, UnicodeCategory>();
