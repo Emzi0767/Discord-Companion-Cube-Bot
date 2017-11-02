@@ -32,31 +32,23 @@ namespace Emzi0767.CompanionCube
             this.Permissions = permissions;
         }
 
-        public override async Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
+        public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
         {
             var app = ctx.Client.CurrentApplication;
             var me = ctx.Client.CurrentUser;
 
             if (app != null && ctx.User.Id == app.Owner.Id)
-                return true;
+                return Task.FromResult(true);
 
             if (ctx.User.Id == me.Id)
-                return true;
+                return Task.FromResult(true);
 
             var usr = ctx.Member;
             if (usr == null)
-                return false;
+                return Task.FromResult(false);
             var pusr = ctx.Channel.PermissionsFor(usr);
 
-            var bot = await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id);
-            if (bot == null)
-                return false;
-            var pbot = ctx.Channel.PermissionsFor(bot);
-
-            if ((pusr & this.Permissions) == this.Permissions && (pbot & this.Permissions) == this.Permissions)
-                return true;
-
-            return false;
+            return Task.FromResult((pusr & this.Permissions) == this.Permissions);
         }
     }
 }
