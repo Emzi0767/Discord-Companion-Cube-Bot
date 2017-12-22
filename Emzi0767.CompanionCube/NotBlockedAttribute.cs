@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Emzi0767.CompanionCube.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Emzi0767.CompanionCube
 {
@@ -28,7 +29,7 @@ namespace Emzi0767.CompanionCube
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
         {
-            var shared = ctx.Dependencies.GetDependency<SharedData>();
+            var shared = ctx.Services.GetService<SharedData>();
 
             if (shared.BlockedUsers.Contains(ctx.User.Id))
                 return Task.FromResult(false);

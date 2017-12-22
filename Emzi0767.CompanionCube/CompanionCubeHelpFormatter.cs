@@ -22,46 +22,47 @@ using DSharpPlus.Entities;
 
 namespace Emzi0767.CompanionCube
 {
-    public sealed class CompanionCubeHelpFormatter : IHelpFormatter
+    public sealed class CompanionCubeHelpFormatter : BaseHelpFormatter
     {
         private DefaultHelpFormatter _d;
 
-        public CompanionCubeHelpFormatter()
+        public CompanionCubeHelpFormatter(CommandsNextExtension cnext)
+            : base(cnext)
         {
-            this._d = new DefaultHelpFormatter();
+            this._d = new DefaultHelpFormatter(cnext);
         }
 
-        public IHelpFormatter WithCommandName(string name)
+        public override BaseHelpFormatter WithCommandName(string name)
         {
             return this._d.WithCommandName(name);
         }
 
-        public IHelpFormatter WithDescription(string description)
+        public override BaseHelpFormatter WithDescription(string description)
         {
             return this._d.WithDescription(description);
         }
 
-        public IHelpFormatter WithGroupExecutable()
+        public override BaseHelpFormatter WithGroupExecutable()
         {
             return this._d.WithGroupExecutable();
         }
 
-        public IHelpFormatter WithAliases(IEnumerable<string> aliases)
+        public override BaseHelpFormatter WithAliases(IEnumerable<string> aliases)
         {
             return this._d.WithAliases(aliases);
         }
 
-        public IHelpFormatter WithArguments(IEnumerable<CommandArgument> arguments)
+        public override BaseHelpFormatter WithArguments(IEnumerable<CommandArgument> arguments)
         {
             return this._d.WithArguments(arguments);
         }
 
-        public IHelpFormatter WithSubcommands(IEnumerable<Command> subcommands)
+        public override BaseHelpFormatter WithSubcommands(IEnumerable<Command> subcommands)
         {
             return this._d.WithSubcommands(subcommands);
         }
 
-        public CommandHelpMessage Build()
+        public override CommandHelpMessage Build()
         {
             var hmsg = this._d.Build();
             var embed = new DiscordEmbedBuilder(hmsg.Embed)

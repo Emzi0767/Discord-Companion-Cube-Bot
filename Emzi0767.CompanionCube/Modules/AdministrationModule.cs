@@ -17,6 +17,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
@@ -27,6 +28,7 @@ using Emzi0767.CompanionCube.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Emzi0767.CompanionCube.Modules
 {
@@ -192,7 +194,11 @@ namespace Emzi0767.CompanionCube.Modules
         public async Task NicknameAsync(CommandContext ctx, [Description("New nickname for the bot.")] string new_nickname = "")
         {
             var mbr = ctx.Guild.Members.FirstOrDefault(xm => xm.Id == ctx.Client.CurrentUser.Id) ?? await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id).ConfigureAwait(false);
-            await mbr.ModifyAsync(new_nickname, reason: string.Concat("Edited by ", ctx.User.Username, "#", ctx.User.Discriminator, " (", ctx.User.Id, ")")).ConfigureAwait(false);
+            await mbr.ModifyAsync(x =>
+            {
+                x.Nickname = new_nickname;
+                x.AuditLogReason = string.Concat("Edited by ", ctx.User.Username, "#", ctx.User.Discriminator, " (", ctx.User.Id, ")");
+            }).ConfigureAwait(false);
             await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
         }
 
@@ -361,12 +367,13 @@ namespace Emzi0767.CompanionCube.Modules
     {
         public CommandContext Context { get; }
 
-        public DiscordMessage Message { get { return this.Context.Message; } }
-        public DiscordChannel Channel { get { return this.Context.Channel; } }
-        public DiscordGuild Guild { get { return this.Context.Guild; } }
-        public DiscordUser User { get { return this.Context.User; } }
-        public DiscordMember Member { get { return this.Context.Member; } }
-        public DiscordClient Client { get { return this.Context.Client; } }
+        public DiscordMessage Message => this.Context.Message;
+        public DiscordChannel Channel => this.Context.Channel;
+        public DiscordGuild Guild => this.Context.Guild;
+        public DiscordUser User => this.Context.User;
+        public DiscordMember Member => this.Context.Member;
+        public DiscordClient Client => this.Context.Client;
+        public HttpClient Http => this.Context.Services.GetService<HttpClient>();
 
         public EvaluationEnvironment(CommandContext ctx)
         {
