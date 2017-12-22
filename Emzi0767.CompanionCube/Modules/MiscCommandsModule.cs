@@ -161,9 +161,12 @@ namespace Emzi0767.CompanionCube.Modules
                 if (emoji.Id == 0)
                     throw new InvalidOperationException("Cannot steal a unicode emoji.");
 
+                DiscordGuildEmoji nemoji = null;
                 using (var res = await this.Http.GetAsync(emoji.Url).ConfigureAwait(false))
                 using (var rss = await res.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                    await ctx.Guild.CreateEmojiAsync(name, rss, reason: $"{ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) stole a meme.").ConfigureAwait(false);
+                    nemoji = await ctx.Guild.CreateEmojiAsync(name, rss, reason: $"{ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) stole a meme.").ConfigureAwait(false);
+
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {nemoji}").ConfigureAwait(false);
             }
 
             [Command("install"), Description("Installs specified image as emote in this server.")]
@@ -185,9 +188,12 @@ namespace Emzi0767.CompanionCube.Modules
                     url = att.Url;
                 }
 
+                DiscordGuildEmoji nemoji = null;
                 using (var res = await this.Http.GetAsync(url).ConfigureAwait(false))
                 using (var rss = await res.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                    await ctx.Guild.CreateEmojiAsync(name, rss, reason: $"{ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) installed a meme.").ConfigureAwait(false);
+                    nemoji = await ctx.Guild.CreateEmojiAsync(name, rss, reason: $"{ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) installed a meme.").ConfigureAwait(false);
+
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {nemoji}").ConfigureAwait(false);
             }
 
             [Command("list"), Description("Lists all emotes in this server.")]
