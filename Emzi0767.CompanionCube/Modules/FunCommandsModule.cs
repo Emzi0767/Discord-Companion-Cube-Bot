@@ -56,7 +56,7 @@ namespace Emzi0767.CompanionCube.Modules
 
             await ctx.TriggerTypingAsync();
             var x = choices[this.RNG.Next(choices.Length)];
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":game_die:")} I choose...\n\n{x}");
+            await ctx.RespondAsync($"\u200b{x}");
         }
 
         [Command("dice"), Description("Roll dice!")]
