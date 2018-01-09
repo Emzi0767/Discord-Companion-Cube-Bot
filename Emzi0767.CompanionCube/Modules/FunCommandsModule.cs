@@ -48,7 +48,7 @@ namespace Emzi0767.CompanionCube.Modules
             this.RNG = rng;
         }
 
-        [Command("choice"), Aliases("pick"), Description("Chooses a random option from suppled ones.")]
+        [Command("choice"), Aliases("pick"), Description("Chooses a random option from supplied ones.")]
         public async Task ChoiceAsync(CommandContext ctx, [Description("Options to choose from.")] params string[] choices)
         {
             if (choices?.Any() != true)
@@ -57,6 +57,44 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.TriggerTypingAsync();
             var x = choices[this.RNG.Next(choices.Length)];
             await ctx.RespondAsync($"\u200b{x}");
+        }
+
+        [Command("choicex"), Aliases("pickx"), Description("Chooses a random option from supplied ones, specified number of times.")]
+        public async Task ChoiceAsync(CommandContext ctx, [Description("Number of times to perform the choice.")] int count, [Description("Options to choose from.")] params string[] choices)
+        {
+            if (count < 2 && count > 10)
+                throw new ArgumentOutOfRangeException(nameof(count), "You need to specify a number between 2 and 10 inclusive.");
+
+            if (choices?.Any() != true)
+                throw new ArgumentException("You need to specify at least 1 item to choose from.", nameof(choices));
+
+            await ctx.TriggerTypingAsync();
+
+            var choice = new string[count];
+            var sb = new StringBuilder();
+            for (var i = 0; i < count; i++)
+            {
+                choice[i] = choices[this.RNG.Next(choices.Length)];
+                sb.Append("Choice ").Append(i + 1).Append(": ").Append(choice[i]).Append("\n");
+            }
+
+            var top = choice.GroupBy(x => x)
+                .OrderByDescending(xg => xg.Count())
+                .GroupBy(xg => xg.Count())
+                .OrderByDescending(xg => xg.Key)
+                .First();
+
+            var topc = top.First().First();
+            if (top.Count() > 1)
+            {
+                // tie-breaker
+                var tie = top.Select(xg => xg.Key);
+                topc = tie.ElementAt(this.RNG.Next(0, tie.Count()));
+                sb.Append("Tie-breaker: ").Append(topc).Append("\n");
+            }
+
+            sb.Append("\nResult:\n").Append(topc);
+            await ctx.RespondAsync(sb.ToString());
         }
 
         [Command("dice"), Description("Roll dice!")]
