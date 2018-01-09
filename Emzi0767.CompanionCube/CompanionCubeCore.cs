@@ -83,7 +83,8 @@ namespace Emzi0767.CompanionCube
             var deps = new ServiceCollection()
                 .AddSingleton(this.Client)
                 .AddSingleton(this.Database)
-                .AddSingleton(this.Shared);
+                .AddSingleton(this.Shared)
+                .AddSingleton(new CSPRNG());
 
             // initialize cnext
             var ccfg = new CommandsNextConfiguration
