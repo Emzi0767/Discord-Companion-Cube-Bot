@@ -17,6 +17,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -141,6 +142,84 @@ namespace Emzi0767.CompanionCube.Modules
 
             var msg = await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
             await Task.Delay(2500).ContinueWith(t => msg.DeleteAsync());
+        }
+
+        [Group("emoji"), Aliases("emotes", "emote", "emojis"), Description("Commands for managing emoji."), OwnerOrPermission(Permissions.ManageEmojis)]
+        public class Emoji
+        {
+            public SharedData Shared { get; }
+            public HttpClient Http => this.Shared.Http;
+
+            public Emoji(SharedData shared)
+            {
+                this.Shared = shared;
+            }
+
+            [Command("steal"), Description("Installs specified emote on current server.")]
+            public async Task StealAsync(CommandContext ctx, DiscordEmoji emoji, string name)
+            {
+                if (emoji.Id == 0)
+                    throw new InvalidOperationException("Cannot steal a unicode emoji.");
+
+                DiscordGuildEmoji nemoji = null;
+                using (var res = await this.Http.GetAsync(emoji.Url).ConfigureAwait(false))
+                using (var rss = await res.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                    nemoji = await ctx.Guild.CreateEmojiAsync(name, rss, reason: $"{ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) stole a meme.").ConfigureAwait(false);
+
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {nemoji}").ConfigureAwait(false);
+            }
+
+            [Command("install"), Description("Installs specified image as emote in this server.")]
+            public async Task InstallAsync(CommandContext ctx, string name, [RemainingText] string url = null)
+            {
+                url = string.IsNullOrWhiteSpace(url) ? null : url;
+
+                if (url == null && !ctx.Message.Attachments.Any())
+                    throw new ArgumentNullException(nameof(url), "Need to specify a URL or add an attachment.");
+
+                if (url == null)
+                {
+                    var att = ctx.Message.Attachments.First();
+                    var fn = att.FileName.ToLowerInvariant();
+
+                    if (!(fn.EndsWith(".png") || fn.EndsWith(".gif")))
+                        throw new ArgumentException("Attachment needs to be a GIF or PNG image.", nameof(url));
+
+                    url = att.Url;
+                }
+
+                DiscordGuildEmoji nemoji = null;
+                using (var res = await this.Http.GetAsync(url).ConfigureAwait(false))
+                using (var rss = await res.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                    nemoji = await ctx.Guild.CreateEmojiAsync(name, rss, reason: $"{ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) installed a meme.").ConfigureAwait(false);
+
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {nemoji}").ConfigureAwait(false);
+            }
+
+            [Command("list"), Description("Lists all emotes in this server.")]
+            public async Task ListAsync(CommandContext ctx)
+            {
+                var ems = ctx.Guild.Emojis;
+                if (!ems.Any())
+                {
+                    await ctx.RespondAsync("There are no custom emotes in this server.");
+                    return;
+                }
+
+                var stems = ems.Where(xe => !xe.IsAnimated);
+                var anems = ems.Where(xe => xe.IsAnimated);
+                var embed = new DiscordEmbedBuilder
+                {
+                    Title = "Custom emotes in this server"
+                };
+
+                if (stems.Any())
+                    embed.AddField("Regular emotes", string.Join(" ", stems), false);
+                if (anems.Any())
+                    embed.AddField("Animated emotes", string.Join(" ", anems), false);
+
+                await ctx.RespondAsync(embed: embed.Build()).ConfigureAwait(false);
+            }
         }
     }
 }

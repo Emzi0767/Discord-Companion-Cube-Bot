@@ -26,18 +26,20 @@ using Newtonsoft.Json;
 
 namespace Emzi0767.CompanionCube
 {
-    internal static class Program
+    internal class Program
     {
-        private static List<CompanionCubeCore> Shards { get; set; }
-        private static DatabaseClient Database { get; set; }
-        private static SharedData Shared { get; set; }
+        private List<CompanionCubeCore> Shards { get; set; }
+        private DatabaseClient Database { get; set; }
+        private SharedData Shared { get; set; }
 
         internal static void Main(string[] args)
         {
-            MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
+            var exec = new AsyncExecutor();
+            var prog = new Program();
+            exec.Execute(prog.MainAsync(args));
         }
 
-        private static async Task MainAsync(string[] args)
+        private async Task MainAsync(string[] args)
         {
             Console.WriteLine("Loading Companion Cube...");
             Console.Write("[1/5] Loading configuration        ");
@@ -126,6 +128,9 @@ namespace Emzi0767.CompanionCube
 
             foreach (var shard in Shards)
                 await shard.StartAsync();
+
+            // do a minimal cleanup
+            GC.Collect();
 
             // wait forever
             await Task.Delay(-1);

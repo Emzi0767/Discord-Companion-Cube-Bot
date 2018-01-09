@@ -158,7 +158,7 @@ namespace Emzi0767.CompanionCube.Services
             return new ReadOnlyDictionary<ulong, string>(dict);
         }
 
-        public async Task SetChannelPrefixAsync(ulong channel_id, string prefix)
+        public async Task SetChannelPrefixAsync(ulong channelId, string prefix)
         {
             await this.Semaphore.WaitAsync();
 
@@ -170,7 +170,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "prefixes");
                 cmd.CommandText = string.Concat("INSERT INTO ", tbl, "(channel_id, guild_id, prefix) VALUES(@channel_id, NULL, @prefix) ON CONFLICT(channel_id) DO UPDATE SET prefix = EXCLUDED.prefix;");
 
-                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
+                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channelId);
                 cmd.Parameters.AddWithValue("prefix", NpgsqlDbType.Text, prefix);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -179,7 +179,7 @@ namespace Emzi0767.CompanionCube.Services
             this.Semaphore.Release();
         }
 
-        public async Task SetGuildPrefixAsync(ulong guild_id, string prefix)
+        public async Task SetGuildPrefixAsync(ulong guildId, string prefix)
         {
             await this.Semaphore.WaitAsync();
 
@@ -191,7 +191,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "prefixes");
                 cmd.CommandText = string.Concat("INSERT INTO ", tbl, "(channel_id, guild_id, prefix) VALUES(NULL, @guild_id, @prefix) ON CONFLICT(guild_id) DO UPDATE SET prefix = EXCLUDED.prefix;");
 
-                cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guild_id);
+                cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guildId);
                 cmd.Parameters.AddWithValue("prefix", NpgsqlDbType.Text, prefix);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -200,7 +200,7 @@ namespace Emzi0767.CompanionCube.Services
             this.Semaphore.Release();
         }
 
-        public async Task ResetChannelPrefixAsync(ulong channel_id)
+        public async Task ResetChannelPrefixAsync(ulong channelId)
         {
             await this.Semaphore.WaitAsync();
 
@@ -212,7 +212,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "prefixes");
                 cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WHERE channel_id = @channel_id;");
 
-                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
+                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channelId);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
@@ -220,7 +220,7 @@ namespace Emzi0767.CompanionCube.Services
             this.Semaphore.Release();
         }
 
-        public async Task ResetGuildPrefixAsync(ulong guild_id)
+        public async Task ResetGuildPrefixAsync(ulong guildId)
         {
             await this.Semaphore.WaitAsync();
 
@@ -232,7 +232,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "prefixes");
                 cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WHERE guild_id = @guild_id;");
 
-                cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guild_id);
+                cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guildId);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
@@ -312,7 +312,7 @@ namespace Emzi0767.CompanionCube.Services
             return new ReadOnlyCollection<ulong>(list);
         }
 
-        public async Task BlockUserAsync(ulong user_id)
+        public async Task BlockUserAsync(ulong userId)
         {
             await this.Semaphore.WaitAsync();
 
@@ -324,7 +324,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "blocked_users");
                 cmd.CommandText = string.Concat("INSERT INTO ", tbl, "(user_id) VALUES(@user_id) ON CONFLICT(user_id) DO NOTHING;");
 
-                cmd.Parameters.AddWithValue("user_id", NpgsqlDbType.Bigint, (long)user_id);
+                cmd.Parameters.AddWithValue("user_id", NpgsqlDbType.Bigint, (long)userId);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
@@ -332,7 +332,7 @@ namespace Emzi0767.CompanionCube.Services
             this.Semaphore.Release();
         }
 
-        public async Task UnblockUserAsync(ulong user_id)
+        public async Task UnblockUserAsync(ulong userId)
         {
             await this.Semaphore.WaitAsync();
 
@@ -344,7 +344,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "blocked_users");
                 cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WHERE user_id = @user_id;");
 
-                cmd.Parameters.AddWithValue("user_id", NpgsqlDbType.Bigint, (long)user_id);
+                cmd.Parameters.AddWithValue("user_id", NpgsqlDbType.Bigint, (long)userId);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
@@ -352,7 +352,7 @@ namespace Emzi0767.CompanionCube.Services
             this.Semaphore.Release();
         }
 
-        public async Task BlockChannelAsync(ulong channel_id)
+        public async Task BlockChannelAsync(ulong channelId)
         {
             await this.Semaphore.WaitAsync();
 
@@ -364,7 +364,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "blocked_channels");
                 cmd.CommandText = string.Concat("INSERT INTO ", tbl, "(channel_id) VALUES(@channel_id) ON CONFLICT(channel_id) DO NOTHING;");
 
-                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
+                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channelId);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
@@ -372,7 +372,7 @@ namespace Emzi0767.CompanionCube.Services
             this.Semaphore.Release();
         }
 
-        public async Task UnblockChannelAsync(ulong channel_id)
+        public async Task UnblockChannelAsync(ulong channelId)
         {
             await this.Semaphore.WaitAsync();
 
@@ -384,7 +384,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "blocked_channels");
                 cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WHERE channel_id = @channel_id;");
 
-                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
+                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channelId);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
@@ -392,7 +392,7 @@ namespace Emzi0767.CompanionCube.Services
             this.Semaphore.Release();
         }
 
-        public async Task BlockGuildAsync(ulong guild_id)
+        public async Task BlockGuildAsync(ulong guildId)
         {
             await this.Semaphore.WaitAsync();
 
@@ -404,7 +404,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "blocked_guilds");
                 cmd.CommandText = string.Concat("INSERT INTO ", tbl, "(guild_id) VALUES(@guild_id) ON CONFLICT(guild_id) DO NOTHING;");
 
-                cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guild_id);
+                cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guildId);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
@@ -412,7 +412,7 @@ namespace Emzi0767.CompanionCube.Services
             this.Semaphore.Release();
         }
 
-        public async Task UnblockGuildAsync(ulong guild_id)
+        public async Task UnblockGuildAsync(ulong guildId)
         {
             await this.Semaphore.WaitAsync();
 
@@ -424,7 +424,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "blocked_guilds");
                 cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WHERE guild_id = @guild_id;");
 
-                cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guild_id);
+                cmd.Parameters.AddWithValue("guild_id", NpgsqlDbType.Bigint, (long)guildId);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
@@ -566,7 +566,7 @@ namespace Emzi0767.CompanionCube.Services
             }
         }
 
-        public async Task<bool> CreateTagAsync(ulong author_id, ulong channel_id, string name, string contents)
+        public async Task<bool> CreateTagAsync(ulong authorId, ulong channelId, string name, string contents)
         {
             await this.Semaphore.WaitAsync();
             var success = false;
@@ -579,12 +579,12 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "tags");
                 cmd.CommandText = string.Concat("INSERT INTO ", tbl, "(channel_id, owner_id, name, contents, edits, editing_user_ids) VALUES(@channel_id, @owner_id, @name, @contents, @edits, @editing_user_ids) ON CONFLICT(channel_id, name) DO NOTHING;");
 
-                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
-                cmd.Parameters.AddWithValue("owner_id", NpgsqlDbType.Bigint, (long)author_id);
+                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channelId);
+                cmd.Parameters.AddWithValue("owner_id", NpgsqlDbType.Bigint, (long)authorId);
                 cmd.Parameters.AddWithValue("name", NpgsqlDbType.Text, name);
                 cmd.Parameters.AddWithValue("contents", NpgsqlDbType.Text | NpgsqlDbType.Array, new[] { contents });
                 cmd.Parameters.AddWithValue("edits", NpgsqlDbType.TimestampTZ | NpgsqlDbType.Array, new[] { DateTimeOffset.Now });
-                cmd.Parameters.AddWithValue("editing_user_ids", NpgsqlDbType.Bigint | NpgsqlDbType.Array, new[] { (long)author_id });
+                cmd.Parameters.AddWithValue("editing_user_ids", NpgsqlDbType.Bigint | NpgsqlDbType.Array, new[] { (long)authorId });
 
                 var affected = await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
                 if (affected > 0)
@@ -595,7 +595,7 @@ namespace Emzi0767.CompanionCube.Services
             return success;
         }
 
-        public async Task<TagResult> GetTagAsync(ulong channel_id, string name)
+        public async Task<TagResult> GetTagAsync(ulong channelId, string name)
         {
             await this.Semaphore.WaitAsync();
             var result = new TagResult { IsSuccess = false };
@@ -608,7 +608,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "tags");
                 cmd.CommandText = string.Concat("SELECT id, channel_id, owner_id, name, contents, edits, editing_user_ids, uses, hidden FROM ", tbl, " WHERE channel_id = @channel_id AND levenshtein(name, @name) < 3 LIMIT 5;");
 
-                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
+                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channelId);
                 cmd.Parameters.AddWithValue("name", NpgsqlDbType.Text, name);
 
                 using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
@@ -652,7 +652,7 @@ namespace Emzi0767.CompanionCube.Services
             return result;
         }
 
-        public async Task IncrementTagUsageAsync(long tag_id)
+        public async Task IncrementTagUsageAsync(long tagId)
         {
             await this.Semaphore.WaitAsync();
 
@@ -664,7 +664,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "tags");
                 cmd.CommandText = string.Concat("UPDATE ", tbl, " SET uses = uses + 1 WHERE id = @id;");
 
-                cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, tag_id);
+                cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, tagId);
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
@@ -672,7 +672,7 @@ namespace Emzi0767.CompanionCube.Services
             this.Semaphore.Release();
         }
 
-        public async Task<TagResult> ListTagsAsync(ulong channel_id, string name)
+        public async Task<TagResult> ListTagsAsync(ulong channelId, string name)
         {
             await this.Semaphore.WaitAsync();
             var result = new TagResult { };
@@ -688,14 +688,14 @@ namespace Emzi0767.CompanionCube.Services
                 {
                     cmd.CommandText = string.Concat("SELECT id, channel_id, owner_id, name, contents, edits, editing_user_ids, uses, hidden FROM ", tbl, " WHERE channel_id = @channel_id AND levenshtein(name, @name) < 3 LIMIT 15;");
 
-                    cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
+                    cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channelId);
                     cmd.Parameters.AddWithValue("name", NpgsqlDbType.Text, name);
                 }
                 else
                 {
                     cmd.CommandText = string.Concat("SELECT id, channel_id, owner_id, name, contents, edits, editing_user_ids, uses, hidden FROM ", tbl, " WHERE channel_id = @channel_id AND hidden IS NOT TRUE;");
 
-                    cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
+                    cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channelId);
                 }
 
                 using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
@@ -729,7 +729,7 @@ namespace Emzi0767.CompanionCube.Services
             return result;
         }
 
-        public async Task SetTagHiddenFlagAsync(ulong channel_id, string name, bool flag)
+        public async Task SetTagHiddenFlagAsync(ulong channelId, string name, bool flag)
         {
             await this.Semaphore.WaitAsync();
 
@@ -741,7 +741,7 @@ namespace Emzi0767.CompanionCube.Services
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "tags");
                 cmd.CommandText = string.Concat("UPDATE ", tbl, " SET hidden = @hidden WHERE channel_id = @channel_id AND name = @name;");
 
-                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channel_id);
+                cmd.Parameters.AddWithValue("channel_id", NpgsqlDbType.Bigint, (long)channelId);
                 cmd.Parameters.AddWithValue("name", NpgsqlDbType.Text, name);
                 cmd.Parameters.AddWithValue("hidden", NpgsqlDbType.Boolean, flag);
 
@@ -751,7 +751,7 @@ namespace Emzi0767.CompanionCube.Services
             this.Semaphore.Release();
         }
 
-        public async Task<bool> DeleteTagAsync(long id, ulong user_id, bool force)
+        public async Task<bool> DeleteTagAsync(long id, ulong userId, bool force)
         {
             await this.Semaphore.WaitAsync();
             var success = false;
@@ -769,7 +769,7 @@ namespace Emzi0767.CompanionCube.Services
                 else
                 {
                     cmd.CommandText = string.Concat("DELETE FROM ", tbl, " WHERE id = @id AND owner_id = @owner_id;");
-                    cmd.Parameters.AddWithValue("owner_id", NpgsqlDbType.Bigint, user_id);
+                    cmd.Parameters.AddWithValue("owner_id", NpgsqlDbType.Bigint, userId);
                 }
 
                 cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, id);
@@ -782,7 +782,7 @@ namespace Emzi0767.CompanionCube.Services
             return success;
         }
 
-        public async Task<bool> EditTagAsync(long id, ulong user_id, string contents, bool force)
+        public async Task<bool> EditTagAsync(long id, ulong userId, string contents, bool force)
         {
             await this.Semaphore.WaitAsync();
             var success = false;
@@ -805,7 +805,7 @@ namespace Emzi0767.CompanionCube.Services
                 cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, id);
                 cmd.Parameters.AddWithValue("contents", NpgsqlDbType.Text, contents);
                 cmd.Parameters.AddWithValue("edit", NpgsqlDbType.TimestampTZ, DateTimeOffset.Now);
-                cmd.Parameters.AddWithValue("editing_user", NpgsqlDbType.Bigint, (long)user_id);
+                cmd.Parameters.AddWithValue("editing_user", NpgsqlDbType.Bigint, (long)userId);
 
                 var res = await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
                 success = res > 0;

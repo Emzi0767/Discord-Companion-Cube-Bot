@@ -29,6 +29,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using Emzi0767.CompanionCube.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Emzi0767.CompanionCube
 {
@@ -48,14 +49,14 @@ namespace Emzi0767.CompanionCube
         public InteractivityExtension Interactivity { get; private set; }
         public DatabaseClient Database { get; }
 
-        public CompanionCubeCore(CompanionCubeConfig config, int shard_id, DatabaseClient database, SharedData shared_data)
+        public CompanionCubeCore(CompanionCubeConfig config, int shardId, DatabaseClient database, SharedData sharedData)
         {
             this.Configuration = config;
-            this.ShardId = shard_id;
+            this.ShardId = shardId;
             this.Database = database;
             this.RNGesus = RandomNumberGenerator.Create();
             
-            this.Shared = shared_data;
+            this.Shared = sharedData;
         }
 
         public void Initialize()
@@ -79,10 +80,10 @@ namespace Emzi0767.CompanionCube
             this.Client = new DiscordClient(dcfg);
 
             // initialize cnext dependencies
-            var deps = new DependencyCollectionBuilder()
-                .AddInstance(this.Client)
-                .AddInstance(this.Database)
-                .AddInstance(this.Shared);
+            var deps = new ServiceCollection()
+                .AddSingleton(this.Client)
+                .AddSingleton(this.Database)
+                .AddSingleton(this.Shared);
 
             // initialize cnext
             var ccfg = new CommandsNextConfiguration
@@ -92,8 +93,8 @@ namespace Emzi0767.CompanionCube
                 EnableDms = false,
                 DefaultHelpChecks = new List<CheckBaseAttribute>() { new NotBlockedAttribute() },
 
-                Dependencies = deps.Build(),
-                CustomPrefixPredicate = this.PrefixPredicateAsync,
+                Services = deps.BuildServiceProvider(),
+                PrefixResolver = this.PrefixResolverAsync,
                 EnableMentionPrefix = this.Configuration.EnableMentionPrefix,
             };
             this.CommandsNext = this.Client.UseCommandsNext(ccfg);
@@ -269,7 +270,7 @@ namespace Emzi0767.CompanionCube
                 await ea.Context.RespondAsync("", embed: embed.Build());
         }
 
-        private Task<int> PrefixPredicateAsync(DiscordMessage m)
+        private Task<int> PrefixResolverAsync(DiscordMessage m)
         {
             if (!this.Shared.GuildPrefixes.TryGetValue(m.Channel.Guild.Id, out var prefix) && !this.Shared.ChannelPrefixes.TryGetValue(m.Channel.Id, out prefix))
                 prefix = this.Configuration.DefaultCommandPrefix;
@@ -281,7 +282,7 @@ namespace Emzi0767.CompanionCube
             var client = _ as DiscordClient;
             try
             {
-                client.UpdateStatusAsync(new DiscordGame(this.Shared.Game)).ConfigureAwait(false).GetAwaiter().GetResult();
+                client.UpdateStatusAsync(new DiscordActivity(this.Shared.Game)).ConfigureAwait(false).GetAwaiter().GetResult();
                 client.DebugLogger.LogMessage(LogLevel.Info, LOG_TAG, "Presence updated", DateTime.Now);
             }
             catch (Exception) 

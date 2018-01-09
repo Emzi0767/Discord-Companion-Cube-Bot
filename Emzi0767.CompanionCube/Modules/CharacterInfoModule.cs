@@ -75,7 +75,7 @@ namespace Emzi0767.CompanionCube.Modules
             }
             else
             {
-                var interact = ctx.Client.GetInteractivityModule();
+                var interact = ctx.Client.GetInteractivity();
                 await interact.SendPaginatedMessage(ctx.Channel, ctx.User, pgs).ConfigureAwait(false);
             }
         }
@@ -178,7 +178,7 @@ namespace Emzi0767.CompanionCube.Modules
             }
             else
             {
-                var interact = ctx.Client.GetInteractivityModule();
+                var interact = ctx.Client.GetInteractivity();
                 await interact.SendPaginatedMessage(ctx.Channel, ctx.User, pgs).ConfigureAwait(false);
             }
         }

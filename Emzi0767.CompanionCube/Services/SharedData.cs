@@ -34,16 +34,16 @@ namespace Emzi0767.CompanionCube.Services
         public string Game { get; }
         public HttpClient Http { get; }
 
-        public SharedData(ConcurrentDictionary<ulong, string> cprefixes, ConcurrentDictionary<ulong, string> gprefixes, ConcurrentHashSet<ulong> blocked_users, ConcurrentHashSet<ulong> blocked_channels, 
-            ConcurrentHashSet<ulong> blocked_guilds, string currency_symbol, DateTime process_started, string game)
+        public SharedData(ConcurrentDictionary<ulong, string> cprefixes, ConcurrentDictionary<ulong, string> gprefixes, ConcurrentHashSet<ulong> blockedUsers, ConcurrentHashSet<ulong> blockedChannels, 
+            ConcurrentHashSet<ulong> blockedGuilds, string currencySymbol, DateTime processStarted, string game)
         {
             this.ChannelPrefixes = cprefixes;
             this.GuildPrefixes = gprefixes;
-            this.BlockedUsers = blocked_users;
-            this.BlockedChannels = blocked_channels;
-            this.BlockedGuilds = blocked_guilds;
-            this.CurrencySymbol = currency_symbol;
-            this.ProcessStarted = process_started;
+            this.BlockedUsers = blockedUsers;
+            this.BlockedChannels = blockedChannels;
+            this.BlockedGuilds = blockedGuilds;
+            this.CurrencySymbol = currencySymbol;
+            this.ProcessStarted = processStarted;
             this.Game = game;
             this.Http = new HttpClient();
         }
