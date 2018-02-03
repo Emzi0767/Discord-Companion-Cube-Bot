@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # This file is part of Emzi0767.CompanionCube project
 #
 # Copyright 2017 Emzi0767
