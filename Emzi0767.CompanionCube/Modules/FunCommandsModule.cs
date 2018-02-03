@@ -34,7 +34,7 @@ using Emzi0767.CompanionCube.Services;
 namespace Emzi0767.CompanionCube.Modules
 {
     [Group("fun"), Description("Commands for fun and great justice."), NotBlocked]
-    public class FunCommandsModule
+    public class FunCommandsModule : BaseCommandModule
     {
         private DatabaseClient Database { get; }
         private SharedData Shared { get; }
