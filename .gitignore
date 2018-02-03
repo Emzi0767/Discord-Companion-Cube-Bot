@@ -261,7 +261,9 @@ __pycache__/
 *.pyc
 
 # VS Code
-.vscode
+#.vscode
+# Actually no - since I will be working on my laptop quite a bit now
+# That can really only use Code
 
 # Config files
 Emzi0767.CompanionCube/config.json
