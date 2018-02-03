@@ -205,7 +205,7 @@ namespace Emzi0767.CompanionCube.Modules
         [Group("prefix"), Description("Commands for managing bot's command prefixes.")]
         public sealed class PrefixAdministration : BaseCommandModule
         {
-            private static readonly string alphabet = "abcdefghijklmnopqrstuvwxyzABCEDFGHIJKLMNOPQRSTUVWXYZ0123456789<>,./?;:'\"\\|[{]}=+-_!@#$%^&*()€";
+            private static readonly string alphabet = "abcdefghijklmnopqrstuvwxyzABCEDFGHIJKLMNOPQRSTUVWXYZ0123456789<>,./?;:'\"\\|[{]}=+-_!@#$%^&*()€ ";
 
             private DatabaseClient Database { get; }
             private SharedData Shared { get; }
@@ -217,14 +217,14 @@ namespace Emzi0767.CompanionCube.Modules
             }
 
             [Command("channel"), Description("Sets a new prefix for the channel the command is invoked in."), OwnerOrPermission(Permissions.ManageChannels)]
-            public async Task ChannelAsync(CommandContext ctx, [RemainingText, Description("New prefix for this channel. Specifying null, empty string, or no value will reset the prefix.")] string new_prefix = null)
+            public async Task ChannelAsync(CommandContext ctx, [Description("New prefix for this channel. Specifying null, empty string, or no value will reset the prefix.")] string new_prefix = null)
             {
                 if (string.IsNullOrWhiteSpace(new_prefix))
                 {
                     await this.Database.ResetChannelPrefixAsync(ctx.Channel.Id).ConfigureAwait(false);
                     this.Shared.ChannelPrefixes.TryRemove(ctx.Channel.Id, out _);
                 }
-                else if (new_prefix.Length > 6 || !new_prefix.All(xc => alphabet.Contains(xc)))
+                else if (new_prefix.Length > 60 || !new_prefix.All(xc => alphabet.Contains(xc)))
                 {
                     throw new ArgumentException("Prefix must be less than or 6 characters long, and can consist only of characters available on the standard US keyboard.", nameof(new_prefix));
                 }
@@ -238,14 +238,14 @@ namespace Emzi0767.CompanionCube.Modules
             }
 
             [Command("guild"), Description("Sets a new prefix for the guild the command is invoked in."), OwnerOrPermission(Permissions.ManageGuild)]
-            public async Task GuildAsync(CommandContext ctx, [RemainingText, Description("New prefix for this guild. Specifying null, empty string, or no value will reset the prefix.")] string new_prefix = null)
+            public async Task GuildAsync(CommandContext ctx, [Description("New prefix for this guild. Specifying null, empty string, or no value will reset the prefix.")] string new_prefix = null)
             {
                 if (string.IsNullOrWhiteSpace(new_prefix))
                 {
                     await this.Database.ResetGuildPrefixAsync(ctx.Guild.Id).ConfigureAwait(false);
                     this.Shared.GuildPrefixes.TryRemove(ctx.Guild.Id, out _);
                 }
-                else if (new_prefix.Length > 6 || !new_prefix.All(xc => alphabet.Contains(xc)))
+                else if (new_prefix.Length > 60 || !new_prefix.All(xc => alphabet.Contains(xc)))
                 {
                     throw new ArgumentException("Prefix must be less than or 6 characters long, and can consist only of characters available on the standard US keyboard.", nameof(new_prefix));
                 }
