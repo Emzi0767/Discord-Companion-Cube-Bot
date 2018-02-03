@@ -32,31 +32,11 @@ namespace Emzi0767.CompanionCube
             this._d = new DefaultHelpFormatter(cnext);
         }
 
-        public override BaseHelpFormatter WithCommandName(string name)
+        public override BaseHelpFormatter WithCommand(Command command)
         {
-            return this._d.WithCommandName(name);
+            return this._d.WithCommand(command);
         }
-
-        public override BaseHelpFormatter WithDescription(string description)
-        {
-            return this._d.WithDescription(description);
-        }
-
-        public override BaseHelpFormatter WithGroupExecutable()
-        {
-            return this._d.WithGroupExecutable();
-        }
-
-        public override BaseHelpFormatter WithAliases(IEnumerable<string> aliases)
-        {
-            return this._d.WithAliases(aliases);
-        }
-
-        public override BaseHelpFormatter WithArguments(IEnumerable<CommandArgument> arguments)
-        {
-            return this._d.WithArguments(arguments);
-        }
-
+        
         public override BaseHelpFormatter WithSubcommands(IEnumerable<Command> subcommands)
         {
             return this._d.WithSubcommands(subcommands);

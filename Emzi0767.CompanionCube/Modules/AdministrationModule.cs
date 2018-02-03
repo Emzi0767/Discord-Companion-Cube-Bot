@@ -33,7 +33,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Emzi0767.CompanionCube.Modules
 {
     [Group("admin"), Aliases("botctl"), Description("Commands for controlling the bot's behaviour."), OwnerOrPermission(Permissions.ManageGuild)]
-    public sealed class AdministrationModule
+    public sealed class AdministrationModule : BaseCommandModule
     {
         private DatabaseClient Database { get; }
         private SharedData Shared { get; }
@@ -203,7 +203,7 @@ namespace Emzi0767.CompanionCube.Modules
         }
 
         [Group("prefix"), Description("Commands for managing bot's command prefixes.")]
-        public sealed class PrefixAdministration
+        public sealed class PrefixAdministration : BaseCommandModule
         {
             private static readonly string alphabet = "abcdefghijklmnopqrstuvwxyzABCEDFGHIJKLMNOPQRSTUVWXYZ0123456789<>,./?;:'\"\\|[{]}=+-_!@#$%^&*()€";
 
@@ -260,7 +260,7 @@ namespace Emzi0767.CompanionCube.Modules
         }
 
         [Group("user"), Description("Commands for blocking and unblocking users from using the bot."), Hidden, RequireOwner]
-        public sealed class UserAdministration
+        public sealed class UserAdministration : BaseCommandModule
         {
             private DatabaseClient Database { get; }
             private SharedData Shared { get; }
@@ -289,7 +289,7 @@ namespace Emzi0767.CompanionCube.Modules
         }
 
         [Group("channel"), Description("Commands for blocking and unblocking bot from listening in specific channels."), OwnerOrPermission(Permissions.ManageChannels)]
-        public sealed class ChannelAdministration
+        public sealed class ChannelAdministration : BaseCommandModule
         {
             private DatabaseClient Database { get; }
             private SharedData Shared { get; }
@@ -334,7 +334,7 @@ namespace Emzi0767.CompanionCube.Modules
         }
 
         [Group("guild"), Description("Commands for blocking and unblocking the bot from listening in specific guilds."), Hidden, RequireOwner]
-        public sealed class GuildAdministration
+        public sealed class GuildAdministration : BaseCommandModule
         {
             private DatabaseClient Database { get; }
             private SharedData Shared { get; }
@@ -358,6 +358,26 @@ namespace Emzi0767.CompanionCube.Modules
             {
                 await this.Database.UnblockGuildAsync(guild.Id).ConfigureAwait(false);
                 this.Shared.BlockedGuilds.TryRemove(guild.Id);
+                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+            }
+
+            [Command, Description("Changes the rate at which messages in this guild emit currency.")]
+            public async Task ShekelRateAsync(CommandContext ctx, [Description("New rate in percents / 100. E.g. to set a rate of 50%, you would specify 0.5. Not specifying a value resets the rate to 5%.")] double? newRate = null)
+            {
+                if (newRate != null && (newRate > 1 || newRate < 0))
+                    throw new ArgumentOutOfRangeException(nameof(newRate), "The rate needs to be between 0 and 100% inclusive.");
+
+                if (newRate == null)
+                {
+                    await this.Database.ResetShekelRateAsync(ctx.Guild.Id);
+                    this.Shared.ShekelRates.TryRemove(ctx.Guild.Id, out _);
+                }
+                else
+                {
+                    await this.Database.SetShekelRateAsync(ctx.Guild.Id, newRate.Value);
+                    this.Shared.ShekelRates.AddOrUpdate(ctx.Guild.Id, newRate.Value, (k, o) => newRate.Value);
+                }
+
                 await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
             }
         }

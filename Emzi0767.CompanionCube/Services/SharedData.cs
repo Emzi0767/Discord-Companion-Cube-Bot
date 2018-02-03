@@ -26,6 +26,7 @@ namespace Emzi0767.CompanionCube.Services
     {
         public ConcurrentDictionary<ulong, string> ChannelPrefixes { get; }
         public ConcurrentDictionary<ulong, string> GuildPrefixes { get; }
+        public ConcurrentDictionary<ulong, double> ShekelRates { get; }
         public ConcurrentHashSet<ulong> BlockedUsers { get; }
         public ConcurrentHashSet<ulong> BlockedChannels { get; }
         public ConcurrentHashSet<ulong> BlockedGuilds { get; }
@@ -35,7 +36,7 @@ namespace Emzi0767.CompanionCube.Services
         public HttpClient Http { get; }
 
         public SharedData(ConcurrentDictionary<ulong, string> cprefixes, ConcurrentDictionary<ulong, string> gprefixes, ConcurrentHashSet<ulong> blockedUsers, ConcurrentHashSet<ulong> blockedChannels, 
-            ConcurrentHashSet<ulong> blockedGuilds, string currencySymbol, DateTime processStarted, string game)
+            ConcurrentHashSet<ulong> blockedGuilds, string currencySymbol, DateTime processStarted, string game, ConcurrentDictionary<ulong, double> shekelRates)
         {
             this.ChannelPrefixes = cprefixes;
             this.GuildPrefixes = gprefixes;
@@ -46,6 +47,7 @@ namespace Emzi0767.CompanionCube.Services
             this.ProcessStarted = processStarted;
             this.Game = game;
             this.Http = new HttpClient();
+            this.ShekelRates = shekelRates;
         }
 
         public string TimeSpanToString(TimeSpan ts)

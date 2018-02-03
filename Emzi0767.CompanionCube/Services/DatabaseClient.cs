@@ -784,7 +784,7 @@ namespace Emzi0767.CompanionCube.Services
 
         public async Task<bool> EditTagAsync(long id, ulong userId, string contents, bool force)
         {
-            await this.Semaphore.WaitAsync();
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
             var success = false;
 
             using (var con = new NpgsqlConnection(this.ConnectionString))
@@ -813,6 +813,68 @@ namespace Emzi0767.CompanionCube.Services
 
             this.Semaphore.Release();
             return success;
+        }
+
+        public async Task<Dictionary<ulong, double>> GetShekelRatesAsync()
+        {
+            var dict = new Dictionary<ulong, double>();
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
+
+            using (var con = new NpgsqlConnection(this.ConnectionString))
+            using (var cmd = con.CreateCommand())
+            {
+                await con.OpenAsync().ConfigureAwait(false);
+                var tbl = string.Concat(this.Configuration.TableNamePrefix, "shekelrates");
+
+                cmd.CommandText = string.Concat("select * from ", tbl, ";");
+                using (var rdr = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
+                    while (await rdr.ReadAsync().ConfigureAwait(false))
+                        dict[(ulong)(long)rdr["guild_id"]] = (double)rdr["rate"];
+            }
+
+            this.Semaphore.Release();
+            return dict;
+        }
+
+        public async Task SetShekelRateAsync(ulong guildId, double rate)
+        {
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
+
+            using (var con = new NpgsqlConnection(this.ConnectionString))
+            using (var cmd = con.CreateCommand())
+            {
+                await con.OpenAsync().ConfigureAwait(false);
+                var tbl = string.Concat(this.Configuration.TableNamePrefix, "shekelrates");
+
+                cmd.CommandText = string.Concat("insert into ", tbl, "(guild_id, rate) values(@id, @rate) on conflict(guild_id) do update set rate=excluded.rate;");
+
+                cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, (long)guildId);
+                cmd.Parameters.AddWithValue("rate", NpgsqlDbType.Double, rate);
+                
+                await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+            }
+
+            this.Semaphore.Release();
+        }
+
+        public async Task ResetShekelRateAsync(ulong guildId)
+        {
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
+
+            using (var con = new NpgsqlConnection(this.ConnectionString))
+            using (var cmd = con.CreateCommand())
+            {
+                await con.OpenAsync().ConfigureAwait(false);
+                var tbl = string.Concat(this.Configuration.TableNamePrefix, "shekelrates");
+
+                cmd.CommandText = string.Concat("delete from ", tbl, " where guild_id=@id;");
+
+                cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, (long)guildId);
+                
+                await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+            }
+
+            this.Semaphore.Release();
         }
     }
 }

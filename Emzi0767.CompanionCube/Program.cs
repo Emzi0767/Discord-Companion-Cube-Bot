@@ -108,9 +108,15 @@ namespace Emzi0767.CompanionCube
             foreach (var bguild in bguilds_db)
                 bguilds.TryAdd(bguild);
 
+            // get shekel rates
+            var shekelrates_db = await Database.GetShekelRatesAsync();
+            var shekelrates = new ConcurrentDictionary<ulong, double>();
+            foreach (var (k, v) in shekelrates_db)
+                shekelrates[k] = v;
+
             var proc = Process.GetCurrentProcess();
 
-            Shared = new SharedData(cpfixes, gpfixes, busers, bchans, bguilds, cfg.CurrencySymbol, proc.StartTime, cfg.Game);
+            Shared = new SharedData(cpfixes, gpfixes, busers, bchans, bguilds, cfg.CurrencySymbol, proc.StartTime, cfg.Game, shekelrates);
 
             Console.Write("\r[5/5] Creating shards              ");
 

@@ -32,7 +32,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 namespace Emzi0767.CompanionCube.Modules
 {
     [NotBlocked]
-    public sealed class MiscCommandsModule
+    public sealed class MiscCommandsModule : BaseCommandModule
     {
         private DatabaseClient Database { get; }
         private SharedData Shared { get; }
@@ -120,7 +120,7 @@ namespace Emzi0767.CompanionCube.Modules
             var lid = 0ul;
             for (var i = 0; i < max_count; i += 100)
             {
-                var msgs = await ctx.Channel.GetMessagesAsync(Math.Min(max_count - i, 100), before: lid != 0 ? (ulong?)lid : null).ConfigureAwait(false);
+                var msgs = await ctx.Channel.GetMessagesBeforeAsync(lid != 0 ? lid : ctx.Message.Id, Math.Min(max_count - i, 100)).ConfigureAwait(false);
                 var msgsf = msgs.Where(xm => xm.Author.Id == ctx.Client.CurrentUser.Id).OrderBy(xm => xm.Id);
 
                 var lmsg = msgsf.FirstOrDefault();
@@ -145,7 +145,7 @@ namespace Emzi0767.CompanionCube.Modules
         }
 
         [Group("emoji"), Aliases("emotes", "emote", "emojis"), Description("Commands for managing emoji."), OwnerOrPermission(Permissions.ManageEmojis)]
-        public class Emoji
+        public class Emoji : BaseCommandModule
         {
             public SharedData Shared { get; }
             public HttpClient Http => this.Shared.Http;

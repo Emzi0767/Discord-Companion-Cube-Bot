@@ -23,8 +23,8 @@ using Emzi0767.CompanionCube.Services;
 
 namespace Emzi0767.CompanionCube.Modules
 {
-    [Group("currency", CanInvokeWithoutSubcommand = true), Aliases("money", "shekels"), Description("Currency-related commands. Invoking without subcommands will show current balance."), NotBlocked]
-    public sealed class CurrencyModule
+    [Group("currency"), Aliases("money", "shekels"), Description("Currency-related commands. Invoking without subcommands will show current balance."), NotBlocked]
+    public sealed class CurrencyModule : BaseCommandModule
     {
         private DatabaseClient Database { get; }
         private SharedData Shared { get; }
@@ -73,6 +73,7 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
+        [GroupCommand]
         public async Task ExecuteGroupAsync(CommandContext ctx, [Description("Member to check balance for. If not specified, defaults to invoker.")] DiscordMember mbr = null)
         {
             var usr = mbr ?? ctx.Member;

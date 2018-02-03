@@ -188,11 +188,15 @@ namespace Emzi0767.CompanionCube
         {
             if (ea.Channel.Type != ChannelType.Text || ea.Guild == null || ea.Author.IsBot || this.Shared.BlockedChannels.Contains(ea.Channel.Id) || this.Shared.BlockedGuilds.Contains(ea.Guild.Id))
                 return; // nothing to see here, move along
+
+            var rates = this.Shared.ShekelRates;
+            if (!rates.TryGetValue(ea.Guild.Id, out var rate))
+                rate = 0.05;
             
             var b = new byte[4];
             this.RNGesus.GetBytes(b);
             var d = (double)BitConverter.ToUInt32(b, 0) / (double)uint.MaxValue;
-            if (d >= 0.95)
+            if (d >= (1.0 - rate))
                 await this.Database.IssueCurrencyAsync(ea.Author.Id, 1);
         }
 

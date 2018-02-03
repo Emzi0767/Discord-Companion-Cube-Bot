@@ -27,8 +27,8 @@ using Emzi0767.CompanionCube.Services;
 
 namespace Emzi0767.CompanionCube.Modules
 {
-    [Group("tag", CanInvokeWithoutSubcommand = true), Description("Tag commands. Invoking without a subcommand will display requested tag."), NotBlocked]
-    public sealed class TagModule
+    [Group("tag"), Description("Tag commands. Invoking without a subcommand will display requested tag."), NotBlocked]
+    public sealed class TagModule : BaseCommandModule
     {
         private static string[] ForbiddenNames { get; } = new[] { "create", "make", "delete", "remove", "force_delete", "force_remove", "edit", "modify", "force_edit", "force_modify", "history", "view_edit", "alias", "dump", "raw", "info", "approve", "unapprove", "list" };
 
@@ -467,6 +467,7 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
         }
 
+        [GroupCommand]
         public async Task ExecuteGroupAsync(CommandContext ctx, [RemainingText, Description("Name of the tag to display.")] string name)
         {
             if (string.IsNullOrWhiteSpace(name) || ForbiddenNames.Contains(name.ToLower()))
@@ -507,7 +508,7 @@ namespace Emzi0767.CompanionCube.Modules
     }
 
     [NotBlocked]
-    public sealed class TagsModule
+    public sealed class TagsModule : BaseCommandModule
     {
         [Command("tags"), Description("Lists tags, optionally specifying a search query.")]
         public async Task TagsAsync(CommandContext ctx, [RemainingText, Description("Optional, tag name to search for.")] string like)

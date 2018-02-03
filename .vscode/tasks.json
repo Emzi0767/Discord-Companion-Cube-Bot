@@ -7,7 +7,10 @@
             "label": "build",
             "command": "dotnet build -c Debug",
             "type": "shell",
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "presentation": {
                 "reveal": "silent"
             },
@@ -16,6 +19,16 @@
         {
             "label": "buildRelease",
             "command": "dotnet build -c Release",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet publish -c Release",
             "type": "shell",
             "group": "build",
             "presentation": {
