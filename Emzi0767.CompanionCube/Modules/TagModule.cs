@@ -30,7 +30,7 @@ namespace Emzi0767.CompanionCube.Modules
     [Group("tag"), Description("Tag commands. Invoking without a subcommand will display requested tag."), NotBlocked]
     public sealed class TagModule : BaseCommandModule
     {
-        private static string[] ForbiddenNames { get; } = new[] { "create", "make", "delete", "remove", "force_delete", "force_remove", "edit", "modify", "force_edit", "force_modify", "history", "view_edit", "alias", "dump", "raw", "info", "approve", "unapprove", "list" };
+        private static string[] ForbiddenNames { get; } = new[] { "create", "make", "delete", "remove", "force_delete", "force_remove", "edit", "modify", "force_edit", "force_modify", "history", "view_edit", "alias", "dump", "raw", "info", "approve", "unapprove", "list", "@everyone", "@here" };
 
         private DatabaseClient Database { get; }
         private SharedData Shared { get; }

@@ -55,7 +55,7 @@ namespace Emzi0767.CompanionCube.Modules
                 throw new ArgumentException("You need to specify at least 1 item to choose from.", nameof(choices));
 
             await ctx.TriggerTypingAsync();
-            var x = choices[this.RNG.Next(choices.Length)];
+            var x = choices[this.RNG.Next(choices.Length)].Replace("@everyone", "@\u200beveryone").Replace("@here", "@\u200bhere");
             await ctx.RespondAsync($"\u200b{x}");
         }
 
@@ -74,7 +74,7 @@ namespace Emzi0767.CompanionCube.Modules
             var sb = new StringBuilder();
             for (var i = 0; i < count; i++)
             {
-                choice[i] = choices[this.RNG.Next(choices.Length)];
+                choice[i] = choices[this.RNG.Next(choices.Length)].Replace("@everyone", "@\u200beveryone").Replace("@here", "@\u200bhere");
                 sb.Append("Choice ").Append(i + 1).Append(": ").Append(choice[i]).Append("\n");
             }
 
@@ -84,7 +84,7 @@ namespace Emzi0767.CompanionCube.Modules
                 .OrderByDescending(xg => xg.Key)
                 .First();
 
-            var topc = top.First().First();
+            var topc = top.First().First().Replace("@everyone", "@\u200beveryone").Replace("@here", "@\u200bhere");
             if (top.Count() > 1)
             {
                 // tie-breaker
