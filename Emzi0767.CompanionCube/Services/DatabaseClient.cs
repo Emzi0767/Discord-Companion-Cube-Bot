@@ -304,7 +304,7 @@ namespace Emzi0767.CompanionCube.Services
                 using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
                 {
                     while (await reader.ReadAsync().ConfigureAwait(false))
-                        list.Add((ulong)(long)reader["guilds_id"]);
+                        list.Add((ulong)(long)reader["guild_id"]);
                 }
             }
             
