@@ -364,7 +364,7 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync(cntnt, embed: embed != null ? embed.Build() : null).ConfigureAwait(false);
+            await ctx.RespondAsync(cntnt.Replace("@everyone", "@\u200beveryone").Replace("@here", "@\u200bhere"), embed: embed != null ? embed.Build() : null).ConfigureAwait(false);
         }
 
         [Command("info"), Description("Views information about a tag.")]
@@ -503,11 +503,11 @@ namespace Emzi0767.CompanionCube.Modules
                 embed.Color = new DiscordColor(0xFF0000);
             }
 
-            await ctx.RespondAsync(cntnt, embed: embed != null ? embed.Build() : null).ConfigureAwait(false);
+            await ctx.RespondAsync(cntnt.Replace("@everyone", "@\u200beveryone").Replace("@here", "@\u200bhere"), embed: embed != null ? embed.Build() : null).ConfigureAwait(false);
         }
     }
 
-    [NotBlocked]
+    [NotBlocked, ModuleLifespan(ModuleLifespan.Transient)]
     public sealed class TagsModule : BaseCommandModule
     {
         [Command("tags"), Description("Lists tags, optionally specifying a search query.")]
