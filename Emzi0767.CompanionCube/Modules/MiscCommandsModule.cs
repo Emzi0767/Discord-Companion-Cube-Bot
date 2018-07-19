@@ -94,7 +94,7 @@ namespace Emzi0767.CompanionCube.Modules
             };
 
             embed.AddField("Bot Version", string.Concat(DiscordEmoji.FromName(ctx.Client, ":companion_cube:"), " ", Formatter.Bold(ccv)), true)
-                .AddField("DSharpPlus Version", string.Concat(DiscordEmoji.FromName(ctx.Client, ":dsplus:"), " ", Formatter.Bold(dsv)), true)
+                .AddField("DSharpPlus Version", string.Concat(DiscordEmoji.FromName(ctx.Client, ":dsharpplus:"), " ", Formatter.Bold(dsv)), true)
                 .AddField(".NET Core Version", string.Concat(DiscordEmoji.FromName(ctx.Client, ":dotnet:"), " ", Formatter.Bold(ncv)), true);
 
             await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
