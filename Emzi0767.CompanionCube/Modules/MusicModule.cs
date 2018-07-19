@@ -67,6 +67,8 @@ namespace Emzi0767.CompanionCube.Modules
 
             var gmd = this.MusicQueues[ctx.Guild.Id];
 
+            if (source.StartsWith('<') && source.EndsWith('>'))
+                source = source.Substring(1, source.Length - 2);
             var tracks = await this.Lavalink.GetTracksAsync(new Uri(source));
             if (!tracks.Any())
             {
