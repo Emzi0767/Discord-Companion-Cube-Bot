@@ -202,6 +202,13 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
         }
 
+        [Command("music"), Description("Sets whether music in the current guild shall be available or not."), RequireOwner]
+        public async Task MusicAsync(CommandContext ctx, bool enabled)
+        {
+            await this.Database.SetMusicOptionAsync(ctx.Guild.Id, enabled).ConfigureAwait(false);
+            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+        }
+
         [Group("prefix"), Description("Commands for managing bot's command prefixes.")]
         public sealed class PrefixAdministration : BaseCommandModule
         {

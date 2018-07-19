@@ -19,6 +19,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using DSharpPlus.Net.Udp;
 
 namespace Emzi0767.CompanionCube.Services
 {
@@ -34,9 +35,12 @@ namespace Emzi0767.CompanionCube.Services
         public DateTime ProcessStarted { get; }
         public string Game { get; }
         public HttpClient Http { get; }
+        public ConnectionEndpoint LavalinkEndpoint { get; }
+        public CompanionCubeLavalinkConfig LavalinkConfiguration { get; }
 
         public SharedData(ConcurrentDictionary<ulong, string> cprefixes, ConcurrentDictionary<ulong, string> gprefixes, ConcurrentHashSet<ulong> blockedUsers, ConcurrentHashSet<ulong> blockedChannels, 
-            ConcurrentHashSet<ulong> blockedGuilds, string currencySymbol, DateTime processStarted, string game, ConcurrentDictionary<ulong, double> shekelRates)
+            ConcurrentHashSet<ulong> blockedGuilds, string currencySymbol, DateTime processStarted, string game, ConcurrentDictionary<ulong, double> shekelRates, ConnectionEndpoint lavalinkEndpoint,
+            CompanionCubeLavalinkConfig lavalinkConfig)
         {
             this.ChannelPrefixes = cprefixes;
             this.GuildPrefixes = gprefixes;
@@ -48,6 +52,8 @@ namespace Emzi0767.CompanionCube.Services
             this.Game = game;
             this.Http = new HttpClient();
             this.ShekelRates = shekelRates;
+            this.LavalinkEndpoint = lavalinkEndpoint;
+            this.LavalinkConfiguration = lavalinkConfig;
         }
 
         public string TimeSpanToString(TimeSpan ts)

@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using DSharpPlus.Net.Udp;
 using Emzi0767.CompanionCube.Services;
 using Newtonsoft.Json;
 
@@ -116,7 +117,8 @@ namespace Emzi0767.CompanionCube
 
             var proc = Process.GetCurrentProcess();
 
-            Shared = new SharedData(cpfixes, gpfixes, busers, bchans, bguilds, cfg.CurrencySymbol, proc.StartTime, cfg.Game, shekelrates);
+            Shared = new SharedData(cpfixes, gpfixes, busers, bchans, bguilds, cfg.CurrencySymbol, proc.StartTime, cfg.Game, shekelrates, 
+                new ConnectionEndpoint { Hostname = cfg.LavalinkConfig.Hostname, Port = cfg.LavalinkConfig.WebSocketPort }, cfg.LavalinkConfig);
 
             Console.Write("\r[5/5] Creating shards              ");
 

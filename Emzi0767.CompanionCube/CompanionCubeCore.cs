@@ -28,6 +28,8 @@ using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Lavalink;
+using DSharpPlus.Net.Udp;
 using Emzi0767.CompanionCube.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -47,6 +49,7 @@ namespace Emzi0767.CompanionCube
         public DiscordClient Client { get; private set; }
         public CommandsNextExtension CommandsNext { get; private set; }
         public InteractivityExtension Interactivity { get; private set; }
+        public LavalinkExtension Lavalink { get; private set; }
         public DatabaseClient Database { get; }
 
         public CompanionCubeCore(CompanionCubeConfig config, int shardId, DatabaseClient database, SharedData sharedData)
@@ -78,6 +81,8 @@ namespace Emzi0767.CompanionCube
                 TokenType = TokenType.Bot
             };
             this.Client = new DiscordClient(dcfg);
+
+            this.Lavalink = this.Client.UseLavalink();
 
             // initialize cnext dependencies
             var deps = new ServiceCollection()
@@ -222,10 +227,12 @@ namespace Emzi0767.CompanionCube
             return Task.CompletedTask;
         }
 
-        private Task OnReady(ReadyEventArgs ea)
+        private async Task OnReady(ReadyEventArgs ea)
         {
+            var llc = this.Configuration.LavalinkConfig.ToLavalinkConfig();
+            await this.Lavalink.ConnectAsync(llc);
+
             this.GameTimer = new Timer(this.GameTimerCallback, ea.Client, TimeSpan.Zero, TimeSpan.FromMinutes(15));
-            return Task.CompletedTask;
         }
 
         private Task OnCommandExecuted(CommandExecutionEventArgs ea)

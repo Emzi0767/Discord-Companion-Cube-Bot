@@ -26,10 +26,10 @@ namespace Emzi0767.CompanionCube
     {
         private DefaultHelpFormatter _d;
 
-        public CompanionCubeHelpFormatter(CommandsNextExtension cnext)
-            : base(cnext)
+        public CompanionCubeHelpFormatter(CommandContext ctx)
+            : base(ctx)
         {
-            this._d = new DefaultHelpFormatter(cnext);
+            this._d = new DefaultHelpFormatter(ctx);
         }
 
         public override BaseHelpFormatter WithCommand(Command command)

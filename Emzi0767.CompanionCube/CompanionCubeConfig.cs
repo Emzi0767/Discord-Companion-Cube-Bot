@@ -15,6 +15,8 @@
 // limitations under the License.
 
 using System;
+using DSharpPlus.Lavalink;
+using DSharpPlus.Net.Udp;
 using Newtonsoft.Json;
 
 namespace Emzi0767.CompanionCube
@@ -45,6 +47,9 @@ namespace Emzi0767.CompanionCube
         [JsonProperty("database_config")]
         public CompanionCubeDatabaseConfig DatabaseConfig { get; private set; }
 
+        [JsonProperty("lavalink_config")]
+        public CompanionCubeLavalinkConfig LavalinkConfig { get; private set; }
+
         [JsonIgnore]
         public static CompanionCubeConfig Default
         {
@@ -59,7 +64,8 @@ namespace Emzi0767.CompanionCube
                     ShardCount = 1,
                     Game = "with Portals",
                     CurrencySymbol = "<:comedy_chevron:338403292138962944>",
-                    DatabaseConfig = CompanionCubeDatabaseConfig.Default
+                    DatabaseConfig = CompanionCubeDatabaseConfig.Default,
+                    LavalinkConfig = CompanionCubeLavalinkConfig.Default
                 };
             }
         }
@@ -88,9 +94,9 @@ namespace Emzi0767.CompanionCube
         [JsonIgnore]
         public static CompanionCubeDatabaseConfig Default
         {
-            get 
+            get
             {
-                return new CompanionCubeDatabaseConfig 
+                return new CompanionCubeDatabaseConfig
                 {
                     Hostname = "localhost",
                     Port = 5432,
@@ -98,8 +104,48 @@ namespace Emzi0767.CompanionCube
                     Username = "companion_cube",
                     Password = "ebuc_noinapmoc",
                     TableNamePrefix = "cc_"
-                }; 
+                };
             }
+        }
+    }
+
+    public struct CompanionCubeLavalinkConfig
+    {
+        [JsonProperty("hostname")]
+        public string Hostname { get; private set; }
+
+        [JsonProperty("ws_port")]
+        public int WebSocketPort { get; private set; }
+
+        [JsonProperty("rest_port")]
+        public int RestPort { get; private set; }
+
+        [JsonProperty("password")]
+        public string Password { get; private set; }
+
+        [JsonIgnore]
+        public static CompanionCubeLavalinkConfig Default
+        {
+            get
+            {
+                return new CompanionCubeLavalinkConfig
+                {
+                    Hostname = "localhost",
+                    WebSocketPort = 80,
+                    RestPort = 2333,
+                    Password = "youshallnotpass"
+                };
+            }
+        }
+
+        public LavalinkConfiguration ToLavalinkConfig()
+        {
+            return new LavalinkConfiguration
+            {
+                Password = this.Password,
+                RestEndpoint = new ConnectionEndpoint { Hostname = this.Hostname, Port = this.RestPort },
+                SocketEndpoint = new ConnectionEndpoint { Hostname = this.Hostname, Port = this.WebSocketPort }
+            };
         }
     }
 }

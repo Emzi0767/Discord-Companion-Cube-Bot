@@ -72,7 +72,7 @@ namespace Emzi0767.CompanionCube.Services
                 var res = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
                 if (res == null || res is DBNull)
                     throw new DatabaseClientException("Database schema is misconfigured. Refer to installation manual for proper instructions.");
-                
+
                 if ((string)res != SCHEMA_VERSION)
                     throw new DatabaseClientException(string.Concat("Database schema has incorrect version. Current: ", (string)res, "; Expected: ", SCHEMA_VERSION, "."));
             }
@@ -122,7 +122,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "prefixes");
                 cmd.CommandText = string.Concat("SELECT channel_id, prefix FROM ", tbl, " WHERE guild_id IS NULL;");
-                
+
                 using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
                 {
                     while (await reader.ReadAsync().ConfigureAwait(false))
@@ -146,7 +146,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "prefixes");
                 cmd.CommandText = string.Concat("SELECT guild_id, prefix FROM ", tbl, " WHERE channel_id IS NULL;");
-                
+
                 using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
                 {
                     while (await reader.ReadAsync().ConfigureAwait(false))
@@ -252,14 +252,14 @@ namespace Emzi0767.CompanionCube.Services
 
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "blocked_users");
                 cmd.CommandText = string.Concat("SELECT user_id FROM ", tbl, ";");
-                
+
                 using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
                 {
                     while (await reader.ReadAsync().ConfigureAwait(false))
                         list.Add((ulong)(long)reader["user_id"]);
                 }
             }
-            
+
             this.Semaphore.Release();
             return new ReadOnlyCollection<ulong>(list);
         }
@@ -276,14 +276,14 @@ namespace Emzi0767.CompanionCube.Services
 
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "blocked_channels");
                 cmd.CommandText = string.Concat("SELECT channel_id FROM ", tbl, ";");
-                
+
                 using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
                 {
                     while (await reader.ReadAsync().ConfigureAwait(false))
                         list.Add((ulong)(long)reader["channel_id"]);
                 }
             }
-            
+
             this.Semaphore.Release();
             return new ReadOnlyCollection<ulong>(list);
         }
@@ -300,14 +300,14 @@ namespace Emzi0767.CompanionCube.Services
 
                 var tbl = string.Concat(this.Configuration.TableNamePrefix, "blocked_guilds");
                 cmd.CommandText = string.Concat("SELECT guild_id FROM ", tbl, ";");
-                
+
                 using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
                 {
                     while (await reader.ReadAsync().ConfigureAwait(false))
                         list.Add((ulong)(long)reader["guild_id"]);
                 }
             }
-            
+
             this.Semaphore.Release();
             return new ReadOnlyCollection<ulong>(list);
         }
@@ -328,7 +328,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
-            
+
             this.Semaphore.Release();
         }
 
@@ -348,7 +348,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
-            
+
             this.Semaphore.Release();
         }
 
@@ -368,7 +368,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
-            
+
             this.Semaphore.Release();
         }
 
@@ -388,7 +388,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
-            
+
             this.Semaphore.Release();
         }
 
@@ -408,7 +408,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
-            
+
             this.Semaphore.Release();
         }
 
@@ -428,7 +428,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
-            
+
             this.Semaphore.Release();
         }
 
@@ -583,7 +583,7 @@ namespace Emzi0767.CompanionCube.Services
                 cmd.Parameters.AddWithValue("owner_id", NpgsqlDbType.Bigint, (long)authorId);
                 cmd.Parameters.AddWithValue("name", NpgsqlDbType.Text, name);
                 cmd.Parameters.AddWithValue("contents", NpgsqlDbType.Text | NpgsqlDbType.Array, new[] { contents });
-                cmd.Parameters.AddWithValue("edits", NpgsqlDbType.TimestampTZ | NpgsqlDbType.Array, new[] { DateTimeOffset.Now });
+                cmd.Parameters.AddWithValue("edits", NpgsqlDbType.TimestampTz | NpgsqlDbType.Array, new[] { DateTimeOffset.Now });
                 cmd.Parameters.AddWithValue("editing_user_ids", NpgsqlDbType.Bigint | NpgsqlDbType.Array, new[] { (long)authorId });
 
                 var affected = await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -804,7 +804,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, id);
                 cmd.Parameters.AddWithValue("contents", NpgsqlDbType.Text, contents);
-                cmd.Parameters.AddWithValue("edit", NpgsqlDbType.TimestampTZ, DateTimeOffset.Now);
+                cmd.Parameters.AddWithValue("edit", NpgsqlDbType.TimestampTz, DateTimeOffset.Now);
                 cmd.Parameters.AddWithValue("editing_user", NpgsqlDbType.Bigint, (long)userId);
 
                 var res = await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -850,7 +850,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, (long)guildId);
                 cmd.Parameters.AddWithValue("rate", NpgsqlDbType.Double, rate);
-                
+
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
 
@@ -870,11 +870,56 @@ namespace Emzi0767.CompanionCube.Services
                 cmd.CommandText = string.Concat("delete from ", tbl, " where guild_id=@id;");
 
                 cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, (long)guildId);
-                
+
                 await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
 
             this.Semaphore.Release();
+        }
+
+        public async Task SetMusicOptionAsync(ulong guildId, bool enabled)
+        {
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
+
+            using (var con = new NpgsqlConnection(this.ConnectionString))
+            using (var cmd = con.CreateCommand())
+            {
+                await con.OpenAsync().ConfigureAwait(false);
+                var tbl = string.Concat(this.Configuration.TableNamePrefix, "musicenabled");
+
+                if (enabled)
+                    cmd.CommandText = string.Concat("insert into ", tbl, "(guild_id) values(@id) on conflict(guild_id) do nothing;");
+                else
+                    cmd.CommandText = string.Concat("delete from ", tbl, "where guild_id=@id;");
+
+                cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, (long)guildId);
+
+                await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+            }
+
+            this.Semaphore.Release();
+        }
+
+        public async Task<bool> GetMusicOptionAsync(ulong guildId)
+        {
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
+            bool result = false;
+
+            using (var con = new NpgsqlConnection(this.ConnectionString))
+            using (var cmd = con.CreateCommand())
+            {
+                await con.OpenAsync().ConfigureAwait(false);
+                var tbl = string.Concat(this.Configuration.TableNamePrefix, "musicenabled");
+                
+                cmd.CommandText = string.Concat("select count(*) from ", tbl, " where guild_id=@id;");
+
+                cmd.Parameters.AddWithValue("id", NpgsqlDbType.Bigint, (long)guildId);
+
+                result = (long)(await cmd.ExecuteScalarAsync().ConfigureAwait(false)) == 1;
+            }
+
+            this.Semaphore.Release();
+            return result;
         }
     }
 }
