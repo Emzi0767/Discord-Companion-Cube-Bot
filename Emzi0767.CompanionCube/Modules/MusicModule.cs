@@ -83,10 +83,10 @@ namespace Emzi0767.CompanionCube.Modules
             if (gmd.Player == null)
             {
                 gmd.Player = await this.Lavalink.ConnectAsync(chn).ConfigureAwait(false);
-                gmd.Player.PlaybackFinished += e =>
+                gmd.Player.PlaybackFinished += async e =>
                 {
+                    await Task.Delay(500);
                     Play();
-                    return Task.CompletedTask;
                 };
                 Play();
             }
