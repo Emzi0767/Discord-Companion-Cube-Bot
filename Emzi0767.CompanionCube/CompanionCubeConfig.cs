@@ -50,6 +50,9 @@ namespace Emzi0767.CompanionCube
         [JsonProperty("lavalink_config")]
         public CompanionCubeLavalinkConfig LavalinkConfig { get; private set; }
 
+        [JsonProperty("youtube_config")]
+        public CompanionCubeYouTubeConfig YouTubeConfig { get; private set; }
+
         [JsonIgnore]
         public static CompanionCubeConfig Default
         {
@@ -65,7 +68,8 @@ namespace Emzi0767.CompanionCube
                     Game = "with Portals",
                     CurrencySymbol = "<:comedy_chevron:338403292138962944>",
                     DatabaseConfig = CompanionCubeDatabaseConfig.Default,
-                    LavalinkConfig = CompanionCubeLavalinkConfig.Default
+                    LavalinkConfig = CompanionCubeLavalinkConfig.Default,
+                    YouTubeConfig = CompanionCubeYouTubeConfig.Default
                 };
             }
         }
@@ -146,6 +150,24 @@ namespace Emzi0767.CompanionCube
                 RestEndpoint = new ConnectionEndpoint { Hostname = this.Hostname, Port = this.RestPort },
                 SocketEndpoint = new ConnectionEndpoint { Hostname = this.Hostname, Port = this.WebSocketPort }
             };
+        }
+    }
+
+    public struct CompanionCubeYouTubeConfig
+    {
+        [JsonProperty("api_key")]
+        public string ApiKey { get; private set; }
+
+        [JsonIgnore]
+        public static CompanionCubeYouTubeConfig Default
+        {
+            get
+            {
+                return new CompanionCubeYouTubeConfig
+                {
+                    ApiKey = null
+                };
+            }
         }
     }
 }

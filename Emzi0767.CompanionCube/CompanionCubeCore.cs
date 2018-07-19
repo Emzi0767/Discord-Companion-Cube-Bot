@@ -29,7 +29,6 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Lavalink;
-using DSharpPlus.Net.Udp;
 using Emzi0767.CompanionCube.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -90,7 +89,8 @@ namespace Emzi0767.CompanionCube
                 .AddSingleton(this.Database)
                 .AddSingleton(this.Shared)
                 .AddSingleton(new CSPRNG())
-                .AddSingleton(this.Shared.Http);
+                .AddSingleton(this.Shared.Http)
+                .AddSingleton(new YouTubeSearchService(this.Configuration.YouTubeConfig));
 
             // initialize cnext
             var ccfg = new CommandsNextConfiguration

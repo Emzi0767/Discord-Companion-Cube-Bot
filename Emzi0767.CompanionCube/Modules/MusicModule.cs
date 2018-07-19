@@ -17,9 +17,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -34,17 +33,36 @@ namespace Emzi0767.CompanionCube.Modules
     [Group("music"), Description("Provides commands for music playback."), ModuleLifespan(ModuleLifespan.Singleton), NotBlocked, MusicEnabled]
     public class MusicModule : BaseCommandModule
     {
+        private static ImmutableDictionary<int, DiscordEmoji> NumberMappings { get; }
+        private static ImmutableDictionary<DiscordEmoji, int> NumberMappingsReverse { get; }
+
         public LavalinkNodeConnection Lavalink { get; set; }
         public SharedData Shared { get; }
         public ConcurrentDictionary<ulong, GuildMusicData> MusicQueues { get; }
         public CSPRNG RNG { get; }
         public InteractivityExtension Interactivity { get; }
+        public YouTubeSearchService YouTubeSearch { get; }
 
-        public MusicModule(SharedData shared, CSPRNG rng)
+        public MusicModule(SharedData shared, CSPRNG rng, YouTubeSearchService ytSearch)
         {
             this.Shared = shared;
             this.MusicQueues = new ConcurrentDictionary<ulong, GuildMusicData>();
             this.RNG = rng;
+            this.YouTubeSearch = ytSearch;
+        }
+
+        static MusicModule()
+        {
+            var idb = ImmutableDictionary.CreateBuilder<int, DiscordEmoji>();
+            idb.Add(0, DiscordEmoji.FromUnicode("1\u20e3"));
+            idb.Add(1, DiscordEmoji.FromUnicode("2\u20e3"));
+            idb.Add(2, DiscordEmoji.FromUnicode("3\u20e3"));
+            idb.Add(3, DiscordEmoji.FromUnicode("4\u20e3"));
+            idb.Add(4, DiscordEmoji.FromUnicode("5\u20e3"));
+            NumberMappings = idb.ToImmutable();
+            var idb2 = ImmutableDictionary.CreateBuilder<DiscordEmoji, int>();
+            idb2.AddRange(NumberMappings.ToDictionary(x => x.Value, x => x.Key));
+            NumberMappingsReverse = idb2.ToImmutable();
         }
 
         [Command("play"), Description("Joins the user's voice channel and plays music.")]
@@ -530,6 +548,99 @@ namespace Emzi0767.CompanionCube.Modules
 
             if (gmd.Player != null)
                 gmd.Player.Seek(gmd.Player.CurrentState.PlaybackPosition - offset);
+        }
+
+        [Command("search"), Description("Search for a video on YouTube.")]
+        public async Task SearchAsync(CommandContext ctx, [RemainingText, Description("Term to search for.")] string term)
+        {
+            var vs = ctx.Member.VoiceState;
+            var chn = vs.Channel;
+            if (chn == null)
+            {
+                await ctx.RespondAsync("You need to be in a voice channel!").ConfigureAwait(false);
+                return;
+            }
+
+            var mbr = ctx.Guild.CurrentMember?.VoiceState?.Channel;
+            if (mbr != null && chn != mbr)
+            {
+                await ctx.RespondAsync("You need to be in the same voice channel!").ConfigureAwait(false);
+                return;
+            }
+
+            var gmd = this.MusicQueues[ctx.Guild.Id];
+            var interactivity = ctx.Client.GetInteractivity();
+
+            var results = await this.YouTubeSearch.SearchAsync(term);
+            if (!results.Any())
+            {
+                await ctx.RespondAsync("Nothing was found!").ConfigureAwait(false);
+                return;
+            }
+
+            var msgC = string.Join("\n", results.Select((x, i) => $"{NumberMappings[i]} {Formatter.Bold(Formatter.Sanitize(x.Title))} by {Formatter.Bold(Formatter.Sanitize(x.Author))}"));
+            var msg = await ctx.RespondAsync(msgC).ConfigureAwait(false);
+            foreach (var emoji in NumberMappings.Values)
+                await msg.CreateReactionAsync(emoji).ConfigureAwait(false);
+            var res = await interactivity.WaitForMessageReactionAsync(x => NumberMappingsReverse.ContainsKey(x), msg, ctx.User, TimeSpan.FromSeconds(30)).ConfigureAwait(false);
+            if (res == null)
+            {
+                await ctx.RespondAsync("No choice was made!").ConfigureAwait(false);
+                return;
+            }
+
+            var elInd = NumberMappingsReverse[res.Emoji];
+            var el = results.ElementAt(elInd);
+            var url = new Uri($"https://youtu.be/{el.Id}");
+
+            var tracks = await this.Lavalink.GetTracksAsync(url);
+            if (!tracks.Any())
+            {
+                await ctx.RespondAsync("No tracks were found at specified link!").ConfigureAwait(false);
+                return;
+            }
+
+            var trackCount = tracks.Count();
+            foreach (var track in tracks)
+                gmd.Enqueue(new MusicItem(track, ctx.Member));
+
+            if (gmd.Player == null)
+            {
+                gmd.Player = await this.Lavalink.ConnectAsync(chn).ConfigureAwait(false);
+                gmd.Player.PlaybackFinished += async e =>
+                {
+                    await Task.Delay(500);
+                    Play();
+                };
+                Play();
+            }
+
+            if (trackCount > 1)
+                await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Added {trackCount:#,##0} tracks to playback queue.").ConfigureAwait(false);
+            else
+            {
+                var track = tracks.First();
+                await msg.ModifyAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Added {Formatter.Bold(Formatter.Sanitize(track.Title))} by {Formatter.Bold(Formatter.Sanitize(track.Author))} to the playback queue.").ConfigureAwait(false);
+            }
+
+            void Play()
+            {
+                var itemN = gmd.Dequeue();
+                if (itemN == null)
+                {
+                    gmd.Player.Disconnect();
+                    gmd.Player = null;
+                    gmd.NowPlaying = default;
+                    return;
+                }
+
+                var item = itemN.Value;
+                gmd.NowPlaying = item;
+                if (item.StartTime != null && item.Duration != null)
+                    gmd.Player.PlayPartial(item.Track, item.StartTime ?? TimeSpan.Zero, item.Duration ?? item.Track.Length);
+                else
+                    gmd.Player.Play(item.Track);
+            }
         }
 
         [Command("disconnectlavalink"), Description("Disconnects Lavalink client. Use before shutting the bot down."), Aliases("dclvl", "dclava"), RequireOwner]
