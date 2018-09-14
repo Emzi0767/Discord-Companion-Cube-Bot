@@ -33,6 +33,7 @@ namespace Emzi0767.CompanionCube.Modules
     [Group("charinfo")]
     [Aliases("utfinfo", "unicodeinfo", "chrinfo", "ucinfo")]
     [Description("Provides commands for obtaining information about unicode strings. Invoking without subcommand will display simplified character information.")]
+    [ModuleLifespan(ModuleLifespan.Transient)]
     [NotBlocked]
     public class CharacterInfoModule : BaseCommandModule
     {

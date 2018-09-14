@@ -32,6 +32,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Emzi0767.CompanionCube.Modules
 {
+    [ModuleLifespan(ModuleLifespan.Transient)]
     [NotBlocked]
     public sealed class MiscCommandsModule : BaseCommandModule
     {
@@ -139,7 +140,11 @@ namespace Emzi0767.CompanionCube.Modules
             await Task.Delay(2500).ContinueWith(t => msg.DeleteAsync());
         }
 
-        [Group("emoji"), Aliases("emotes", "emote", "emojis"), Description("Commands for managing emoji."), OwnerOrPermission(Permissions.ManageEmojis)]
+        [Group("emoji")]
+        [Aliases("emotes", "emote", "emojis")]
+        [Description("Commands for managing emoji.")]
+        [ModuleLifespan(ModuleLifespan.Transient)]
+        [OwnerOrPermission(Permissions.ManageEmojis)]
         public class Emoji : BaseCommandModule
         {
             public HttpClient Http { get; }
