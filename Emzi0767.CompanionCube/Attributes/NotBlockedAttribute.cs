@@ -1,6 +1,6 @@
-// This file is part of Emzi0767.CompanionCube project
+// This file is part of Companion Cube project
 //
-// Copyright 2017 Emzi0767
+// Copyright 2018 Emzi0767
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,25 +19,36 @@ using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Emzi0767.CompanionCube.Data;
 using Emzi0767.CompanionCube.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Emzi0767.CompanionCube
+namespace Emzi0767.CompanionCube.Attributes
 {
+    /// <summary>
+    /// Verifies that the user is not blocked for the purpose of the command usage.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public sealed class NotBlockedAttribute : CheckBaseAttribute
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
         {
-            var shared = ctx.Services.GetService<SharedData>();
+            if (ctx.Guild == null)
+                return Task.FromResult(false);
 
-            if (shared.BlockedUsers.Contains(ctx.User.Id))
-                return Task.FromResult(false);
-            
-            if (shared.BlockedChannels.Contains(ctx.Channel.Id))
-                return Task.FromResult(false);
-            
-            return Task.FromResult(true);
+            if (help)
+                return Task.FromResult(true);
+
+            if (ctx.User == ctx.Client.CurrentApplication.Owner)
+                return Task.FromResult(true);
+
+            var uid = (long)ctx.User.Id;
+            var cid = (long)ctx.Channel.Id;
+            var gid = (long)ctx.Guild.Id;
+
+            var db = ctx.Services.GetService<DatabaseContext>();
+            var blocked = db.BlockedEntities.Any(x => (x.Id == uid && x.Kind == DatabaseEntityKind.User) || (x.Id == cid && x.Kind == DatabaseEntityKind.Channel) || (x.Id == gid && x.Kind == DatabaseEntityKind.Channel));
+            return Task.FromResult(!blocked);
         }
     }
 }

@@ -1,24 +1,44 @@
-﻿using System;
+﻿// This file is part of Companion Cube project
+//
+// Copyright 2018 Emzi0767
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//   http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Emzi0767.CompanionCube.Data;
 using Newtonsoft.Json.Linq;
 
 namespace Emzi0767.CompanionCube.Services
 {
-    public sealed class YouTubeSearchService
+    /// <summary>
+    /// Provides ability to search YouTube in a streamlined manner.
+    /// </summary>
+    public sealed class YouTubeSearchProvider
     {
-        private static UTF8Encoding UTF8 { get; } = new UTF8Encoding(false);
-
         private string ApiKey { get; }
         private HttpClient Http { get; }
 
-        public YouTubeSearchService(CompanionCubeYouTubeConfig cfg)
+        /// <summary>
+        /// Creates a new YouTube search provider service instance.
+        /// </summary>
+        /// <param name="cfg">Configuration of this service.</param>
+        public YouTubeSearchProvider(CompanionCubeConfigYouTube cfg)
         {
             this.ApiKey = cfg.ApiKey;
             this.Http = new HttpClient()
@@ -28,6 +48,11 @@ namespace Emzi0767.CompanionCube.Services
             this.Http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Companion-Cube");
         }
 
+        /// <summary>
+        /// Performs a YouTube search and returns the results.
+        /// </summary>
+        /// <param name="term">What to search for.</param>
+        /// <returns>A collection of search results.</returns>
         public async Task<IEnumerable<YouTubeSearchResult>> SearchAsync(string term)
         {
             var uri = new Uri($"https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&type=video&fields=items(id(videoId),snippet(title,channelTitle))&key={this.ApiKey}&q={WebUtility.UrlEncode(term)}");
@@ -35,52 +60,13 @@ namespace Emzi0767.CompanionCube.Services
             var json = "{}";
             using (var req = await this.Http.GetAsync(uri).ConfigureAwait(false))
             using (var res = await req.Content.ReadAsStreamAsync())
-            using (var sr = new StreamReader(res, UTF8))
+            using (var sr = new StreamReader(res, CompanionCubeUtilities.UTF8))
                 json = await sr.ReadToEndAsync();
 
             var jsonData = JObject.Parse(json);
             var data = jsonData["items"].ToObject<IEnumerable<YouTubeApiResponseItem>>();
 
             return data.Select(x => new YouTubeSearchResult(x.Snippet.Title, x.Snippet.Author, x.Id.VideoId));
-        }
-    }
-
-    public struct YouTubeSearchResult
-    {
-        public string Title { get; }
-        public string Author { get; }
-        public string Id { get; }
-
-        public YouTubeSearchResult(string title, string author, string id)
-        {
-            this.Title = title;
-            this.Author = author;
-            this.Id = id;
-        }
-    }
-
-    public struct YouTubeApiResponseItem
-    {
-        [JsonProperty("id")]
-        public ResponseId Id { get; private set; }
-
-        [JsonProperty("snippet")]
-        public ResponseSnippet Snippet { get; private set; }
-
-
-        public struct ResponseId
-        {
-            [JsonProperty("videoId")]
-            public string VideoId { get; private set; }
-        }
-
-        public struct ResponseSnippet
-        {
-            [JsonProperty("title")]
-            public string Title { get; private set; }
-
-            [JsonProperty("channelTitle")]
-            public string Author { get; private set; }
         }
     }
 }

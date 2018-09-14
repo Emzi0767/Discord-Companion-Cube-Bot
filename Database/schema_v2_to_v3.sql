@@ -2,16 +2,16 @@
 -- for PostgreSQL 9.6+
 -- 
 -- Author:          Emzi0767
--- Project:         Emzi0767.CompanionCube
+-- Project:         Companion Cube
 -- Version:         2 to 3
 -- Last update:     2018-07-19 11:04 +02:00
 -- Requires:        fuzzystrmatch
 --
 -- ------------------------------------------------------------------------
 -- 
--- This file is part of Emzi0767.CompanionCube project
+-- This file is part of Companion Cube project
 --
--- Copyright 2017 Emzi0767
+-- Copyright 2018 Emzi0767
 -- 
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.

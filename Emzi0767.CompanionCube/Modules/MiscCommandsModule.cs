@@ -1,6 +1,6 @@
-// This file is part of Emzi0767.CompanionCube project
+// This file is part of Companion Cube project
 //
-// Copyright 2017 Emzi0767
+// Copyright 2018 Emzi0767
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -26,7 +27,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
-using Emzi0767.CompanionCube.Services;
+using Emzi0767.CompanionCube.Attributes;
 using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Emzi0767.CompanionCube.Modules
@@ -34,25 +35,19 @@ namespace Emzi0767.CompanionCube.Modules
     [NotBlocked]
     public sealed class MiscCommandsModule : BaseCommandModule
     {
-        private DatabaseClient Database { get; }
-        private SharedData Shared { get; }
-
-        public MiscCommandsModule(DatabaseClient database, SharedData shared)
-        {
-            this.Database = database;
-            this.Shared = shared;
-        }
+        public MiscCommandsModule()
+        { }
 
         [Command("about"), Aliases("info"), Description("Displays information about the bot.")]
         public async Task AboutAsync(CommandContext ctx)
         {
-            var ccv = typeof(CompanionCubeCore)
+            var ccv = typeof(CompanionCubeBot)
                 .GetTypeInfo()
                 .Assembly
                 ?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion ??
 
-                typeof(CompanionCubeCore)
+                typeof(CompanionCubeBot)
                 .GetTypeInfo()
                 .Assembly
                 .GetName()
@@ -103,8 +98,8 @@ namespace Emzi0767.CompanionCube.Modules
         [Command("uptime"), Description("Display bot's uptime.")]
         public async Task UptimeAsync(CommandContext ctx)
         {
-            var upt = DateTime.Now - this.Shared.ProcessStarted;
-            var ups = this.Shared.TimeSpanToString(upt);
+            var upt = DateTime.Now - Process.GetCurrentProcess().StartTime;
+            var ups = upt.ToDurationString();
             await ctx.RespondAsync(string.Concat("\u200b", DiscordEmoji.FromName(ctx.Client, ":companion_cube:"), " The bot has been running for ", Formatter.Bold(ups), ".")).ConfigureAwait(false);
         }
 
@@ -147,12 +142,11 @@ namespace Emzi0767.CompanionCube.Modules
         [Group("emoji"), Aliases("emotes", "emote", "emojis"), Description("Commands for managing emoji."), OwnerOrPermission(Permissions.ManageEmojis)]
         public class Emoji : BaseCommandModule
         {
-            public SharedData Shared { get; }
-            public HttpClient Http => this.Shared.Http;
+            public HttpClient Http { get; }
 
-            public Emoji(SharedData shared)
+            public Emoji(HttpClient http)
             {
-                this.Shared = shared;
+                this.Http = http;
             }
 
             [Command("steal"), Description("Installs specified emote on current server.")]

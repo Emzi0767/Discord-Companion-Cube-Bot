@@ -1,6 +1,6 @@
-// This file is part of Emzi0767.CompanionCube project
+// This file is part of Companion Cube project
 //
-// Copyright 2017 Emzi0767
+// Copyright 2018 Emzi0767
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
@@ -23,39 +24,65 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
+using Emzi0767.CompanionCube.Attributes;
+using Emzi0767.CompanionCube.Data;
 using Emzi0767.CompanionCube.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Emzi0767.CompanionCube.Modules
 {
-    [Group("admin"), Aliases("botctl"), Description("Commands for controlling the bot's behaviour."), OwnerOrPermission(Permissions.ManageGuild)]
+    [Group("admin"), Aliases("botctl")]
+    [Description("Commands for controlling the bot's behaviour.")]
+    [ModuleLifespan(ModuleLifespan.Transient)]
+    [OwnerOrPermission(Permissions.ManageGuild)]
     public sealed class AdministrationModule : BaseCommandModule
     {
-        private DatabaseClient Database { get; }
-        private SharedData Shared { get; }
+        private DatabaseContext Database { get; }
+        private CompanionCubeBot Bot { get; }
 
-        public AdministrationModule(DatabaseClient database, SharedData shared)
+        public AdministrationModule(DatabaseContext database, CompanionCubeBot bot)
         {
             this.Database = database;
-            this.Shared = shared;
+            this.Bot = bot;
         }
 
         [Command("sudo"), Description("Executes a command as another user."), Hidden, RequireOwner]
         public async Task SudoAsync(CommandContext ctx, [Description("Member to execute the command as.")] DiscordMember member, [RemainingText, Description("Command text to execute.")] string command)
         {
-            await ctx.CommandsNext.SudoAsync(member, ctx.Channel, command).ConfigureAwait(false);
+            var cmd = ctx.CommandsNext.FindCommand(command, out var args);
+            if (cmd == null)
+                throw new CommandNotFoundException(command);
+
+            var fctx = ctx.CommandsNext.CreateFakeContext(member, ctx.Channel, command, ctx.Prefix, cmd, args);
+            await ctx.CommandsNext.ExecuteCommandAsync(fctx).ConfigureAwait(false);
         }
 
         [Command("sql"), Description("Executes a raw SQL query."), Hidden, RequireOwner]
         public async Task SqlQueryAsync(CommandContext ctx, [RemainingText, Description("SQL query to execute.")] string query)
         {
-            var dat = await this.Database.ExecuteRawQueryAsync(query).ConfigureAwait(false);
-            DiscordEmbedBuilder embed = null;
+            var dat = new List<Dictionary<string, string>>();
+            var i = 0;
+            using (var cmd = this.Database.Database.GetDbConnection().CreateCommand())
+            {
+                await this.Database.Database.OpenConnectionAsync().ConfigureAwait(false);
 
+                cmd.CommandText = query;
+                using (var rdr = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
+                {
+                    var dict = new Dictionary<string, string>();
+                    for (i = 0; i < rdr.FieldCount; i++)
+                        dict[rdr.GetName(i)] = rdr[i] is DBNull ? "<null>" : rdr[i].ToString();
+                    dat.Add(dict);
+                }
+            }
+            
+            DiscordEmbedBuilder embed = null;
             if (!dat.Any() || !dat.First().Any())
             {
                 embed = new DiscordEmbedBuilder
@@ -78,7 +105,7 @@ namespace Emzi0767.CompanionCube.Modules
             };
             var adat = dat.Take(24);
 
-            var i = 0;
+            i = 0;
             foreach (var xdat in adat)
             {
                 var sb = new StringBuilder();
@@ -202,191 +229,193 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
         }
 
-        [Command("music"), Description("Sets whether music in the current guild shall be available or not."), RequireOwner]
-        public async Task MusicAsync(CommandContext ctx, bool enabled)
+        [Command("setmusic"), Description("Sets whether music in the specified guild shall be available or not."), RequireOwner]
+        public async Task MusicAsync(CommandContext ctx,
+            [Description("Guild for which to toggle the setting.")] DiscordGuild guild,
+            [Description("Whether the music should be available.")] bool enabled,
+            [RemainingText, Description("Reason why the guild has music enabled.")] string reason = null)
         {
-            await this.Database.SetMusicOptionAsync(ctx.Guild.Id, enabled).ConfigureAwait(false);
-            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+            var gid = (long)guild.Id;
+            var enable = this.Database.MusicEnabled.SingleOrDefault(x => x.GuildId == gid);
+            if (enabled && enable == null)
+            {
+                enable = new DatabaseMusicEnabled
+                {
+                    GuildId = gid,
+                    Reason = reason
+                };
+                this.Database.MusicEnabled.Add(enable);
+            }
+            else if (!enabled && enable != null)
+            {
+                this.Database.MusicEnabled.Remove(enable);
+            }
+
+            await this.Database.SaveChangesAsync().ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Music is now {(enabled? "enabled" : "disabled")} in {Formatter.Bold(Formatter.Sanitize(guild.Name))}.").ConfigureAwait(false);
         }
 
-        [Group("prefix"), Description("Commands for managing bot's command prefixes.")]
-        public sealed class PrefixAdministration : BaseCommandModule
+        [Command("setblock"), Description("Sets blocked status for a user, channel, or guild."), Aliases("block", "unblock")]
+        public async Task SetBlockAsync(CommandContext ctx,
+           [Description("User whose block status to change.")] DiscordUser user,
+           [Description("Whether the user should be blocked.")] bool blocked,
+           [RemainingText, Description("Reason why this user is blocked.")] string reason = null)
         {
-            private static readonly string alphabet = "abcdefghijklmnopqrstuvwxyzABCEDFGHIJKLMNOPQRSTUVWXYZ0123456789<>,./?;:'\"\\|[{]}=+-_!@#$%^&*()€ ";
-
-            private DatabaseClient Database { get; }
-            private SharedData Shared { get; }
-
-            public PrefixAdministration(DatabaseClient database, SharedData shared)
+            var uid = (long)user.Id;
+            var block = this.Database.BlockedEntities.SingleOrDefault(x => x.Id == uid && x.Kind == DatabaseEntityKind.User);
+            if (blocked && block == null)
             {
-                this.Database = database;
-                this.Shared = shared;
+                block = new DatabaseBlockedEntity
+                {
+                    Id = uid,
+                    Kind = DatabaseEntityKind.User,
+                    Reason = reason,
+                    Since = DateTime.UtcNow
+                };
+                this.Database.BlockedEntities.Add(block);
+            }
+            else if (!blocked && block != null)
+            {
+                this.Database.BlockedEntities.Remove(block);
             }
 
-            [Command("channel"), Description("Sets a new prefix for the channel the command is invoked in."), OwnerOrPermission(Permissions.ManageChannels)]
-            public async Task ChannelAsync(CommandContext ctx, [Description("New prefix for this channel. Specifying null, empty string, or no value will reset the prefix.")] string new_prefix = null)
-            {
-                if (string.IsNullOrWhiteSpace(new_prefix))
-                {
-                    await this.Database.ResetChannelPrefixAsync(ctx.Channel.Id).ConfigureAwait(false);
-                    this.Shared.ChannelPrefixes.TryRemove(ctx.Channel.Id, out _);
-                }
-                else if (new_prefix.Length > 60 || !new_prefix.All(xc => alphabet.Contains(xc)))
-                {
-                    throw new ArgumentException("Prefix must be less than or 6 characters long, and can consist only of characters available on the standard US keyboard.", nameof(new_prefix));
-                }
-                else
-                {
-                    await this.Database.SetChannelPrefixAsync(ctx.Channel.Id, new_prefix).ConfigureAwait(false);
-                    this.Shared.ChannelPrefixes.AddOrUpdate(ctx.Channel.Id, new_prefix, (key, oldval) => new_prefix);
-                }
-
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
-            }
-
-            [Command("guild"), Description("Sets a new prefix for the guild the command is invoked in."), OwnerOrPermission(Permissions.ManageGuild)]
-            public async Task GuildAsync(CommandContext ctx, [Description("New prefix for this guild. Specifying null, empty string, or no value will reset the prefix.")] string new_prefix = null)
-            {
-                if (string.IsNullOrWhiteSpace(new_prefix))
-                {
-                    await this.Database.ResetGuildPrefixAsync(ctx.Guild.Id).ConfigureAwait(false);
-                    this.Shared.GuildPrefixes.TryRemove(ctx.Guild.Id, out _);
-                }
-                else if (new_prefix.Length > 60 || !new_prefix.All(xc => alphabet.Contains(xc)))
-                {
-                    throw new ArgumentException("Prefix must be less than or 6 characters long, and can consist only of characters available on the standard US keyboard.", nameof(new_prefix));
-                }
-                else
-                {
-                    await this.Database.SetGuildPrefixAsync(ctx.Guild.Id, new_prefix).ConfigureAwait(false);
-                    this.Shared.GuildPrefixes.AddOrUpdate(ctx.Guild.Id, new_prefix, (key, oldval) => new_prefix);
-                }
-
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
-            }
+            await this.Database.SaveChangesAsync().ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} User {user.Mention} is {(blocked ? "now blocked" : "no longer blocked")}.").ConfigureAwait(false);
         }
 
-        [Group("user"), Description("Commands for blocking and unblocking users from using the bot."), Hidden, RequireOwner]
-        public sealed class UserAdministration : BaseCommandModule
+        [Command("setblock")]
+        public async Task SetBlockAsync(CommandContext ctx,
+            [Description("Channel of which block status to change.")] DiscordChannel channel,
+            [Description("Whether the user should be blocked.")] bool blocked,
+            [RemainingText, Description("Reason why this user is blocked.")] string reason = null)
         {
-            private DatabaseClient Database { get; }
-            private SharedData Shared { get; }
-
-            public UserAdministration(DatabaseClient database, SharedData shared)
+            var cid = (long)channel.Id;
+            var block = this.Database.BlockedEntities.SingleOrDefault(x => x.Id == cid && x.Kind == DatabaseEntityKind.Channel);
+            if (blocked && block == null)
             {
-                this.Database = database;
-                this.Shared = shared;
+                block = new DatabaseBlockedEntity
+                {
+                    Id = cid,
+                    Kind = DatabaseEntityKind.Channel,
+                    Reason = reason,
+                    Since = DateTime.UtcNow
+                };
+                this.Database.BlockedEntities.Add(block);
+            }
+            else if (!blocked && block != null)
+            {
+                this.Database.BlockedEntities.Remove(block);
             }
 
-            [Command("block"), Description("Blocks a user from using the bot.")]
-            public async Task BlockAsync(CommandContext ctx, [Description("User to block.")] DiscordUser user)
-            {
-                await this.Database.BlockUserAsync(user.Id).ConfigureAwait(false);
-                this.Shared.BlockedUsers.TryAdd(user.Id);
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
-            }
-
-            [Command("unblock"), Description("Unblocks a user, allowing them to use the bot again.")]
-            public async Task UnblockAsync(CommandContext ctx, [Description("User to unblock.")] DiscordUser user)
-            {
-                await this.Database.UnblockUserAsync(user.Id).ConfigureAwait(false);
-                this.Shared.BlockedUsers.TryRemove(user.Id);
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
-            }
+            await this.Database.SaveChangesAsync().ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Channel {channel.Mention} is {(blocked ? "now blocked" : "no longer blocked")}.").ConfigureAwait(false);
         }
 
-        [Group("channel"), Description("Commands for blocking and unblocking bot from listening in specific channels."), OwnerOrPermission(Permissions.ManageChannels)]
-        public sealed class ChannelAdministration : BaseCommandModule
+        [Command("setblock")]
+        public async Task SetBlockAsync(CommandContext ctx,
+            [Description("Guild of which block status to change.")] DiscordGuild guild,
+            [Description("Whether the user should be blocked.")] bool blocked,
+            [RemainingText, Description("Reason why this user is blocked.")] string reason = null)
         {
-            private DatabaseClient Database { get; }
-            private SharedData Shared { get; }
-
-            public ChannelAdministration(DatabaseClient database, SharedData shared)
+            var gid = (long)guild.Id;
+            var block = this.Database.BlockedEntities.SingleOrDefault(x => x.Id == gid && x.Kind == DatabaseEntityKind.Guild);
+            if (blocked && block == null)
             {
-                this.Database = database;
-                this.Shared = shared;
+                block = new DatabaseBlockedEntity
+                {
+                    Id = gid,
+                    Kind = DatabaseEntityKind.Guild,
+                    Reason = reason,
+                    Since = DateTime.UtcNow
+                };
+                this.Database.BlockedEntities.Add(block);
+            }
+            else if (!blocked && block != null)
+            {
+                this.Database.BlockedEntities.Remove(block);
             }
 
-            [Command("blockcurrent"), Aliases("block_current"), Description("Stops the bot from listening in the channel the command is invoked in.")]
-            public async Task BlockCurrentAsync(CommandContext ctx)
-            {
-                await this.Database.BlockChannelAsync(ctx.Channel.Id).ConfigureAwait(false);
-                this.Shared.BlockedChannels.TryAdd(ctx.Channel.Id);
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
-            }
-
-            [Command("block"), Description("Stops the bot from listening in specified channel."), Hidden, RequireOwner]
-            public async Task BlockAsync(CommandContext ctx, [Description("Channel to block.")] DiscordChannel channel)
-            {
-                await this.Database.BlockChannelAsync(channel.Id).ConfigureAwait(false);
-                this.Shared.BlockedChannels.TryAdd(channel.Id);
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
-            }
-
-            [Command("unblockcurrent"), Aliases("unblock_current"), Description("Makes the bot resume listening in the channel the command is invoked in.")]
-            public async Task UnblockCurrentAsync(CommandContext ctx)
-            {
-                await this.Database.UnblockChannelAsync(ctx.Channel.Id).ConfigureAwait(false);
-                this.Shared.BlockedChannels.TryRemove(ctx.Channel.Id);
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
-            }
-
-            [Command("unblock"), Description("Makes the bot resume listening in specified channel."), Hidden, RequireOwner]
-            public async Task UnblockAsync(CommandContext ctx, [Description("Channel to unblock.")] DiscordChannel channel)
-            {
-                await this.Database.UnblockChannelAsync(channel.Id).ConfigureAwait(false);
-                this.Shared.BlockedChannels.TryRemove(channel.Id);
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
-            }
+            await this.Database.SaveChangesAsync().ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Guild {Formatter.Bold(Formatter.Sanitize(guild.Name))} is {(blocked ? "now blocked" : "no longer blocked")}.").ConfigureAwait(false);
         }
 
-        [Group("guild"), Description("Commands for blocking and unblocking the bot from listening in specific guilds."), Hidden, RequireOwner]
-        public sealed class GuildAdministration : BaseCommandModule
+        [Command("addprefix"), Description("Adds a prefix to this guild's command prefixes."), Aliases("addpfix")]
+        public async Task AddPrefixAsync(CommandContext ctx,
+            [RemainingText, Description("Prefix to add to this guild's prefixes.")] string prefix)
         {
-            private DatabaseClient Database { get; }
-            private SharedData Shared { get; }
-
-            public GuildAdministration(DatabaseClient database, SharedData shared)
+            if (this.Bot.Configuration.Discord.DefaultPrefixes.Contains(prefix))
             {
-                this.Database = database;
-                this.Shared = shared;
-            }
-        
-            [Command("block"), Description("Blocks a specific guild from interacting with the bot.")]
-            public async Task BlockAsync(CommandContext ctx, [Description("Guild to block.")] DiscordGuild guild)
-            {
-                await this.Database.BlockGuildAsync(guild.Id).ConfigureAwait(false);
-                this.Shared.BlockedGuilds.TryAdd(guild.Id);
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} Cannot add default prefix.").ConfigureAwait(false);
+                return;
             }
 
-            [Command("unblock"), Description("Unblocks a specific guild from interacting with the bot.")]
-            public async Task UnblockAsync(CommandContext ctx, [Description("Guild to unblock.")] DiscordGuild guild)
+            var gid = (long)ctx.Guild.Id;
+            var gpfix = this.Database.Prefixes.SingleOrDefault(x => x.GuildId == gid);
+            if (gpfix == null)
             {
-                await this.Database.UnblockGuildAsync(guild.Id).ConfigureAwait(false);
-                this.Shared.BlockedGuilds.TryRemove(guild.Id);
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
-            }
-
-            [Command, Description("Changes the rate at which messages in this guild emit currency.")]
-            public async Task ShekelRateAsync(CommandContext ctx, [Description("New rate in percents / 100. E.g. to set a rate of 50%, you would specify 0.5. Not specifying a value resets the rate to 5%.")] double? newRate = null)
-            {
-                if (newRate != null && (newRate > 1 || newRate < 0))
-                    throw new ArgumentOutOfRangeException(nameof(newRate), "The rate needs to be between 0 and 100% inclusive.");
-
-                if (newRate == null)
+                gpfix = new DatabasePrefix
                 {
-                    await this.Database.ResetShekelRateAsync(ctx.Guild.Id);
-                    this.Shared.ShekelRates.TryRemove(ctx.Guild.Id, out _);
-                }
-                else
-                {
-                    await this.Database.SetShekelRateAsync(ctx.Guild.Id, newRate.Value);
-                    this.Shared.ShekelRates.AddOrUpdate(ctx.Guild.Id, newRate.Value, (k, o) => newRate.Value);
-                }
-
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+                    GuildId = gid,
+                    Prefixes = new[] { prefix },
+                    EnableDefault = true
+                };
+                this.Database.Prefixes.Add(gpfix);
             }
+            else if (!gpfix.Prefixes.Contains(prefix))
+            {
+                gpfix.Prefixes = gpfix.Prefixes.Concat(new[] { prefix }).ToArray();
+                this.Database.Prefixes.Update(gpfix);
+            }
+
+            await this.Database.SaveChangesAsync().ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix added.").ConfigureAwait(false);
+        }
+
+        [Command("removeprefix"), Description("Removes a prefix from this guild's command prefixes."), Aliases("rmpfix")]
+        public async Task RemovePrefixAsync(CommandContext ctx,
+            [RemainingText, Description("Prefix to remove from this guild's prefixes.")] string prefix)
+        {
+            var gid = (long)ctx.Guild.Id;
+            var gpfix = this.Database.Prefixes.SingleOrDefault(x => x.GuildId == gid);
+            if (gpfix != null && gpfix.Prefixes.Contains(prefix))
+            {
+                gpfix.Prefixes = gpfix.Prefixes.Concat(new[] { prefix }).ToArray();
+                this.Database.Prefixes.Update(gpfix);
+            }
+            else if (gpfix != null && !gpfix.Prefixes.Contains(prefix))
+            {
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} This prefix is not configured.").ConfigureAwait(false);
+                return;
+            }
+
+            await this.Database.SaveChangesAsync().ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix removed.").ConfigureAwait(false);
+        }
+
+        [Command("configuredefaultprefixes"), Description("Configures whether default prefixes are to be enabled in this guild."), Aliases("cfgdefpfx")]
+        public async Task ConfigureDefaultPrefixesAsync(CommandContext ctx,
+            [RemainingText, Description("Whether default prefixes are to be enabled.")] bool enable)
+        {
+            var gid = (long)ctx.Guild.Id;
+            var gpfix = this.Database.Prefixes.SingleOrDefault(x => x.GuildId == gid);
+            if (gpfix == null)
+            {
+                gpfix = new DatabasePrefix
+                {
+                    GuildId = gid,
+                    Prefixes = new string[] { },
+                    EnableDefault = enable
+                };
+                this.Database.Prefixes.Add(gpfix);
+            }
+            else
+            {
+                gpfix.EnableDefault = enable;
+                this.Database.Prefixes.Update(gpfix);
+            }
+
+            await this.Database.SaveChangesAsync().ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Setting saved.").ConfigureAwait(false);
         }
     }
 

@@ -1,6 +1,6 @@
-﻿// This file is part of Emzi0767.CompanionCube project
+﻿// This file is part of Companion Cube project
 //
-// Copyright 2017 Emzi0767
+// Copyright 2018 Emzi0767
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,126 +15,88 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
-using DSharpPlus.Net.Udp;
+using Emzi0767.CompanionCube.Data;
 using Emzi0767.CompanionCube.Services;
-using Newtonsoft.Json;
+using Npgsql;
 
 namespace Emzi0767.CompanionCube
 {
+    /// <summary>
+    /// Entry point of the bot's binary.
+    /// </summary>
     internal class Program
     {
-        private List<CompanionCubeCore> Shards { get; set; }
-        private DatabaseClient Database { get; set; }
-        private SharedData Shared { get; set; }
+        private static Dictionary<int, CompanionCubeBot> Shards { get; set; }
 
+        /// <summary>
+        /// Wrapper for asynchronous entry point.
+        /// </summary>
+        /// <param name="args">Command-line arguments for the binary.</param>
         internal static void Main(string[] args)
         {
-            var exec = new AsyncExecutor();
-            var prog = new Program();
-            exec.Execute(prog.MainAsync(args));
+            // pass the execution to the asynchronous entry point
+            var async = new AsyncExecutor();
+            async.Execute(MainAsync(args));
         }
 
-        private async Task MainAsync(string[] args)
+        /// <summary>
+        /// Asynchronous entry point of the bot's binary.
+        /// </summary>
+        /// <param name="args">Command-line arguments for the binary.</param>
+        /// <returns></returns>
+        private static async Task MainAsync(string[] args)
         {
             Console.WriteLine("Loading Companion Cube...");
-            Console.Write("[1/5] Loading configuration        ");
+            Console.Write("[1/4] Loading configuration         ");
 
-            var json = "{}";
-            var utf8 = new UTF8Encoding(false);
-            var fi = new FileInfo("config.json");
-            if (!fi.Exists)
-            {
-                Console.WriteLine("\rLoading configuration failed");
+            // locate the config file
+            var cfgFile = new FileInfo("config.json");
 
-                json = JsonConvert.SerializeObject(CompanionCubeConfig.Default, Formatting.Indented);
-                using (var fs = fi.Create())
-                using (var sw = new StreamWriter(fs, utf8))
-                {
-                    await sw.WriteAsync(json);
-                    await sw.FlushAsync();
-                }
+            // load the config file and validate it
+            var cfgLoader = new CompanionCubeConfigLoader();
+            var cfg = await cfgLoader.LoadConfigurationAsync(cfgFile).ConfigureAwait(false);
+            cfgLoader.ValidateConfiguration(cfg);
 
-                Console.WriteLine("New default configuration file has been written to the following location:");
-                Console.WriteLine(fi.FullName);
-                Console.WriteLine("Fill it with appropriate values then re-run this program");
+            Console.Write("\r[2/4] Loading unicode data          ");
 
-                return;
-            }
-
-            using (var fs = fi.OpenRead())
-            using (var sr = new StreamReader(fs, utf8))
-                json = await sr.ReadToEndAsync();
-            var cfg = JsonConvert.DeserializeObject<CompanionCubeConfig>(json);
-
-            Console.Write("\r[2/5] Loading unicode data         ");
-
+            // load unicode data
             using (var utfloader = new UnicodeDataLoader("unicode_data.json.gz"))
                 await utfloader.LoadCodepointsAsync().ConfigureAwait(false);
 
-            Console.Write("\r[3/5] Booting PostgreSQL connection");
+            Console.Write("\r[3/4] Validating PostgreSQL database");
 
-            Database = new DatabaseClient(cfg.DatabaseConfig);
-            await Database.InitializeAsync();
+            // create database type mapping
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<DatabaseEntityKind>("entity_kind");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<DatabaseTagKind>("tag_kind");
 
-            Console.Write("\r[4/5] Loading data from database   ");
+            // create database connection and validate schema
+            var dbcsp = new ConnectionStringProvider(cfg.PostgreSQL);
+            var db = new DatabaseContext(dbcsp);
+            var dbv = db.Metadata.SingleOrDefault(x => x.MetaKey == "schema_version");
+            if (dbv == null || dbv.MetaValue != "4")
+                throw new InvalidDataException("Database schema version mismatch.");
+            dbv = db.Metadata.SingleOrDefault(x => x.MetaKey == "project");
+            if (dbv == null || dbv.MetaValue != "Companion Cube")
+                throw new InvalidDataException("Database schema type mismatch.");
 
-            var cpfixes_db = await Database.GetChannelPrefixesAsync();
-            var cpfixes = new ConcurrentDictionary<ulong, string>();
-            foreach (var cpfix in cpfixes_db)
-                cpfixes.TryAdd(cpfix.Key, cpfix.Value);
+            Console.Write("\r[4/4] Creating and booting shards   ");
 
-            var gpfixes_db = await Database.GetGuildPrefixesAsync();
-            var gpfixes = new ConcurrentDictionary<ulong, string>();
-            foreach (var gpfix in gpfixes_db)
-                gpfixes.TryAdd(gpfix.Key, gpfix.Value);
-
-            var busers_db = await Database.GetBlockedUsersAsync();
-            var busers = new ConcurrentHashSet<ulong>();
-            foreach (var buser in busers_db)
-                busers.TryAdd(buser);
-
-            var bchans_db = await Database.GetBlockedChannelsAsync();
-            var bchans = new ConcurrentHashSet<ulong>();
-            foreach (var bchan in bchans_db)
-                bchans.TryAdd(bchan);
-
-            var bguilds_db = await Database.GetBlockedGuildsAsync();
-            var bguilds = new ConcurrentHashSet<ulong>();
-            foreach (var bguild in bguilds_db)
-                bguilds.TryAdd(bguild);
-
-            // get shekel rates
-            var shekelrates_db = await Database.GetShekelRatesAsync();
-            var shekelrates = new ConcurrentDictionary<ulong, double>();
-            foreach (var (k, v) in shekelrates_db)
-                shekelrates[k] = v;
-
-            var proc = Process.GetCurrentProcess();
-
-            Shared = new SharedData(cpfixes, gpfixes, busers, bchans, bguilds, cfg.CurrencySymbol, proc.StartTime, cfg.Game, shekelrates, 
-                new ConnectionEndpoint { Hostname = cfg.LavalinkConfig.Hostname, Port = cfg.LavalinkConfig.WebSocketPort }, cfg.LavalinkConfig);
-
-            Console.Write("\r[5/5] Creating shards              ");
-
-            Shards = new List<CompanionCubeCore>();
-            for (var i = 0; i < cfg.ShardCount; i++)
-            {
-                var shard = new CompanionCubeCore(cfg, i, Database, Shared);
-                shard.Initialize();
-                Shards.Add(shard);
-            }
+            // create shards
+            Shards = new Dictionary<int, CompanionCubeBot>();
+            var async = new AsyncExecutor();
+            for (int i = 0; i < cfg.Discord.ShardCount; i++)
+                Shards[i] = new CompanionCubeBot(cfg, i, async);
 
             // --- LOADING COMPLETED ---
             Console.WriteLine("\rLoading completed, booting the shards");
             Console.WriteLine("-------------------------------------");
 
-            foreach (var shard in Shards)
+            // boot shards
+            foreach (var (k, shard) in Shards)
                 await shard.StartAsync();
 
             // do a minimal cleanup

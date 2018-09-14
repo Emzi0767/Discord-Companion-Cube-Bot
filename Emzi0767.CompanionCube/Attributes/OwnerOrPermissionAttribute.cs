@@ -1,6 +1,6 @@
-// This file is part of Emzi0767.CompanionCube project
+// This file is part of Companion Cube project
 //
-// Copyright 2017 Emzi0767
+// Copyright 2018 Emzi0767
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 
-namespace Emzi0767.CompanionCube
+namespace Emzi0767.CompanionCube.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public sealed class OwnerOrPermissionAttribute : CheckBaseAttribute

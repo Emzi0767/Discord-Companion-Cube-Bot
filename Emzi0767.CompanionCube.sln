@@ -15,9 +15,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE = LICENSE
 		NOTICE = NOTICE
 		README.md = README.md
-		schema_v1.sql = schema_v1.sql
-		schema_v1_to_v2.sql = schema_v1_to_v2.sql
-		schema_v2_to_v3.sql = schema_v2_to_v3.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{06A3C0C9-A7EA-4205-BFB9-E0C549E94A4F}"
+	ProjectSection(SolutionItems) = preProject
+		Database\schema_v1.sql = Database\schema_v1.sql
+		Database\schema_v1_to_v2.sql = Database\schema_v1_to_v2.sql
+		Database\schema_v2_to_v3.sql = Database\schema_v2_to_v3.sql
+		Database\schema_v3_to_v4.sql = Database\schema_v3_to_v4.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{89849CF0-DE10-46A2-BFE5-0F1EBF6E09E0}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\bot.sh = Scripts\bot.sh
+		Scripts\lavalink.sh = Scripts\lavalink.sh
 	EndProjectSection
 EndProject
 Global

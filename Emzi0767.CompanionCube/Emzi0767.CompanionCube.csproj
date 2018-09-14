@@ -1,27 +1,54 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!-- 
+  This file is a part of Companion Cube project.
+  
+  Copyright 2018 Emzi0767
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
 <Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.12.1</Version>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Version>2.0.0</Version>
     <AssemblyVersion>$(Version).0</AssemblyVersion>
-    <FileVersion>$(Version).0</FileVersion>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
     <AssemblyTitle>Companion Cube</AssemblyTitle>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7.2</LangVersion>
+    <DebugType>Portable</DebugType>
   </PropertyGroup>
+  
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-beta-00473" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-beta-00473" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-beta-00473" />
-    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-beta-00471" />
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00524" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00524" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00524" />
+    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00524" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" Version="3.0.0-dev-61717-03" />
-    <PackageReference Include="Npgsql" Version="4.0.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.3" />
     <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
   </ItemGroup>
+  
   <ItemGroup>
+    <None Update="config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="unicode_data.json.gz">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  
 </Project>
