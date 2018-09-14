@@ -1,6 +1,6 @@
 {
   "version": {
-    "numeric": 2
+    "config": 2
   },
   "discord": {
     "token": "insert_token_here",
