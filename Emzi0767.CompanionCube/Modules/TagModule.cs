@@ -258,13 +258,16 @@ namespace Emzi0767.CompanionCube.Modules
             
             if (tag != null)
             {
+                var users = await Task.WhenAll(tag.Revisions.Select(x => x.UserId).Distinct().Select(x => (ulong)x).Select(x => ctx.Client.GetUserAsync(x))).ConfigureAwait(false);
+
                 var sb = new StringBuilder()
                     .AppendLine($"List of edits to {Formatter.InlineCode(tag.Name)}")
                     .AppendLine();
                 for (var i = 0; i < tag.Revisions.Count; i++)
                 {
                     var tagRev = tag.Revisions.ElementAt(i);
-                    sb.AppendLine($"`{i,-3}:` {tagRev.CreatedAt:yyyy-MM-dd HH:mm:ss.fff zzz} by <@!{tagRev.UserId}>");
+                    var usr = users.FirstOrDefault(x => x.Id == (ulong)tagRev.UserId);
+                    sb.AppendLine($"`{i,-3}:` {tagRev.CreatedAt:yyyy-MM-dd HH:mm:ss.fff zzz} by {Formatter.Bold(Formatter.Sanitize(usr.Username))}#{usr.Discriminator} ({usr.Id})");
                 }
 
                 await ctx.RespondAsync(sb.ToString().Replace("\r\n", "\n"));
@@ -801,13 +804,16 @@ namespace Emzi0767.CompanionCube.Modules
                 
                 if (tag != null)
                 {
+                    var users = await Task.WhenAll(tag.Revisions.Select(x => x.UserId).Distinct().Select(x => (ulong)x).Select(x => ctx.Client.GetUserAsync(x))).ConfigureAwait(false);
+
                     var sb = new StringBuilder()
                         .AppendLine($"List of edits to {Formatter.InlineCode(tag.Name)}")
                         .AppendLine();
                     for (var i = 0; i < tag.Revisions.Count; i++)
                     {
                         var tagRev = tag.Revisions.ElementAt(i);
-                        sb.AppendLine($"`{i,-3}:` {tagRev.CreatedAt:yyyy-MM-dd HH:mm:ss.fff zzz} by <@!{tagRev.UserId}>");
+                        var usr = users.FirstOrDefault(x => x.Id == (ulong)tagRev.UserId);
+                        sb.AppendLine($"`{i,-3}:` {tagRev.CreatedAt:yyyy-MM-dd HH:mm:ss.fff zzz} by {Formatter.Bold(Formatter.Sanitize(usr.Username))}#{usr.Discriminator} ({usr.Id})");
                     }
 
                     await ctx.RespondAsync(sb.ToString().Replace("\r\n", "\n"));
