@@ -104,7 +104,7 @@ namespace Emzi0767.CompanionCube.Data
     /// <summary>
     /// Represents information about guilds for which the music module is enabled.
     /// </summary>
-    [Table("music_enabled")]
+    [Table("musicenabled")]
     public partial class DatabaseMusicEnabled
     {
         /// <summary>
