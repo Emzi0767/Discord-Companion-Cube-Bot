@@ -21,8 +21,8 @@
   },
   "lavalink": {
     "hostname": "localhost",
-    "ws_port": 80,
-    "rest_port": 2333,
+    "port_ws": 80,
+    "port_rest": 2333,
     "password": "youshallnotpass"
   },
   "youtube": {
