@@ -75,10 +75,13 @@ namespace Emzi0767.CompanionCube.Modules
                 cmd.CommandText = query;
                 using (var rdr = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
                 {
-                    var dict = new Dictionary<string, string>();
-                    for (i = 0; i < rdr.FieldCount; i++)
-                        dict[rdr.GetName(i)] = rdr[i] is DBNull ? "<null>" : rdr[i].ToString();
-                    dat.Add(dict);
+                    while (await rdr.ReadAsync().ConfigureAwait(false))
+                    {
+                        var dict = new Dictionary<string, string>();
+                        for (i = 0; i < rdr.FieldCount; i++)
+                            dict[rdr.GetName(i)] = rdr[i] is DBNull ? "<null>" : rdr[i].ToString();
+                        dat.Add(dict);
+                    }
                 }
             }
             
