@@ -35,7 +35,7 @@ namespace Emzi0767.CompanionCube.Modules
     [Group("music")]
     [Description("Provides commands for music playback.")]
     [ModuleLifespan(ModuleLifespan.Transient)]
-    [NotBlocked, MusicEnabled]
+    [NotBlacklisted, MusicWhitelisted]
     public sealed class MusicModule : BaseCommandModule
     {
         private static ImmutableDictionary<int, DiscordEmoji> NumberMappings { get; }

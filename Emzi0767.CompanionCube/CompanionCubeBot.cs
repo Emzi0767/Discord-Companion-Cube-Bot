@@ -149,7 +149,7 @@ namespace Emzi0767.CompanionCube
                 IgnoreExtraArguments = false,
 
                 EnableDefaultHelp = true,
-                DefaultHelpChecks = new[] { new NotBlockedAttribute() },
+                DefaultHelpChecks = new[] { new NotBlacklistedAttribute() },
 
                 EnableMentionPrefix = cfg.Discord.EnableMentionPrefix,
                 PrefixResolver = this.ResolvePrefixAsync,
@@ -327,7 +327,7 @@ namespace Emzi0767.CompanionCube
             { } // ignore
             else if (ex is ChecksFailedException cfe)
             {
-                if (!cfe.FailedChecks.OfType<NotBlockedAttribute>().Any())
+                if (!cfe.FailedChecks.OfType<NotBlacklistedAttribute>().Any())
                     embed = new DiscordEmbedBuilder
                     {
                         Title = "Permission denied",

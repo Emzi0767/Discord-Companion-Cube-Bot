@@ -77,7 +77,7 @@ namespace Emzi0767.CompanionCube
             var dbcsp = new ConnectionStringProvider(cfg.PostgreSQL);
             var db = new DatabaseContext(dbcsp);
             var dbv = db.Metadata.SingleOrDefault(x => x.MetaKey == "schema_version");
-            if (dbv == null || dbv.MetaValue != "4")
+            if (dbv == null || dbv.MetaValue != "5")
                 throw new InvalidDataException("Database schema version mismatch.");
             dbv = db.Metadata.SingleOrDefault(x => x.MetaKey == "project");
             if (dbv == null || dbv.MetaValue != "Companion Cube")

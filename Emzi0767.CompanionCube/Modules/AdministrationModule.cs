@@ -232,114 +232,139 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
         }
 
-        [Command("setmusic"), Description("Sets whether music in the specified guild shall be available or not."), RequireOwner]
+        [Command("musicwhitelist"), Description("Sets whether the specified guild should be whitelisted for music. Invoking with no arguments lists whitelisted guilds."), Aliases("musicwl"), RequireOwner]
         public async Task MusicAsync(CommandContext ctx,
             [Description("Guild for which to toggle the setting.")] DiscordGuild guild,
-            [Description("Whether the music should be available.")] bool enabled,
+            [Description("Whether the music module should be available.")] bool whitelist,
             [RemainingText, Description("Reason why the guild has music enabled.")] string reason = null)
         {
             var gid = (long)guild.Id;
-            var enable = this.Database.MusicEnabled.SingleOrDefault(x => x.GuildId == gid);
-            if (enabled && enable == null)
+            var enable = this.Database.MusicWhitelist.SingleOrDefault(x => x.GuildId == gid);
+            if (whitelist && enable == null)
             {
-                enable = new DatabaseMusicEnabled
+                enable = new DatabaseMusicWhitelistedGuild
                 {
                     GuildId = gid,
                     Reason = reason
                 };
-                this.Database.MusicEnabled.Add(enable);
+                this.Database.MusicWhitelist.Add(enable);
             }
-            else if (!enabled && enable != null)
+            else if (!whitelist && enable != null)
             {
-                this.Database.MusicEnabled.Remove(enable);
+                this.Database.MusicWhitelist.Remove(enable);
             }
 
             await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Music is now {(enabled? "enabled" : "disabled")} in {Formatter.Bold(Formatter.Sanitize(guild.Name))}.").ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {Formatter.Bold(Formatter.Sanitize(guild.Name))} is {(whitelist ? "now whitelisted for music playback" : "not whitelisted for music playback anymore")}.").ConfigureAwait(false);
         }
 
-        [Command("setblock"), Description("Sets blocked status for a user, channel, or guild."), Aliases("block", "unblock")]
-        public async Task SetBlockAsync(CommandContext ctx,
-           [Description("User whose block status to change.")] DiscordUser user,
-           [Description("Whether the user should be blocked.")] bool blocked,
-           [RemainingText, Description("Reason why this user is blocked.")] string reason = null)
+        [Command("musicwhitelist")]
+        public async Task MusicAsync(CommandContext ctx)
+        {
+            var sb = new StringBuilder("Music is enabled in the following guilds (for this shard):\n\n");
+            foreach (var x in this.Database.MusicWhitelist)
+            {
+                if (!ctx.Client.Guilds.TryGetValue((ulong)x.GuildId, out var gld))
+                    continue;
+
+                sb.Append($"{gld.Id} ({Formatter.Sanitize(gld.Name)}): {(string.IsNullOrWhiteSpace(x.Reason) ? "no reason specified" : x.Reason)}\n");
+            }
+
+            await ctx.RespondAsync(sb.ToString()).ConfigureAwait(false);
+        }
+
+        [Command("blacklist"), Description("Sets blacklisted status for a user, channel, or guild. Invoking with no arguments lists blacklisted entities."), Aliases("bl")]
+        public async Task BlacklistAsync(CommandContext ctx,
+           [Description("User whose blacklisted status to change.")] DiscordUser user,
+           [Description("Whether the user should be blacklisted.")] bool blacklisted,
+           [RemainingText, Description("Reason why this user is blacklisted.")] string reason = null)
         {
             var uid = (long)user.Id;
-            var block = this.Database.BlockedEntities.SingleOrDefault(x => x.Id == uid && x.Kind == DatabaseEntityKind.User);
-            if (blocked && block == null)
+            var block = this.Database.EntityBlacklist.SingleOrDefault(x => x.Id == uid && x.Kind == DatabaseEntityKind.User);
+            if (blacklisted && block == null)
             {
-                block = new DatabaseBlockedEntity
+                block = new DatabaseBlacklistedEntity
                 {
                     Id = uid,
                     Kind = DatabaseEntityKind.User,
                     Reason = reason,
                     Since = DateTime.UtcNow
                 };
-                this.Database.BlockedEntities.Add(block);
+                this.Database.EntityBlacklist.Add(block);
             }
-            else if (!blocked && block != null)
+            else if (!blacklisted && block != null)
             {
-                this.Database.BlockedEntities.Remove(block);
+                this.Database.EntityBlacklist.Remove(block);
             }
 
             await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} User {user.Mention} is {(blocked ? "now blocked" : "no longer blocked")}.").ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} User {user.Mention} is {(blacklisted ? "now blacklisted" : "no longer blacklisted")}.").ConfigureAwait(false);
         }
 
-        [Command("setblock")]
-        public async Task SetBlockAsync(CommandContext ctx,
-            [Description("Channel of which block status to change.")] DiscordChannel channel,
-            [Description("Whether the user should be blocked.")] bool blocked,
-            [RemainingText, Description("Reason why this user is blocked.")] string reason = null)
+        [Command("blacklist")]
+        public async Task BlacklistAsync(CommandContext ctx,
+            [Description("Channel of which blacklisted status to change.")] DiscordChannel channel,
+            [Description("Whether the user should be blacklisted.")] bool blacklisted,
+            [RemainingText, Description("Reason why this user is blacklisted.")] string reason = null)
         {
             var cid = (long)channel.Id;
-            var block = this.Database.BlockedEntities.SingleOrDefault(x => x.Id == cid && x.Kind == DatabaseEntityKind.Channel);
-            if (blocked && block == null)
+            var block = this.Database.EntityBlacklist.SingleOrDefault(x => x.Id == cid && x.Kind == DatabaseEntityKind.Channel);
+            if (blacklisted && block == null)
             {
-                block = new DatabaseBlockedEntity
+                block = new DatabaseBlacklistedEntity
                 {
                     Id = cid,
                     Kind = DatabaseEntityKind.Channel,
                     Reason = reason,
                     Since = DateTime.UtcNow
                 };
-                this.Database.BlockedEntities.Add(block);
+                this.Database.EntityBlacklist.Add(block);
             }
-            else if (!blocked && block != null)
+            else if (!blacklisted && block != null)
             {
-                this.Database.BlockedEntities.Remove(block);
+                this.Database.EntityBlacklist.Remove(block);
             }
 
             await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Channel {channel.Mention} is {(blocked ? "now blocked" : "no longer blocked")}.").ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Channel {channel.Mention} is {(blacklisted ? "now blacklisted" : "no longer blacklisted")}.").ConfigureAwait(false);
         }
 
-        [Command("setblock")]
-        public async Task SetBlockAsync(CommandContext ctx,
-            [Description("Guild of which block status to change.")] DiscordGuild guild,
-            [Description("Whether the user should be blocked.")] bool blocked,
-            [RemainingText, Description("Reason why this user is blocked.")] string reason = null)
+        [Command("blacklist")]
+        public async Task BlacklistAsync(CommandContext ctx,
+            [Description("Guild of which blacklisted status to change.")] DiscordGuild guild,
+            [Description("Whether the user should be blacklisted.")] bool blacklisted,
+            [RemainingText, Description("Reason why this user is blacklisted.")] string reason = null)
         {
             var gid = (long)guild.Id;
-            var block = this.Database.BlockedEntities.SingleOrDefault(x => x.Id == gid && x.Kind == DatabaseEntityKind.Guild);
-            if (blocked && block == null)
+            var block = this.Database.EntityBlacklist.SingleOrDefault(x => x.Id == gid && x.Kind == DatabaseEntityKind.Guild);
+            if (blacklisted && block == null)
             {
-                block = new DatabaseBlockedEntity
+                block = new DatabaseBlacklistedEntity
                 {
                     Id = gid,
                     Kind = DatabaseEntityKind.Guild,
                     Reason = reason,
                     Since = DateTime.UtcNow
                 };
-                this.Database.BlockedEntities.Add(block);
+                this.Database.EntityBlacklist.Add(block);
             }
-            else if (!blocked && block != null)
+            else if (!blacklisted && block != null)
             {
-                this.Database.BlockedEntities.Remove(block);
+                this.Database.EntityBlacklist.Remove(block);
             }
 
             await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Guild {Formatter.Bold(Formatter.Sanitize(guild.Name))} is {(blocked ? "now blocked" : "no longer blocked")}.").ConfigureAwait(false);
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Guild {Formatter.Bold(Formatter.Sanitize(guild.Name))} is {(blacklisted ? "now blacklisted" : "no longer blacklisted")}.").ConfigureAwait(false);
+        }
+
+        [Command("blacklist")]
+        public async Task BlacklistAsync(CommandContext ctx)
+        {
+            var sb = new StringBuilder("Following entities are blacklisted:\n\n");
+            foreach (var x in this.Database.EntityBlacklist)
+                sb.Append($"{(ulong)x.Id} ({x.Kind}, since {x.Since:yyyy-MM-dd HH:mm:ss zzz}): {(string.IsNullOrWhiteSpace(x.Reason) ? "no reason specified" : x.Reason)}\n");
+
+            await ctx.RespondAsync(sb.ToString()).ConfigureAwait(false);
         }
 
         [Command("addprefix"), Description("Adds a prefix to this guild's command prefixes."), Aliases("addpfix")]

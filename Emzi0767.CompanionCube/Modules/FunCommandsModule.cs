@@ -31,7 +31,7 @@ namespace Emzi0767.CompanionCube.Modules
     [Group("fun")]
     [Description("Commands for fun and great justice.")]
     [ModuleLifespan(ModuleLifespan.Transient)]
-    [NotBlocked]
+    [NotBlacklisted]
     public class FunCommandsModule : BaseCommandModule
     {
         private CSPRNG RNG { get; }

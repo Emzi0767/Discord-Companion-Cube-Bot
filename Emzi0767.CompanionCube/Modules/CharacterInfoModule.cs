@@ -34,7 +34,7 @@ namespace Emzi0767.CompanionCube.Modules
     [Aliases("utfinfo", "unicodeinfo", "chrinfo", "ucinfo")]
     [Description("Provides commands for obtaining information about unicode strings. Invoking without subcommand will display simplified character information.")]
     [ModuleLifespan(ModuleLifespan.Transient)]
-    [NotBlocked]
+    [NotBlacklisted]
     public class CharacterInfoModule : BaseCommandModule
     {
         private static Regex SeparatorReplacementRegex { get; } = new Regex(@"[\s\-,]");

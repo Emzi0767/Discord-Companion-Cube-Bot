@@ -73,8 +73,8 @@ namespace Emzi0767.CompanionCube.Data
     /// <summary>
     /// Represents a collection of entities blocked from using the bot.
     /// </summary>
-    [Table("blocked_entities")]
-    public partial class DatabaseBlockedEntity
+    [Table("entity_blacklist")]
+    public partial class DatabaseBlacklistedEntity
     {
         /// <summary>
         /// Gets or sets the entity's ID.
@@ -104,8 +104,8 @@ namespace Emzi0767.CompanionCube.Data
     /// <summary>
     /// Represents information about guilds for which the music module is enabled.
     /// </summary>
-    [Table("musicenabled")]
-    public partial class DatabaseMusicEnabled
+    [Table("music_whitelist")]
+    public partial class DatabaseMusicWhitelistedGuild
     {
         /// <summary>
         /// Gets or sets the ID of the guild for which music module is enabled.

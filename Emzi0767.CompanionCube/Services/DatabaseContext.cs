@@ -35,14 +35,14 @@ namespace Emzi0767.CompanionCube.Services
         public virtual DbSet<DatabasePrefix> Prefixes { get; set; }
 
         /// <summary>
-        /// Gets or sets blocked entities.
+        /// Gets or sets entities that are blacklisted from using the bot.
         /// </summary>
-        public virtual DbSet<DatabaseBlockedEntity> BlockedEntities { get; set; }
+        public virtual DbSet<DatabaseBlacklistedEntity> EntityBlacklist { get; set; }
 
         /// <summary>
-        /// Gets or sets guilds for which music is enabled.
+        /// Gets or sets guilds which are whitelisted to use the music module.
         /// </summary>
-        public virtual DbSet<DatabaseMusicEnabled> MusicEnabled { get; set; }
+        public virtual DbSet<DatabaseMusicWhitelistedGuild> MusicWhitelist { get; set; }
 
         /// <summary>
         /// Gets or sets defined tags.
@@ -104,12 +104,12 @@ namespace Emzi0767.CompanionCube.Services
                 entity.Property(e => e.EnableDefault).HasDefaultValueSql("true");
             });
 
-            modelBuilder.Entity<DatabaseBlockedEntity>(entity =>
+            modelBuilder.Entity<DatabaseBlacklistedEntity>(entity =>
             {
                 entity.HasKey(e => new { e.Id, e.Kind });
             });
 
-            modelBuilder.Entity<DatabaseMusicEnabled>(entity =>
+            modelBuilder.Entity<DatabaseMusicWhitelistedGuild>(entity =>
             {
                 entity.Property(e => e.GuildId).ValueGeneratedNever();
             });

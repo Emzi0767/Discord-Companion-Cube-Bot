@@ -1,4 +1,4 @@
-﻿// This file is part of Companion Cube project
+// This file is part of Companion Cube project
 //
 // Copyright 2018 Emzi0767
 // 
@@ -14,16 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Emzi0767.CompanionCube.Data;
 using Emzi0767.CompanionCube.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Emzi0767.CompanionCube.Attributes
 {
-    public class MusicEnabledAttribute : CheckBaseAttribute
+    /// <summary>
+    /// Verifies that the user is not blocked for the purpose of the command usage.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public sealed class NotBlacklistedAttribute : CheckBaseAttribute
     {
         public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
         {
@@ -33,9 +39,16 @@ namespace Emzi0767.CompanionCube.Attributes
             if (help)
                 return Task.FromResult(true);
 
+            if (ctx.User == ctx.Client.CurrentApplication.Owner)
+                return Task.FromResult(true);
+
+            var uid = (long)ctx.User.Id;
+            var cid = (long)ctx.Channel.Id;
             var gid = (long)ctx.Guild.Id;
+
             var db = ctx.Services.GetService<DatabaseContext>();
-            return Task.FromResult(db.MusicEnabled.Any(x => x.GuildId == gid));
+            var blocked = db.EntityBlacklist.Any(x => (x.Id == uid && x.Kind == DatabaseEntityKind.User) || (x.Id == cid && x.Kind == DatabaseEntityKind.Channel) || (x.Id == gid && x.Kind == DatabaseEntityKind.Guild));
+            return Task.FromResult(!blocked);
         }
     }
 }

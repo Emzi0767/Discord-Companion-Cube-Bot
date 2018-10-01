@@ -22,7 +22,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Version>2.0.5</Version>
+    <Version>2.1.0</Version>
     <AssemblyVersion>$(Version).0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <AssemblyTitle>Companion Cube</AssemblyTitle>
@@ -31,10 +31,10 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00524" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00524" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00524" />
-    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00524" />
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00539" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00539" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00539" />
+    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00539" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.2" />

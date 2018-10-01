@@ -33,7 +33,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 namespace Emzi0767.CompanionCube.Modules
 {
     [ModuleLifespan(ModuleLifespan.Transient)]
-    [NotBlocked]
+    [NotBlacklisted]
     public sealed class MiscCommandsModule : BaseCommandModule
     {
         public MiscCommandsModule()
