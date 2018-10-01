@@ -71,7 +71,7 @@ namespace Emzi0767.CompanionCube.Data
     }
 
     /// <summary>
-    /// Represents a collection of entities blocked from using the bot.
+    /// Represents an entity blacklisted from using the bot.
     /// </summary>
     [Table("entity_blacklist")]
     public partial class DatabaseBlacklistedEntity
@@ -89,33 +89,33 @@ namespace Emzi0767.CompanionCube.Data
         public DatabaseEntityKind Kind { get; set; }
 
         /// <summary>
-        /// Gets or sets the reason why the entity was blocked.
+        /// Gets or sets the reason why the entity was blacklisted.
         /// </summary>
         [Column("reason")]
         public string Reason { get; set; }
 
         /// <summary>
-        /// Gets or sets when the entity was blocked.
+        /// Gets or sets when the entity was blacklisted.
         /// </summary>
         [Column("since", TypeName = "timestamp with time zone")]
         public DateTime Since { get; set; }
     }
 
     /// <summary>
-    /// Represents information about guilds for which the music module is enabled.
+    /// Represents information about a guild whitelisted to use the music module.
     /// </summary>
     [Table("music_whitelist")]
     public partial class DatabaseMusicWhitelistedGuild
     {
         /// <summary>
-        /// Gets or sets the ID of the guild for which music module is enabled.
+        /// Gets or sets the ID of the guild whitelisted for music module usage.
         /// </summary>
         [Key]
         [Column("guild_id")]
         public long GuildId { get; set; }
 
         /// <summary>
-        /// Gets or sets the reason why this guild has music enabled.
+        /// Gets or sets the reason why this guild is whitelisted.
         /// </summary>
         [Column("reason")]
         public string Reason { get; set; }

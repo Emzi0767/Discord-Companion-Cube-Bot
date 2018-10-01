@@ -26,7 +26,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Emzi0767.CompanionCube.Attributes
 {
     /// <summary>
-    /// Verifies that the user is not blocked for the purpose of the command usage.
+    /// Verifies that the user is not blacklisted for the purpose of the command usage.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public sealed class NotBlacklistedAttribute : CheckBaseAttribute
