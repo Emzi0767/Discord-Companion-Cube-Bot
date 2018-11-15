@@ -63,12 +63,15 @@ namespace Emzi0767.CompanionCube.Modules
 
             var cid = (long)ctx.Channel.Id;
             var gid = (long)ctx.Guild.Id;
-            
+
+            var cnid = type == TagType.Channel ? cid : gid;
+            var cnkind = type == TagType.Channel ? DatabaseTagKind.Channel : DatabaseTagKind.Guild;
+
             name = Formatter.Strip(name.ToLower()).Trim();
             var tag = new DatabaseTag
             {
-                ContainerId = type == TagType.Channel ? cid : gid,
-                Kind = type == TagType.Channel ? DatabaseTagKind.Channel : DatabaseTagKind.Guild,
+                ContainerId = cnid,
+                Kind = cnkind,
                 Name = name,
                 IsHidden = false,
                 OwnerId = (long)ctx.User.Id,
@@ -83,6 +86,12 @@ namespace Emzi0767.CompanionCube.Modules
                 CreatedAt = tag.LatestRevision,
                 UserId = tag.OwnerId
             };
+
+            if (this.Database.Tags.Any(x => x.ContainerId == cnid && x.Kind == cnkind && x.Name == name))
+            {
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} A {cnkind.ToString().ToLower()} tag with the name {Formatter.InlineCode(name)} already exists in this {cnkind.ToString().ToLower()}.").ConfigureAwait(false);
+                return;
+            }
 
             await this.Database.Tags.AddAsync(tag).ConfigureAwait(false);
             await this.Database.TagRevisions.AddAsync(tagRev).ConfigureAwait(false);
@@ -714,6 +723,12 @@ namespace Emzi0767.CompanionCube.Modules
                     CreatedAt = tag.LatestRevision,
                     UserId = tag.OwnerId
                 };
+
+                if (this.Database.Tags.Any(x => x.ContainerId == 0 && x.Kind == DatabaseTagKind.Global && x.Name == name))
+                {
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} A global tag with the name {Formatter.InlineCode(name)} already exists.").ConfigureAwait(false);
+                    return;
+                }
 
                 await this.Database.Tags.AddAsync(tag).ConfigureAwait(false);
                 await this.Database.TagRevisions.AddAsync(tagRev).ConfigureAwait(false);

@@ -292,7 +292,7 @@ namespace Emzi0767.CompanionCube
                 return;
 
             var usrs = chn.Users;
-            if (usrs.Count() == 1 && usrs.First() == this.Discord.CurrentUser)
+            if (gmd.IsPlaying && usrs.Count() == 1 && usrs.First() == this.Discord.CurrentUser)
             {
                 e.Client.DebugLogger.LogMessage(LogLevel.Info, LOG_TAG, $"All users left voice in {e.Guild.Name}, pausing playback", DateTime.Now);
                 gmd.Pause();
