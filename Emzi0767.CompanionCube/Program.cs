@@ -54,7 +54,8 @@ namespace Emzi0767.CompanionCube
             Console.Write("[1/4] Loading configuration         ");
 
             // locate the config file
-            var cfgFile = new FileInfo("config.json");
+            var dockerSecret = Environment.GetEnvironmentVariable("DOCKER_SECRET");
+            var cfgFile = new FileInfo(dockerSecret != null ? Path.Combine("/run/secrets", dockerSecret) : "config.json");
 
             // load the config file and validate it
             var cfgLoader = new CompanionCubeConfigLoader();

@@ -175,19 +175,13 @@ namespace Emzi0767.CompanionCube.Data
         public string Hostname { get; private set; } = "localhost";
 
         /// <summary>
-        /// Gets the port of the WebSocket part of Lavalink API.
+        /// Gets the port of the Lavalink node server.
         /// </summary>
-        [JsonProperty("port_ws")]
-        public int WebSocketPort { get; private set; } = 80;
+        [JsonProperty("port")]
+        public int Port { get; private set; } = 2333;
 
         /// <summary>
-        /// Gets the port of the REST part of Lavalink API.
-        /// </summary>
-        [JsonProperty("port_rest")]
-        public int RestPort { get; private set; } = 2333;
-
-        /// <summary>
-        /// Gets the password to Lavalink API.
+        /// Gets the password to Lavalink node server.
         /// </summary>
         [JsonProperty("password")]
         public string Password { get; private set; } = "youshallnotpass";

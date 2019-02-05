@@ -44,12 +44,10 @@ namespace Emzi0767.CompanionCube.Modules
     public sealed class AdministrationModule : BaseCommandModule
     {
         private DatabaseContext Database { get; }
-        private CompanionCubeBot Bot { get; }
 
-        public AdministrationModule(DatabaseContext database, CompanionCubeBot bot)
+        public AdministrationModule(DatabaseContext database)
         {
             this.Database = database;
-            this.Bot = bot;
         }
 
         [Command("sudo"), Description("Executes a command as another user."), Hidden, RequireOwner]
@@ -367,83 +365,142 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync(sb.ToString()).ConfigureAwait(false);
         }
 
-        [Command("addprefix"), Description("Adds a prefix to this guild's command prefixes."), Aliases("addpfix")]
-        public async Task AddPrefixAsync(CommandContext ctx,
-            [RemainingText, Description("Prefix to add to this guild's prefixes.")] string prefix)
+        [Group("prefix"), ModuleLifespan(ModuleLifespan.Transient), Description("Commands for managing the prefixes that trigger the bot's commands."), Aliases("pfx")]
+        public class Prefix : BaseCommandModule
         {
-            if (this.Bot.Configuration.Discord.DefaultPrefixes.Contains(prefix))
+            private DatabaseContext Database { get; }
+            private CompanionCubeBot Bot { get; }
+
+            public Prefix(DatabaseContext database, CompanionCubeBot bot)
             {
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} Cannot add default prefix.").ConfigureAwait(false);
-                return;
+                this.Database = database;
+                this.Bot = bot;
             }
 
-            var gid = (long)ctx.Guild.Id;
-            var gpfix = this.Database.Prefixes.SingleOrDefault(x => x.GuildId == gid);
-            if (gpfix == null)
+            [GroupCommand]
+            public async Task ListAsync(CommandContext ctx)
             {
-                gpfix = new DatabasePrefix
+                var gid = (long)ctx.Guild.Id;
+                var gpfx = this.Database.Prefixes.SingleOrDefault(x => x.GuildId == gid);
+                var dcfg = this.Bot.Configuration.Discord;
+
+                var sb = new StringBuilder();
+                sb.Append($"Prefixes for {Formatter.Sanitize(ctx.Guild.Name)}:\n\n");
+                if (gpfx == null)
                 {
-                    GuildId = gid,
-                    Prefixes = new[] { prefix },
-                    EnableDefault = true
-                };
-                this.Database.Prefixes.Add(gpfix);
-            }
-            else if (!gpfix.Prefixes.Contains(prefix))
-            {
-                gpfix.Prefixes = gpfix.Prefixes.Concat(new[] { prefix }).ToArray();
-                this.Database.Prefixes.Update(gpfix);
-            }
+                    if (dcfg.DefaultPrefixes.Any())
+                        sb.Append(string.Join(" ", dcfg.DefaultPrefixes.Select(Formatter.InlineCode)));
 
-            await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix added.").ConfigureAwait(false);
-        }
+                    if (dcfg.DefaultPrefixes.Any() && dcfg.EnableMentionPrefix)
+                        sb.Append(" ");
 
-        [Command("removeprefix"), Description("Removes a prefix from this guild's command prefixes."), Aliases("rmpfix")]
-        public async Task RemovePrefixAsync(CommandContext ctx,
-            [RemainingText, Description("Prefix to remove from this guild's prefixes.")] string prefix)
-        {
-            var gid = (long)ctx.Guild.Id;
-            var gpfix = this.Database.Prefixes.SingleOrDefault(x => x.GuildId == gid);
-            if (gpfix != null && gpfix.Prefixes.Contains(prefix))
-            {
-                gpfix.Prefixes = gpfix.Prefixes.Concat(new[] { prefix }).ToArray();
-                this.Database.Prefixes.Update(gpfix);
-            }
-            else if (gpfix != null && !gpfix.Prefixes.Contains(prefix))
-            {
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} This prefix is not configured.").ConfigureAwait(false);
-                return;
-            }
-
-            await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix removed.").ConfigureAwait(false);
-        }
-
-        [Command("configuredefaultprefixes"), Description("Configures whether default prefixes are to be enabled in this guild."), Aliases("cfgdefpfx")]
-        public async Task ConfigureDefaultPrefixesAsync(CommandContext ctx,
-            [RemainingText, Description("Whether default prefixes are to be enabled.")] bool enable)
-        {
-            var gid = (long)ctx.Guild.Id;
-            var gpfix = this.Database.Prefixes.SingleOrDefault(x => x.GuildId == gid);
-            if (gpfix == null)
-            {
-                gpfix = new DatabasePrefix
+                    if (dcfg.EnableMentionPrefix)
+                        sb.Append(ctx.Client.CurrentUser.Mention);
+                }
+                else
                 {
-                    GuildId = gid,
-                    Prefixes = new string[] { },
-                    EnableDefault = enable
-                };
-                this.Database.Prefixes.Add(gpfix);
-            }
-            else
-            {
-                gpfix.EnableDefault = enable;
-                this.Database.Prefixes.Update(gpfix);
+                    if (dcfg.EnableMentionPrefix)
+                        sb.Append(ctx.Client.CurrentUser.Mention);
+
+                    if (dcfg.EnableMentionPrefix && gpfx.EnableDefault == true && dcfg.DefaultPrefixes.Any())
+                        sb.Append(" ");
+
+                    if (gpfx.EnableDefault == true && dcfg.DefaultPrefixes.Any())
+                    {
+                        sb.Append(string.Join(" ", dcfg.DefaultPrefixes.Select(Formatter.InlineCode)));
+                    }
+
+                    if (gpfx.EnableDefault == true && dcfg.DefaultPrefixes.Any() && gpfx.Prefixes?.Any() == true)
+                        sb.Append(" ");
+
+                    if (gpfx.Prefixes?.Any() == true)
+                    {
+                        sb.Append(string.Join(" ", gpfx.Prefixes.Select(Formatter.InlineCode)));
+                    }
+                }
+
+                await ctx.RespondAsync(sb.ToString()).ConfigureAwait(false);
             }
 
-            await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Setting saved.").ConfigureAwait(false);
+            [Command("add"), Description("Adds a prefix to this guild's command prefixes.")]
+            public async Task AddPrefixAsync(CommandContext ctx,
+                [Description("Prefix to add to this guild's prefixes.")] string prefix)
+            {
+                var gid = (long)ctx.Guild.Id;
+                var gpfx = this.Database.Prefixes.SingleOrDefault(x => x.GuildId == gid);
+
+                if (gpfx?.EnableDefault != false && this.Bot.Configuration.Discord.DefaultPrefixes.Contains(prefix))
+                {
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} Cannot add default prefix.").ConfigureAwait(false);
+                    return;
+                }
+
+                if (gpfx == null)
+                {
+                    gpfx = new DatabasePrefix
+                    {
+                        GuildId = gid,
+                        Prefixes = new[] { prefix },
+                        EnableDefault = true
+                    };
+                    this.Database.Prefixes.Add(gpfx);
+                }
+                else if (!gpfx.Prefixes.Contains(prefix))
+                {
+                    gpfx.Prefixes = gpfx.Prefixes.Concat(new[] { prefix }).ToArray();
+                    this.Database.Prefixes.Update(gpfx);
+                }
+
+                await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix added.").ConfigureAwait(false);
+            }
+
+            [Command("remove"), Description("Removes a prefix from this guild's command prefixes."), Aliases("rm", "delete", "del")]
+            public async Task RemovePrefixAsync(CommandContext ctx,
+                [Description("Prefix to remove from this guild's prefixes.")] string prefix)
+            {
+                var gid = (long)ctx.Guild.Id;
+                var gpfx = this.Database.Prefixes.SingleOrDefault(x => x.GuildId == gid);
+                if (gpfx != null && gpfx.Prefixes.Contains(prefix))
+                {
+                    gpfx.Prefixes = gpfx.Prefixes.Except(new[] { prefix }).ToArray();
+                    this.Database.Prefixes.Update(gpfx);
+                }
+                else if (gpfx != null && !gpfx.Prefixes.Contains(prefix))
+                {
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} This prefix is not configured.").ConfigureAwait(false);
+                    return;
+                }
+
+                await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix removed.").ConfigureAwait(false);
+            }
+
+            [Command("enabledefault"), Description("Configures whether default prefixes are to be enabled in this guild."), Aliases("default", "def")]
+            public async Task ConfigureDefaultPrefixesAsync(CommandContext ctx,
+                [RemainingText, Description("Whether default prefixes are to be enabled.")] bool enable)
+            {
+                var gid = (long)ctx.Guild.Id;
+                var gpfx = this.Database.Prefixes.SingleOrDefault(x => x.GuildId == gid);
+                if (gpfx == null)
+                {
+                    gpfx = new DatabasePrefix
+                    {
+                        GuildId = gid,
+                        Prefixes = new string[] { },
+                        EnableDefault = enable
+                    };
+                    this.Database.Prefixes.Add(gpfx);
+                }
+                else
+                {
+                    gpfx.EnableDefault = enable;
+                    this.Database.Prefixes.Update(gpfx);
+                }
+
+                await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Setting saved.").ConfigureAwait(false);
+            }
         }
     }
 
