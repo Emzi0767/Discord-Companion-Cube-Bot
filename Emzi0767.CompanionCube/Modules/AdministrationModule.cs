@@ -221,7 +221,9 @@ namespace Emzi0767.CompanionCube.Modules
         [Command("nick"), Aliases("nickname"), Description("Changes the bot's nickname."), OwnerOrPermission(Permissions.ManageNicknames)]
         public async Task NicknameAsync(CommandContext ctx, [Description("New nickname for the bot.")] string new_nickname = "")
         {
-            var mbr = ctx.Guild.Members.FirstOrDefault(xm => xm.Id == ctx.Client.CurrentUser.Id) ?? await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id).ConfigureAwait(false);
+            if (!ctx.Guild.Members.TryGetValue(ctx.Client.CurrentUser.Id, out var mbr))
+                mbr = await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id).ConfigureAwait(false);
+
             await mbr.ModifyAsync(x =>
             {
                 x.Nickname = new_nickname;

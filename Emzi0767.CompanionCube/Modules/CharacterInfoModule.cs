@@ -25,6 +25,8 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Enums;
+using DSharpPlus.Interactivity.EventHandling;
 using Emzi0767.CompanionCube.Attributes;
 using Emzi0767.CompanionCube.Data;
 
@@ -49,38 +51,45 @@ namespace Emzi0767.CompanionCube.Modules
             if (string.IsNullOrEmpty(text))
                 throw new ArgumentNullException(nameof(text), "You need to supply a non-null string.");
 
-            var cps = text.ToCodepoints().Select(xcp => string.Concat("`U+", xcp.Codepoint, "` (", xcp.Name, (xcp.UnihanData.IsUnihan ? string.Concat(" / ", xcp.UnihanData.Definition) : ""), ") - ", Formatter.Sanitize(xcp.CodepointString), " - <http://www.fileformat.info/info/unicode/char/", xcp.Codepoint, ">"));
-            var pgs = new List<Page>();
-            var pn = 1;
+            var cps = text.ToCodepoints().Select(xcp => string.Concat("`U+", xcp.Codepoint, "` (", xcp.Name, xcp.UnihanData.IsUnihan ? string.Concat(" / ", xcp.UnihanData.Definition) : "", ") - ", Formatter.Sanitize(xcp.CodepointString), " - <http://www.fileformat.info/info/unicode/char/", xcp.Codepoint, ">"));
+
+            var pages = new List<StringBuilder>(cps.Sum(x => x.Length) / 1000 + 1);
             var sb = new StringBuilder();
+            var pn = 1;
             foreach (var xcp in cps)
             {
-                if (sb.Length + xcp.Length > 1000)
+                if (sb.Length + xcp.Length > 1024)
                 {
-                    sb.Append("\nPage: ").Append(pn++.ToString("#,##0")).Append(" of ");
-                    pgs.Add(new Page { Content = sb.ToString() });
+                    sb.Append("\nPage: ").Append(pn++).Append(" of ");
+                    pages.Add(sb);
                     sb = new StringBuilder();
                 }
 
                 sb.Append(xcp).Append("\n");
             }
 
-            sb.Append("\nPage: ").Append(pn++).Append(" of ");
-            pgs.Add(new Page { Content = sb.ToString() });
-
-            foreach (var xpg in pgs)
-                xpg.Content = string.Concat(xpg.Content, pgs.Count.ToString("#,##0"));
-
-            if (pgs.Count == 1)
+            if (pn != 1)
             {
-                var cnt = pgs.First().Content;
-                cnt = cnt.Substring(0, cnt.LastIndexOf("\n\n"));
-                await ctx.RespondAsync(cnt).ConfigureAwait(false);
+                sb.Append("\nPage: ").Append(pn).Append(" of ");
+                pages.Add(sb);
+
+                var pga = pages.Select(x => new Page(x.Append(pn).ToString(), null)).ToArray();
+                var ems = new PaginationEmojis(ctx.Client)
+                {
+                    SkipLeft = null,
+                    SkipRight = null,
+                    Stop = DiscordEmoji.FromUnicode("⏹"),
+                    Left = DiscordEmoji.FromUnicode("◀"),
+                    Right = DiscordEmoji.FromUnicode("▶")
+                };
+
+                var interact = ctx.Client.GetInteractivity();
+                await interact.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pga, ems, PaginationBehaviour.Ignore, PaginationDeletion.KeepEmojis).ConfigureAwait(false);
             }
             else
             {
-                var interact = ctx.Client.GetInteractivity();
-                await interact.SendPaginatedMessage(ctx.Channel, ctx.User, pgs).ConfigureAwait(false);
+                var cnt = sb.ToString();
+                await ctx.RespondAsync(cnt).ConfigureAwait(false);
             }
         }
 
@@ -94,7 +103,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (cps.Length > 32)
                 throw new ArgumentException("You can only specify up to 32 codepoints.", nameof(text));
 
-            var pgs = new List<Page>();
+            var pgs = new List<DiscordEmbedBuilder>();
             for (var i = 0; i < cps.Length; i++)
             {
                 var xcp = cps[i];
@@ -173,17 +182,27 @@ namespace Emzi0767.CompanionCube.Modules
                     embed.AddField("Titlecase Mapping", "Same as uppercase");
                 }
 
-                pgs.Add(new Page { Embed = embed.Build() });
+                pgs.Add(embed);
             }
 
             if (pgs.Count == 1)
             {
-                await ctx.RespondAsync(embed: pgs.First().Embed).ConfigureAwait(false);
+                await ctx.RespondAsync(embed: pgs.First()).ConfigureAwait(false);
             }
             else
             {
+                var pga = pgs.Select(x => new Page(null, x)).ToArray();
+                var ems = new PaginationEmojis(ctx.Client)
+                {
+                    SkipLeft = null,
+                    SkipRight = null,
+                    Stop = DiscordEmoji.FromUnicode("⏹"),
+                    Left = DiscordEmoji.FromUnicode("◀"),
+                    Right = DiscordEmoji.FromUnicode("▶")
+                };
+
                 var interact = ctx.Client.GetInteractivity();
-                await interact.SendPaginatedMessage(ctx.Channel, ctx.User, pgs).ConfigureAwait(false);
+                await interact.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pga, ems, PaginationBehaviour.Ignore, PaginationDeletion.KeepEmojis).ConfigureAwait(false);
             }
         }
     }

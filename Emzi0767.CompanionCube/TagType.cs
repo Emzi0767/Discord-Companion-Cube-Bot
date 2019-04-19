@@ -35,13 +35,13 @@ namespace Emzi0767.CompanionCube
             switch (value)
             {
                 case "channel":
-                    return Task.FromResult(Optional<TagType>.FromValue(TagType.Channel));
+                    return Task.FromResult(Optional.FromValue(TagType.Channel));
 
                 case "guild":
-                    return Task.FromResult(Optional<TagType>.FromValue(TagType.Guild));
+                    return Task.FromResult(Optional.FromValue(TagType.Guild));
 
                 default:
-                    return Task.FromResult(Optional<TagType>.FromNoValue());
+                    return Task.FromResult(Optional.FromNoValue<TagType>());
             }
         }
     }

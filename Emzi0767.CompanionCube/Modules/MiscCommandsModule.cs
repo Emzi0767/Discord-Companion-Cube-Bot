@@ -205,8 +205,8 @@ namespace Emzi0767.CompanionCube.Modules
                     return;
                 }
 
-                var stems = ems.Where(xe => !xe.IsAnimated);
-                var anems = ems.Where(xe => xe.IsAnimated);
+                var stems = ems.Values.Where(xe => !xe.IsAnimated);
+                var anems = ems.Values.Where(xe => xe.IsAnimated);
                 var embed = new DiscordEmbedBuilder
                 {
                     Title = "Custom emotes in this server"
