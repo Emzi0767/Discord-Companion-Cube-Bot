@@ -389,7 +389,7 @@ namespace Emzi0767.CompanionCube.Modules
             else if (!pages.Any())
                 pages = new[] { new Page($"Now playing: {this.GuildMusic.NowPlaying.ToTrackString()}", null) };
 
-            var ems = new PaginationEmojis(ctx.Client)
+            var ems = new PaginationEmojis
             {
                 SkipLeft = null,
                 SkipRight = null,

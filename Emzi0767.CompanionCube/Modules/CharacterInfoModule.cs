@@ -74,7 +74,7 @@ namespace Emzi0767.CompanionCube.Modules
                 pages.Add(sb);
 
                 var pga = pages.Select(x => new Page(x.Append(pn).ToString(), null)).ToArray();
-                var ems = new PaginationEmojis(ctx.Client)
+                var ems = new PaginationEmojis
                 {
                     SkipLeft = null,
                     SkipRight = null,
@@ -192,7 +192,7 @@ namespace Emzi0767.CompanionCube.Modules
             else
             {
                 var pga = pgs.Select(x => new Page(null, x)).ToArray();
-                var ems = new PaginationEmojis(ctx.Client)
+                var ems = new PaginationEmojis
                 {
                     SkipLeft = null,
                     SkipRight = null,
