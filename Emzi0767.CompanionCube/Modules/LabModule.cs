@@ -32,8 +32,7 @@ namespace Emzi0767.CompanionCube.Modules
         [Command("rolecolour")]
         [Aliases("rcolor", "rclr", "rc")]
         [Description("Facilitates <@!255950165200994307>' urge to change role colours every day, without human interaction. This will not create new roles.")]
-        [Cooldown(1, 60, CooldownBucketType.User)]
-        public async Task RoleColourAsync(CommandContext ctx, [RemainingText, Description("New colour you want for your role.")] DiscordColor newColor)
+        public async Task RoleColourAsync(CommandContext ctx, [RemainingText, Description("New colour you want for your role.")] DiscordColor newColour)
         {
             await ctx.TriggerTypingAsync().ConfigureAwait(false);
 
@@ -49,7 +48,7 @@ namespace Emzi0767.CompanionCube.Modules
             var embed = new DiscordEmbedBuilder(msg.Embeds.First());
             try
             {
-                await rol.ModifyAsync(x => x.Color = newColor).ConfigureAwait(false);
+                await rol.ModifyAsync(x => x.Color = newColour).ConfigureAwait(false);
                 await msg.ModifyAsync(embed: AppendDescription(embed, DiscordEmoji.FromName(ctx.Client, ":msokhand:"))).ConfigureAwait(false);
             }
             catch
