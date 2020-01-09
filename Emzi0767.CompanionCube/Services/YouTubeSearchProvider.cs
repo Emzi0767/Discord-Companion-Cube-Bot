@@ -58,7 +58,7 @@ namespace Emzi0767.CompanionCube.Services
             var uri = new Uri($"https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&type=video&fields=items(id(videoId),snippet(title,channelTitle))&key={this.ApiKey}&q={WebUtility.UrlEncode(term)}");
 
             var json = "{}";
-            using (var req = await this.Http.GetAsync(uri).ConfigureAwait(false))
+            using (var req = await this.Http.GetAsync(uri))
             using (var res = await req.Content.ReadAsStreamAsync())
             using (var sr = new StreamReader(res, CompanionCubeUtilities.UTF8))
                 json = await sr.ReadToEndAsync();

@@ -42,7 +42,7 @@ namespace Emzi0767.CompanionCube
         /// <summary>
         /// Gets the tag used when emitting log events from the bot.
         /// </summary>
-        public const string LOG_TAG = "CompanionCube";
+        public const string LOG_TAG = "CCube";
 
         /// <summary>
         /// Gets the discord client instance for this bot shard.
@@ -284,7 +284,7 @@ namespace Emzi0767.CompanionCube
                 return;
 
             var music = this.Services.GetService<MusicService>();
-            var gmd = await music.GetOrCreateDataAsync(e.Guild).ConfigureAwait(false);
+            var gmd = await music.GetOrCreateDataAsync(e.Guild);
             var chn = gmd.Channel;
             if (chn == null || chn != e.Before.Channel)
                 return;
@@ -344,7 +344,7 @@ namespace Emzi0767.CompanionCube
             }
 
             if (embed != null)
-                await e.Context.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
+                await e.Context.RespondAsync("", embed: embed.Build());
         }
 
         private Task<int> ResolvePrefixAsync(DiscordMessage msg)

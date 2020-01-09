@@ -89,17 +89,17 @@ namespace Emzi0767.CompanionCube.Modules
 
             if (this.Database.Tags.Any(x => x.ContainerId == cnid && x.Kind == cnkind && x.Name == name))
             {
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} A {cnkind.ToString().ToLower()} tag with the name {Formatter.InlineCode(name)} already exists in this {cnkind.ToString().ToLower()}.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} A {cnkind.ToString().ToLower()} tag with the name {Formatter.InlineCode(name)} already exists in this {cnkind.ToString().ToLower()}.");
                 return;
             }
 
-            await this.Database.Tags.AddAsync(tag).ConfigureAwait(false);
-            await this.Database.TagRevisions.AddAsync(tagRev).ConfigureAwait(false);
+            await this.Database.Tags.AddAsync(tag);
+            await this.Database.TagRevisions.AddAsync(tagRev);
             var modCount = await this.Database.SaveChangesAsync(false);
             if (modCount > 0)
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:")).ConfigureAwait(false);
+                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not create the tag.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not create the tag.");
         }
 
         [Command("delete"), Aliases("remove"), Description("Deletes a tag.")]
@@ -113,22 +113,22 @@ namespace Emzi0767.CompanionCube.Modules
             var uid = (long)ctx.User.Id;
 
             name = Formatter.Strip(name.ToLower()).Trim();
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             
             if (tag != null)
             {
                 this.Database.TagRevisions.RemoveRange(tag.Revisions);
                 this.Database.Tags.Remove(tag);
-                var modCount = await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                var modCount = await this.Database.SaveChangesAsync();
                 if (modCount > 0)
-                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:")).ConfigureAwait(false);
+                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not delete the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not delete the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.");
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
         }
 
         [Command("force_delete"), Aliases("force_remove"), Description("Forcefully deletes a tag. This is meant for moderators."), OwnerOrPermission(Permissions.ManageChannels)]
@@ -141,22 +141,22 @@ namespace Emzi0767.CompanionCube.Modules
             var gid = (long)ctx.Guild.Id;
 
             name = Formatter.Strip(name.ToLower()).Trim();
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             
             if (tag != null)
             {
                 this.Database.TagRevisions.RemoveRange(tag.Revisions);
                 this.Database.Tags.Remove(tag);
-                var modCount = await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                var modCount = await this.Database.SaveChangesAsync();
                 if (modCount > 0)
-                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:")).ConfigureAwait(false);
+                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not delete the tag. Make sure the tag exists, and you spelled the name correctly.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not delete the tag. Make sure the tag exists, and you spelled the name correctly.");
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
         }
 
         [Command("edit"), Aliases("modify"), Description("Edits a tag.")]
@@ -176,9 +176,9 @@ namespace Emzi0767.CompanionCube.Modules
             var uid = (long)ctx.User.Id;
 
             name = Formatter.Strip(name.ToLower()).Trim();
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             
             if (tag != null)
             {
@@ -193,16 +193,16 @@ namespace Emzi0767.CompanionCube.Modules
                 };
                 tag.LatestRevision = tagRev.CreatedAt;
 
-                await this.Database.TagRevisions.AddAsync(tagRev).ConfigureAwait(false);
+                await this.Database.TagRevisions.AddAsync(tagRev);
                 this.Database.Tags.Update(tag);
-                var modCount = await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                var modCount = await this.Database.SaveChangesAsync();
                 if (modCount > 0)
-                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:")).ConfigureAwait(false);
+                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not edit the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not edit the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.");
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
         }
 
         [Command("force_edit"), Aliases("force_modify"), Description("Forcefully edits a tag. This is meant for moderators."), OwnerOrPermission(Permissions.ManageChannels)]
@@ -222,9 +222,9 @@ namespace Emzi0767.CompanionCube.Modules
             var uid = (long)ctx.User.Id;
 
             name = Formatter.Strip(name.ToLower()).Trim();
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             
             if (tag != null)
             {
@@ -239,16 +239,16 @@ namespace Emzi0767.CompanionCube.Modules
                 };
                 tag.LatestRevision = tagRev.CreatedAt;
 
-                await this.Database.TagRevisions.AddAsync(tagRev).ConfigureAwait(false);
+                await this.Database.TagRevisions.AddAsync(tagRev);
                 this.Database.Tags.Update(tag);
-                var modCount = await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                var modCount = await this.Database.SaveChangesAsync();
                 if (modCount > 0)
-                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:")).ConfigureAwait(false);
+                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not edit the tag. Make sure the tag exists, and you spelled the name correctly.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not edit the tag. Make sure the tag exists, and you spelled the name correctly.");
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
         }
 
         [Command("history"), Description("Views edit history for a tag.")]
@@ -261,13 +261,13 @@ namespace Emzi0767.CompanionCube.Modules
             var gid = (long)ctx.Guild.Id;
 
             name = Formatter.Strip(name.ToLower()).Trim();
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             
             if (tag != null)
             {
-                var users = await Task.WhenAll(tag.Revisions.Select(x => x.UserId).Distinct().Select(x => (ulong)x).Select(x => ctx.Client.GetUserAsync(x))).ConfigureAwait(false);
+                var users = await Task.WhenAll(tag.Revisions.Select(x => x.UserId).Distinct().Select(x => (ulong)x).Select(x => ctx.Client.GetUserAsync(x)));
 
                 var sb = new StringBuilder()
                     .AppendLine($"List of edits to {Formatter.InlineCode(tag.Name)}")
@@ -282,7 +282,7 @@ namespace Emzi0767.CompanionCube.Modules
                 await ctx.RespondAsync(sb.ToString().Replace("\r\n", "\n"));
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
         }
 
         [Command("view_edit"), Description("Views a tag's specific revision.")]
@@ -295,19 +295,19 @@ namespace Emzi0767.CompanionCube.Modules
             var gid = (long)ctx.Guild.Id;
 
             name = Formatter.Strip(name.ToLower()).Trim();
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             
             if (tag != null)
             {
                 if (edit_id >= tag.Revisions.Count || edit_id < 0)
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find specified tag revision. Make sure you entered a valid revision ID.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find specified tag revision. Make sure you entered a valid revision ID.");
                 else
-                    await ctx.RespondAsync($"\u200b{tag.Revisions.ElementAt(edit_id).Contents}").ConfigureAwait(false);
+                    await ctx.RespondAsync($"\u200b{tag.Revisions.ElementAt(edit_id).Contents}");
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
         }
 
         // This might happen in the future, for now, disabled
@@ -327,18 +327,18 @@ namespace Emzi0767.CompanionCube.Modules
             var gid = (long)ctx.Guild.Id;
 
             name = Formatter.Strip(name.ToLower()).Trim();
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             
             if (tag != null)
             {
                 var rev = tag.Revisions.First(x => x.CreatedAt == tag.LatestRevision);
                 var cnt = rev.Contents.Replace("@everyone", "@\u200beveryone").Replace("@here", "@\u200bhere");
-                await ctx.RespondAsync($"\u200b{Formatter.Sanitize(cnt)}").ConfigureAwait(false);
+                await ctx.RespondAsync($"\u200b{Formatter.Sanitize(cnt)}");
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
         }
 
         [Command("info"), Description("Views information about a tag.")]
@@ -351,9 +351,9 @@ namespace Emzi0767.CompanionCube.Modules
             var gid = (long)ctx.Guild.Id;
 
             name = Formatter.Strip(name.ToLower()).Trim();
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
 
             if (tag != null)
             {
@@ -361,13 +361,13 @@ namespace Emzi0767.CompanionCube.Modules
                 DiscordUser usr = null;
                 try
                 {
-                    usr = await ctx.Guild.GetMemberAsync(uid).ConfigureAwait(false);
+                    usr = await ctx.Guild.GetMemberAsync(uid);
                 }
                 catch (Exception)
                 {
                     try
                     {
-                        usr = await ctx.Client.GetUserAsync(uid).ConfigureAwait(false);
+                        usr = await ctx.Client.GetUserAsync(uid);
                     }
                     catch (Exception)
                     { }
@@ -385,10 +385,10 @@ namespace Emzi0767.CompanionCube.Modules
                     .AddField("Kind", tag.Kind.ToString(), true)
                     .AddField("Version count", tag.Revisions.Count.ToString("#,##0"), true)
                     .AddField("Is hidden?", tag.IsHidden ? "Yes" : "No", true);
-                await ctx.RespondAsync(embed: embed.Build()).ConfigureAwait(false);
+                await ctx.RespondAsync(embed: embed.Build());
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
         }
 
         [Command("unhide"), Description("Unhides a tag, which makes it appear in tag listings.")]
@@ -400,11 +400,11 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower()).Trim();
             var uid = (long)ctx.User.Id;
             var cid = (long)ctx.Channel.Id;
-            var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
             {
                 var gid = (long)ctx.Guild.Id;
-                tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             }
 
             if (tag != null)
@@ -413,12 +413,12 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     tag.IsHidden = false;
                     this.Database.Tags.Update(tag);
-                    await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                    await this.Database.SaveChangesAsync();
                 }
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString());
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.");
         }
 
         [Command("force_unhide"), Description("Forcefully unhides a tag. This is meant for moderators."), OwnerOrPermission(Permissions.ManageChannels)]
@@ -429,11 +429,11 @@ namespace Emzi0767.CompanionCube.Modules
 
             name = Formatter.Strip(name.ToLower()).Trim();
             var cid = (long)ctx.Channel.Id;
-            var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
             {
                 var gid = (long)ctx.Guild.Id;
-                tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             }
 
             if (tag != null)
@@ -442,12 +442,12 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     tag.IsHidden = false;
                     this.Database.Tags.Update(tag);
-                    await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                    await this.Database.SaveChangesAsync();
                 }
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString());
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, and you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, and you spelled the name correctly.");
         }
 
         [Command("hide"), Description("Hides a tag, which prevents it from being displayed in tag listings.")]
@@ -459,11 +459,11 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower()).Trim(); name = Formatter.Strip(name.ToLower()).Trim();
             var uid = (long)ctx.User.Id;
             var cid = (long)ctx.Channel.Id;
-            var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
             {
                 var gid = (long)ctx.Guild.Id;
-                tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             }
 
             if (tag != null)
@@ -472,12 +472,12 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     tag.IsHidden = true;
                     this.Database.Tags.Update(tag);
-                    await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                    await this.Database.SaveChangesAsync();
                 }
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString());
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.");
         }
 
         [Command("force_hide"), Description("Forcefully hides a tag. This is meant for moderators."), OwnerOrPermission(Permissions.ManageChannels)]
@@ -488,11 +488,11 @@ namespace Emzi0767.CompanionCube.Modules
 
             name = Formatter.Strip(name.ToLower()).Trim(); name = Formatter.Strip(name.ToLower()).Trim();
             var cid = (long)ctx.Channel.Id;
-            var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
             {
                 var gid = (long)ctx.Guild.Id;
-                tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             }
 
             if (tag != null)
@@ -501,12 +501,12 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     tag.IsHidden = true;
                     this.Database.Tags.Update(tag);
-                    await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                    await this.Database.SaveChangesAsync();
                 }
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString());
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, and you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, and you spelled the name correctly.");
         }
 
         [Command("changetype"), Description("Changes type of a tag between guild and channel.")]
@@ -519,9 +519,9 @@ namespace Emzi0767.CompanionCube.Modules
             var cid = (long)ctx.Channel.Id;
             var gid = (long)ctx.Guild.Id;
             var uid = (long)ctx.User.Id;
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.OwnerId == uid && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
 
             if (tag != null)
             {
@@ -547,19 +547,19 @@ namespace Emzi0767.CompanionCube.Modules
                     }).ToList();
 
                     if (this.Database.Tags.Any(x => x.Kind == ntag.Kind && x.ContainerId == ntag.ContainerId && x.Name == ntag.Name))
-                        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag, because a tag with target parameters already exists.").ConfigureAwait(false);
+                        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag, because a tag with target parameters already exists.");
 
                     this.Database.TagRevisions.RemoveRange(tag.Revisions);
                     await this.Database.SaveChangesAsync();
                     this.Database.Tags.Remove(tag);
-                    await this.Database.Tags.AddAsync(ntag).ConfigureAwait(false);
-                    await this.Database.TagRevisions.AddRangeAsync(nrevs).ConfigureAwait(false);
+                    await this.Database.Tags.AddAsync(ntag);
+                    await this.Database.TagRevisions.AddRangeAsync(nrevs);
                     await this.Database.SaveChangesAsync();
                 }
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString());
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.");
         }
 
         [Command("force_changetype"), Description("Forcibly changes type of a tag. This is meant for moderators."), OwnerOrPermission(Permissions.ManageMessages)]
@@ -571,9 +571,9 @@ namespace Emzi0767.CompanionCube.Modules
             name = Formatter.Strip(name.ToLower()).Trim(); name = Formatter.Strip(name.ToLower()).Trim();
             var cid = (long)ctx.Channel.Id;
             var gid = (long)ctx.Guild.Id;
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name&& x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name&& x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name&& x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name&& x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
 
             if (tag != null && ((new_type == TagType.Channel && tag.Kind == DatabaseTagKind.Guild) || tag.Kind == DatabaseTagKind.Channel))
             {
@@ -597,19 +597,19 @@ namespace Emzi0767.CompanionCube.Modules
                 }).ToList();
 
                 if (this.Database.Tags.Any(x => x.Kind == ntag.Kind && x.ContainerId == ntag.ContainerId && x.Name == ntag.Name))
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag, because a tag with target parameters already exists.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag, because a tag with target parameters already exists.");
 
                 this.Database.TagRevisions.RemoveRange(tag.Revisions);
                 await this.Database.SaveChangesAsync();
                 this.Database.Tags.Remove(tag);
-                await this.Database.Tags.AddAsync(ntag).ConfigureAwait(false);
-                await this.Database.TagRevisions.AddRangeAsync(nrevs).ConfigureAwait(false);
+                await this.Database.Tags.AddAsync(ntag);
+                await this.Database.TagRevisions.AddRangeAsync(nrevs);
                 await this.Database.SaveChangesAsync();
 
-                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+                await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString());
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, and you spelled the name correctly.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, and you spelled the name correctly.");
         }
 
         [Command("list"), Description("Lists tags, optionally specifying a search query.")]
@@ -628,17 +628,16 @@ namespace Emzi0767.CompanionCube.Modules
 
             var res = like == null ?
                 this.Database.Tags.Where(x => ((x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid) || (x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid) || x.Kind == DatabaseTagKind.Global) && !x.IsHidden) :
-                this.Database.Tags.FromSql("select * from tags where ((kind = 'channel' and container_id = @cid) or (kind = 'guild' and container_id = @gid) or kind = 'global') and hidden = false and levenshtein_less_equal(name, @like, 3) < 3",
-                new NpgsqlParameter("@cid", cid), new NpgsqlParameter("@gid", gid), new NpgsqlParameter("@like", like));
+                this.Database.Tags.FromSqlInterpolated($"select * from tags where ((kind = 'channel' and container_id = {cid}) or (kind = 'guild' and container_id = {gid}) or kind = 'global') and hidden = false and levenshtein_less_equal(name, {like}, 3) < 3");
             
             if (res.Any())
             {
                 var tstr = string.Join(", ", res.OrderBy(x => x.Name).Select(xt => Formatter.InlineCode(xt.Name)).Distinct());
 
-                await ctx.RespondAsync($"Following tags matching your query were found:\n\n{tstr}").ConfigureAwait(false);
+                await ctx.RespondAsync($"Following tags matching your query were found:\n\n{tstr}");
             }
             else
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} No tags were found.").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} No tags were found.");
         }
 
         [GroupCommand]
@@ -651,30 +650,29 @@ namespace Emzi0767.CompanionCube.Modules
             var gid = (long)ctx.Guild.Id;
 
             name = Formatter.Strip(name.ToLower()).Trim();
-            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid).ConfigureAwait(false);
+            var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Channel && x.ContainerId == cid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Guild && x.ContainerId == gid);
             if (tag == null)
-                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global).ConfigureAwait(false);
+                tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global);
             
             if (tag != null)
             {
                 var rev = tag.Revisions.First(x => x.CreatedAt == tag.LatestRevision);
                 var cnt = rev.Contents.Replace("@everyone", "@\u200beveryone").Replace("@here", "@\u200bhere");
-                await ctx.RespondAsync($"\u200b{cnt}").ConfigureAwait(false);
+                await ctx.RespondAsync($"\u200b{cnt}");
             }
             else
             {
-                var res = this.Database.Tags.FromSql("select * from tags where ((kind = 'channel' and container_id = @cid) or (kind = 'guild' and container_id = @gid) or kind = 'global') and hidden = false and levenshtein_less_equal(name, @like, 3) < 3",
-                    new NpgsqlParameter("@cid", cid), new NpgsqlParameter("@gid", gid), new NpgsqlParameter("@like", name));
+                var res = this.Database.Tags.FromSqlInterpolated($"select * from tags where ((kind = 'channel' and container_id = {cid}) or (kind = 'guild' and container_id = {gid}) or kind = 'global') and hidden = false and levenshtein_less_equal(name, {name}, 3) < 3");
 
                 if (res.Any())
                 { 
                     var sugs = string.Join(", ", res.OrderBy(x => x.Name).Select(xt => Formatter.InlineCode(xt.Name)).Distinct());
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Specified tag was not found. Here are some suggestions:\n\n{sugs}").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Specified tag was not found. Here are some suggestions:\n\n{sugs}");
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Specified tag was not found.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Specified tag was not found.");
             }
         }
 
@@ -726,17 +724,17 @@ namespace Emzi0767.CompanionCube.Modules
 
                 if (this.Database.Tags.Any(x => x.ContainerId == 0 && x.Kind == DatabaseTagKind.Global && x.Name == name))
                 {
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} A global tag with the name {Formatter.InlineCode(name)} already exists.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} A global tag with the name {Formatter.InlineCode(name)} already exists.");
                     return;
                 }
 
-                await this.Database.Tags.AddAsync(tag).ConfigureAwait(false);
-                await this.Database.TagRevisions.AddAsync(tagRev).ConfigureAwait(false);
+                await this.Database.Tags.AddAsync(tag);
+                await this.Database.TagRevisions.AddAsync(tagRev);
                 var modCount = await this.Database.SaveChangesAsync(false);
                 if (modCount > 0)
-                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:")).ConfigureAwait(false);
+                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not create the tag.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not create the tag.");
             }
 
             [Command("delete"), Aliases("remove"), Description("Deletes a tag."), RequireOwner]
@@ -750,20 +748,20 @@ namespace Emzi0767.CompanionCube.Modules
                 var uid = (long)ctx.User.Id;
 
                 name = Formatter.Strip(name.ToLower()).Trim();
-                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global).ConfigureAwait(false);
+                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global);
                 
                 if (tag != null)
                 {
                     this.Database.TagRevisions.RemoveRange(tag.Revisions);
                     this.Database.Tags.Remove(tag);
-                    var modCount = await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                    var modCount = await this.Database.SaveChangesAsync();
                     if (modCount > 0)
-                        await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:")).ConfigureAwait(false);
+                        await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
                     else
-                        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not delete the tag. Make sure the tag exists, and you spelled the name correctly.").ConfigureAwait(false);
+                        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not delete the tag. Make sure the tag exists, and you spelled the name correctly.");
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
             }
 
             [Command("edit"), Aliases("modify"), Description("Edits a tag."), RequireOwner]
@@ -781,7 +779,7 @@ namespace Emzi0767.CompanionCube.Modules
                 var uid = (long)ctx.User.Id;
 
                 name = Formatter.Strip(name.ToLower()).Trim();
-                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global).ConfigureAwait(false);
+                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global);
                 
                 if (tag != null)
                 {
@@ -796,16 +794,16 @@ namespace Emzi0767.CompanionCube.Modules
                     };
                     tag.LatestRevision = tagRev.CreatedAt;
 
-                    await this.Database.TagRevisions.AddAsync(tagRev).ConfigureAwait(false);
+                    await this.Database.TagRevisions.AddAsync(tagRev);
                     this.Database.Tags.Update(tag);
-                    var modCount = await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                    var modCount = await this.Database.SaveChangesAsync();
                     if (modCount > 0)
-                        await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:")).ConfigureAwait(false);
+                        await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:"));
                     else
-                        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not edit the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.").ConfigureAwait(false);
+                        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not edit the tag. Make sure the tag exists, you spelled the name correctly, and that you own it.");
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
             }
 
             [Command("history"), Description("Views edit history for a tag.")]
@@ -815,11 +813,11 @@ namespace Emzi0767.CompanionCube.Modules
                     throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
 
                 name = Formatter.Strip(name.ToLower()).Trim();
-                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global).ConfigureAwait(false);
+                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global);
                 
                 if (tag != null)
                 {
-                    var users = await Task.WhenAll(tag.Revisions.Select(x => x.UserId).Distinct().Select(x => (ulong)x).Select(x => ctx.Client.GetUserAsync(x))).ConfigureAwait(false);
+                    var users = await Task.WhenAll(tag.Revisions.Select(x => x.UserId).Distinct().Select(x => (ulong)x).Select(x => ctx.Client.GetUserAsync(x)));
 
                     var sb = new StringBuilder()
                         .AppendLine($"List of edits to {Formatter.InlineCode(tag.Name)}")
@@ -834,7 +832,7 @@ namespace Emzi0767.CompanionCube.Modules
                     await ctx.RespondAsync(sb.ToString().Replace("\r\n", "\n"));
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
             }
 
             [Command("view_edit"), Description("Views a tag's specific revision.")]
@@ -844,17 +842,17 @@ namespace Emzi0767.CompanionCube.Modules
                     throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
 
                 name = Formatter.Strip(name.ToLower()).Trim();
-                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global).ConfigureAwait(false);
+                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global);
                 
                 if (tag != null)
                 {
                     if (edit_id >= tag.Revisions.Count || edit_id < 0)
-                        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find specified tag revision. Make sure you entered a valid revision ID.").ConfigureAwait(false);
+                        await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find specified tag revision. Make sure you entered a valid revision ID.");
                     else
-                        await ctx.RespondAsync($"\u200b{tag.Revisions.ElementAt(edit_id).Contents}").ConfigureAwait(false);
+                        await ctx.RespondAsync($"\u200b{tag.Revisions.ElementAt(edit_id).Contents}");
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
             }
 
             [Command("dump"), Aliases("raw"), Description("Dumps tag's contents in raw form.")]
@@ -864,16 +862,16 @@ namespace Emzi0767.CompanionCube.Modules
                     throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
 
                 name = Formatter.Strip(name.ToLower()).Trim();
-                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global).ConfigureAwait(false);
+                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global);
 
                 if (tag != null)
                 {
                     var rev = tag.Revisions.First(x => x.CreatedAt == tag.LatestRevision);
                     var cnt = rev.Contents.Replace("@everyone", "@\u200beveryone").Replace("@here", "@\u200bhere");
-                    await ctx.RespondAsync($"\u200b{Formatter.Sanitize(cnt)}").ConfigureAwait(false);
+                    await ctx.RespondAsync($"\u200b{Formatter.Sanitize(cnt)}");
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
             }
 
             [Command("info"), Description("Views information about a tag.")]
@@ -886,7 +884,7 @@ namespace Emzi0767.CompanionCube.Modules
                 var gid = (long)ctx.Guild.Id;
 
                 name = Formatter.Strip(name.ToLower()).Trim();
-                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global).ConfigureAwait(false);
+                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global);
                 
                 if (tag != null)
                 {
@@ -894,13 +892,13 @@ namespace Emzi0767.CompanionCube.Modules
                     DiscordUser usr = null;
                     try
                     {
-                        usr = await ctx.Guild.GetMemberAsync(uid).ConfigureAwait(false);
+                        usr = await ctx.Guild.GetMemberAsync(uid);
                     }
                     catch (Exception)
                     {
                         try
                         {
-                            usr = await ctx.Client.GetUserAsync(uid).ConfigureAwait(false);
+                            usr = await ctx.Client.GetUserAsync(uid);
                         }
                         catch (Exception)
                         { }
@@ -918,10 +916,10 @@ namespace Emzi0767.CompanionCube.Modules
                         .AddField("Kind", tag.Kind.ToString(), true)
                         .AddField("Version count", tag.Revisions.Count.ToString("#,##0"), true)
                         .AddField("Is hidden?", tag.IsHidden ? "Yes" : "No", true);
-                    await ctx.RespondAsync(embed: embed.Build()).ConfigureAwait(false);
+                    await ctx.RespondAsync(embed: embed.Build());
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not find the tag. Make sure you spelled the name correctly.");
             }
 
             [Command("unhide"), Description("Unhides a tag, which makes it appear in tag listings."), RequireOwner]
@@ -931,7 +929,7 @@ namespace Emzi0767.CompanionCube.Modules
                     throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
 
                 name = Formatter.Strip(name.ToLower()).Trim(); name = Formatter.Strip(name.ToLower()).Trim();
-                var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global).ConfigureAwait(false);
+                var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global);
 
                 if (tag != null)
                 {
@@ -939,12 +937,12 @@ namespace Emzi0767.CompanionCube.Modules
                     {
                         tag.IsHidden = false;
                         this.Database.Tags.Update(tag);
-                        await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                        await this.Database.SaveChangesAsync();
                     }
-                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString());
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, and you spelled the name correctly.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, and you spelled the name correctly.");
             }
 
             [Command("hide"), Description("Hides a tag, which prevents it from being displayed in tag listings."), RequireOwner]
@@ -954,7 +952,7 @@ namespace Emzi0767.CompanionCube.Modules
                     throw new ArgumentException("Name of the tag cannot be null, empty, all-whitespace, or equal to any of the tag command names.", nameof(name));
 
                 name = Formatter.Strip(name.ToLower()).Trim(); name = Formatter.Strip(name.ToLower()).Trim();
-                var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global).ConfigureAwait(false);
+                var tag = await this.Database.Tags.SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global);
 
                 if (tag != null)
                 {
@@ -962,12 +960,12 @@ namespace Emzi0767.CompanionCube.Modules
                     {
                         tag.IsHidden = true;
                         this.Database.Tags.Update(tag);
-                        await this.Database.SaveChangesAsync().ConfigureAwait(false);
+                        await this.Database.SaveChangesAsync();
                     }
-                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+                    await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString());
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, and you spelled the name correctly.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Could not modify the tag. Make sure the tag exists, and you spelled the name correctly.");
             }
 
             [Command("list"), Description("Lists tags, optionally specifying a search query.")]
@@ -983,17 +981,16 @@ namespace Emzi0767.CompanionCube.Modules
 
                 var res = like == null ?
                     this.Database.Tags.Where(x => x.Kind == DatabaseTagKind.Global && !x.IsHidden) :
-                    this.Database.Tags.FromSql("select * from tags where kind = 'global' and hidden = false and levenshtein_less_equal(name, @like, 3) < 3",
-                    new NpgsqlParameter("@like", like));
+                    this.Database.Tags.FromSqlInterpolated($"select * from tags where kind = 'global' and hidden = false and levenshtein_less_equal(name, {like}, 3) < 3");
 
                 if (res.Any())
                 {
                     var tstr = string.Join(", ", res.OrderBy(x => x.Name).Select(xt => Formatter.InlineCode(xt.Name)).Distinct());
 
-                    await ctx.RespondAsync($"Following tags matching your query were found:\n\n{tstr}").ConfigureAwait(false);
+                    await ctx.RespondAsync($"Following tags matching your query were found:\n\n{tstr}");
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} No tags were found.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} No tags were found.");
             }
 
             [GroupCommand]
@@ -1006,16 +1003,16 @@ namespace Emzi0767.CompanionCube.Modules
                 var gid = (long)ctx.Guild.Id;
 
                 name = Formatter.Strip(name.ToLower()).Trim();
-                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global).ConfigureAwait(false);
+                var tag = await this.Database.Tags.Include(x => x.Revisions).SingleOrDefaultAsync(x => x.Name == name && x.Kind == DatabaseTagKind.Global);
 
                 if (tag != null)
                 {
                     var rev = tag.Revisions.First(x => x.CreatedAt == tag.LatestRevision);
                     var cnt = rev.Contents.Replace("@everyone", "@\u200beveryone").Replace("@here", "@\u200bhere");
-                    await ctx.RespondAsync($"\u200b{cnt}").ConfigureAwait(false);
+                    await ctx.RespondAsync($"\u200b{cnt}");
                 }
                 else
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Specified tag was not found.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} Specified tag was not found.");
             }
         }
     }
@@ -1028,7 +1025,7 @@ namespace Emzi0767.CompanionCube.Modules
         {
             var cmd = ctx.CommandsNext.FindCommand($"tag list", out _);
             var fctx = ctx.CommandsNext.CreateFakeContext(ctx.Member, ctx.Channel, ctx.Message.Content, ctx.Prefix, cmd, like);
-            await ctx.CommandsNext.ExecuteCommandAsync(fctx).ConfigureAwait(false);
+            await ctx.CommandsNext.ExecuteCommandAsync(fctx);
         }
     }
 }

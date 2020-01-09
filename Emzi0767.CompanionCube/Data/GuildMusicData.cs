@@ -353,7 +353,7 @@ namespace Emzi0767.CompanionCube.Data
             if (this.Player != null && this.Player.IsConnected)
                 return;
 
-            this.Player = await this.Lavalink.LavalinkNode.ConnectAsync(channel).ConfigureAwait(false);
+            this.Player = await this.Lavalink.LavalinkNode.ConnectAsync(channel);
             if (this.Volume != 100)
                 this.Player.SetVolume(this.Volume);
             this.Player.PlaybackFinished += this.Player_PlaybackFinished;
@@ -389,7 +389,7 @@ namespace Emzi0767.CompanionCube.Data
 
         private async Task Player_PlaybackFinished(TrackFinishEventArgs e)
         {
-            await Task.Delay(500).ConfigureAwait(false);
+            await Task.Delay(500);
             this.IsPlaying = false;
             this.PlayHandler();
         }

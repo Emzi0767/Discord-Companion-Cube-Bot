@@ -34,26 +34,26 @@ namespace Emzi0767.CompanionCube.Modules
         [Description("Facilitates <@!255950165200994307>' urge to change role colours every day, without human interaction. This will not create new roles.")]
         public async Task RoleColourAsync(CommandContext ctx, [RemainingText, Description("New colour you want for your role.")] DiscordColor newColour)
         {
-            await ctx.TriggerTypingAsync().ConfigureAwait(false);
+            await ctx.TriggerTypingAsync();
 
             var mbr = ctx.Member;
             var rol = mbr.Roles.FirstOrDefault(x => !x.IsManaged && x.Color.Value != 0);
             if (rol == null)
             {
-                await ctx.RespondAsync("You don't have a coloured role I can alter. Please contact a nearby administrator.").ConfigureAwait(false);
+                await ctx.RespondAsync("You don't have a coloured role I can alter. Please contact a nearby administrator.");
                 return;
             }
 
-            var msg = await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Modifying {rol.Mention}...").Build()).ConfigureAwait(false);
+            var msg = await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Modifying {rol.Mention}...").Build());
             var embed = new DiscordEmbedBuilder(msg.Embeds.First());
             try
             {
-                await rol.ModifyAsync(x => x.Color = newColour).ConfigureAwait(false);
-                await msg.ModifyAsync(embed: AppendDescription(embed, DiscordEmoji.FromName(ctx.Client, ":msokhand:"))).ConfigureAwait(false);
+                await rol.ModifyAsync(x => x.Color = newColour);
+                await msg.ModifyAsync(embed: AppendDescription(embed, DiscordEmoji.FromName(ctx.Client, ":msokhand:")));
             }
             catch
             {
-                await msg.ModifyAsync(embed: AppendDescription(embed, "SIKE!")).ConfigureAwait(false);
+                await msg.ModifyAsync(embed: AppendDescription(embed, "SIKE!"));
             }
 
             DiscordEmbed AppendDescription(DiscordEmbedBuilder e, string t)

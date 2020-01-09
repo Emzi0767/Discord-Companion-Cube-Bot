@@ -58,7 +58,7 @@ namespace Emzi0767.CompanionCube.Services
 
                 SocketEndpoint = new ConnectionEndpoint(this.Configuration.Hostname, this.Configuration.Port),
                 RestEndpoint = new ConnectionEndpoint(this.Configuration.Hostname, this.Configuration.Port)
-            }).ConfigureAwait(false);
+            });
         }
     }
 }

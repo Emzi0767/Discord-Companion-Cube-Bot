@@ -64,7 +64,7 @@ namespace Emzi0767.CompanionCube.Data
             var json = "{}";
             using (var fs = file.OpenRead())
             using (var sr = new StreamReader(fs, CompanionCubeUtilities.UTF8))
-                json = await sr.ReadToEndAsync().ConfigureAwait(false);
+                json = await sr.ReadToEndAsync();
 
             // deserialize the config
             return JsonConvert.DeserializeObject<CompanionCubeConfig>(json);
@@ -88,8 +88,8 @@ namespace Emzi0767.CompanionCube.Data
             using (var fs = file.Create())
             using (var sr = new StreamWriter(fs, CompanionCubeUtilities.UTF8))
             {
-                await sr.WriteLineAsync(json).ConfigureAwait(false);
-                await sr.FlushAsync().ConfigureAwait(false);
+                await sr.WriteLineAsync(json);
+                await sr.FlushAsync();
             }
         }
 

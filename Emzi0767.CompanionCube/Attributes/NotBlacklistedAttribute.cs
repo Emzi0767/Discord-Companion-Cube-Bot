@@ -39,7 +39,7 @@ namespace Emzi0767.CompanionCube.Attributes
             if (help)
                 return Task.FromResult(true);
 
-            if (ctx.User == ctx.Client.CurrentApplication.Owner)
+            if (ctx.Client.CurrentApplication.Owners.Contains(ctx.User))
                 return Task.FromResult(true);
 
             var uid = (long)ctx.User.Id;

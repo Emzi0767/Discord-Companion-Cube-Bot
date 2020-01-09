@@ -59,14 +59,14 @@ namespace Emzi0767.CompanionCube
 
             // load the config file and validate it
             var cfgLoader = new CompanionCubeConfigLoader();
-            var cfg = await cfgLoader.LoadConfigurationAsync(cfgFile).ConfigureAwait(false);
+            var cfg = await cfgLoader.LoadConfigurationAsync(cfgFile);
             cfgLoader.ValidateConfiguration(cfg);
 
             Console.Write("\r[2/4] Loading unicode data          ");
 
             // load unicode data
             using (var utfloader = new UnicodeDataLoader("unicode_data.json.gz"))
-                await utfloader.LoadCodepointsAsync().ConfigureAwait(false);
+                await utfloader.LoadCodepointsAsync();
 
             Console.Write("\r[3/4] Validating PostgreSQL database");
 

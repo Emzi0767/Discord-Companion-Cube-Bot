@@ -84,12 +84,12 @@ namespace Emzi0767.CompanionCube.Modules
                 };
 
                 var interact = ctx.Client.GetInteractivity();
-                await interact.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pga, ems, PaginationBehaviour.Ignore, PaginationDeletion.KeepEmojis).ConfigureAwait(false);
+                await interact.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pga, ems, PaginationBehaviour.Ignore, PaginationDeletion.KeepEmojis);
             }
             else
             {
                 var cnt = sb.ToString();
-                await ctx.RespondAsync(cnt).ConfigureAwait(false);
+                await ctx.RespondAsync(cnt);
             }
         }
 
@@ -187,7 +187,7 @@ namespace Emzi0767.CompanionCube.Modules
 
             if (pgs.Count == 1)
             {
-                await ctx.RespondAsync(embed: pgs.First()).ConfigureAwait(false);
+                await ctx.RespondAsync(embed: pgs.First());
             }
             else
             {
@@ -202,7 +202,7 @@ namespace Emzi0767.CompanionCube.Modules
                 };
 
                 var interact = ctx.Client.GetInteractivity();
-                await interact.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pga, ems, PaginationBehaviour.Ignore, PaginationDeletion.KeepEmojis).ConfigureAwait(false);
+                await interact.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pga, ems, PaginationBehaviour.Ignore, PaginationDeletion.KeepEmojis);
             }
         }
     }

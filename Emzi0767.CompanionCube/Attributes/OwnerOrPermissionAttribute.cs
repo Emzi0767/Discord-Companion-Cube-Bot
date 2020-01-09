@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -37,7 +38,7 @@ namespace Emzi0767.CompanionCube.Attributes
             var app = ctx.Client.CurrentApplication;
             var me = ctx.Client.CurrentUser;
 
-            if (app != null && ctx.User.Id == app.Owner.Id)
+            if (app != null && app.Owners.Contains(ctx.User))
                 return Task.FromResult(true);
 
             if (ctx.User.Id == me.Id)

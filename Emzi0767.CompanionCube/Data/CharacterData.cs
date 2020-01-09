@@ -1655,7 +1655,7 @@ namespace Emzi0767.CompanionCube.Data
             byte[] buff = null;
             using (var ms = new MemoryStream())
             {
-                await this.SourceDecompressedStream.CopyToAsync(ms).ConfigureAwait(false);
+                await this.SourceDecompressedStream.CopyToAsync(ms);
                 buff = ms.ToArray();
             }
 

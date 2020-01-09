@@ -93,7 +93,7 @@ namespace Emzi0767.CompanionCube.Modules
                 .AddField("DSharpPlus Version", string.Concat(DiscordEmoji.FromName(ctx.Client, ":dsharpplus:"), " ", Formatter.Bold(dsv)), true)
                 .AddField(".NET Core Version", string.Concat(DiscordEmoji.FromName(ctx.Client, ":dotnet:"), " ", Formatter.Bold(ncv)), true);
 
-            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
+            await ctx.RespondAsync("", embed: embed.Build());
         }
 
         [Command("uptime"), Description("Display bot's uptime.")]
@@ -101,13 +101,13 @@ namespace Emzi0767.CompanionCube.Modules
         {
             var upt = DateTime.Now - Process.GetCurrentProcess().StartTime;
             var ups = upt.ToDurationString();
-            await ctx.RespondAsync(string.Concat("\u200b", DiscordEmoji.FromName(ctx.Client, ":companion_cube:"), " The bot has been running for ", Formatter.Bold(ups), ".")).ConfigureAwait(false);
+            await ctx.RespondAsync(string.Concat("\u200b", DiscordEmoji.FromName(ctx.Client, ":companion_cube:"), " The bot has been running for ", Formatter.Bold(ups), "."));
         }
 
         [Command("ping"), Description("Displays this shard's WebSocket latency.")]
         public async Task PingAsync(CommandContext ctx)
         {
-            await ctx.RespondAsync(string.Concat("\u200b", DiscordEmoji.FromName(ctx.Client, ":ping_pong:"), " WebSocket latency: ", ctx.Client.Ping.ToString("#,##0"), "ms.")).ConfigureAwait(false);
+            await ctx.RespondAsync(string.Concat("\u200b", DiscordEmoji.FromName(ctx.Client, ":ping_pong:"), " WebSocket latency: ", ctx.Client.Ping.ToString("#,##0"), "ms."));
         }
 
         [Command("cleanup")]
@@ -116,7 +116,7 @@ namespace Emzi0767.CompanionCube.Modules
             var lid = 0ul;
             for (var i = 0; i < max_count; i += 100)
             {
-                var msgs = await ctx.Channel.GetMessagesBeforeAsync(lid != 0 ? lid : ctx.Message.Id, Math.Min(max_count - i, 100)).ConfigureAwait(false);
+                var msgs = await ctx.Channel.GetMessagesBeforeAsync(lid != 0 ? lid : ctx.Message.Id, Math.Min(max_count - i, 100));
                 var msgsf = msgs.Where(xm => xm.Author.Id == ctx.Client.CurrentUser.Id).OrderBy(xm => xm.Id);
 
                 var lmsg = msgsf.FirstOrDefault();
@@ -127,7 +127,7 @@ namespace Emzi0767.CompanionCube.Modules
 
                 try
                 {
-                    await ctx.Channel.DeleteMessagesAsync(msgsf).ConfigureAwait(false);
+                    await ctx.Channel.DeleteMessagesAsync(msgsf);
                 }
                 catch (UnauthorizedException)
                 {
@@ -136,7 +136,7 @@ namespace Emzi0767.CompanionCube.Modules
                 }
             }
 
-            var msg = await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+            var msg = await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString());
             await Task.Delay(2500).ContinueWith(t => msg.DeleteAsync());
         }
 
@@ -161,11 +161,11 @@ namespace Emzi0767.CompanionCube.Modules
                     throw new InvalidOperationException("Cannot steal a unicode emoji.");
 
                 DiscordGuildEmoji nemoji = null;
-                using (var res = await this.Http.GetAsync(emoji.Url).ConfigureAwait(false))
-                using (var rss = await res.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                    nemoji = await ctx.Guild.CreateEmojiAsync(name, rss, reason: $"{ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) stole a meme.").ConfigureAwait(false);
+                using (var res = await this.Http.GetAsync(emoji.Url))
+                using (var rss = await res.Content.ReadAsStreamAsync())
+                    nemoji = await ctx.Guild.CreateEmojiAsync(name, rss, reason: $"{ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) stole a meme.");
 
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {nemoji}").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {nemoji}");
             }
 
             [Command("install"), Description("Installs specified image as emote in this server.")]
@@ -188,11 +188,11 @@ namespace Emzi0767.CompanionCube.Modules
                 }
 
                 DiscordGuildEmoji nemoji = null;
-                using (var res = await this.Http.GetAsync(url).ConfigureAwait(false))
-                using (var rss = await res.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                    nemoji = await ctx.Guild.CreateEmojiAsync(name, rss, reason: $"{ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) installed a meme.").ConfigureAwait(false);
+                using (var res = await this.Http.GetAsync(url))
+                using (var rss = await res.Content.ReadAsStreamAsync())
+                    nemoji = await ctx.Guild.CreateEmojiAsync(name, rss, reason: $"{ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) installed a meme.");
 
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {nemoji}").ConfigureAwait(false);
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {nemoji}");
             }
 
             [Command("list"), Description("Lists all emotes in this server.")]
@@ -217,7 +217,7 @@ namespace Emzi0767.CompanionCube.Modules
                 if (anems.Any())
                     embed.AddField("Animated emotes", string.Join(" ", anems), false);
 
-                await ctx.RespondAsync(embed: embed.Build()).ConfigureAwait(false);
+                await ctx.RespondAsync(embed: embed.Build());
             }
         }
     }

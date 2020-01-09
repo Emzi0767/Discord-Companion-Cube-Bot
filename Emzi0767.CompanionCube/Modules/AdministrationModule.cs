@@ -58,7 +58,7 @@ namespace Emzi0767.CompanionCube.Modules
                 throw new CommandNotFoundException(command);
 
             var fctx = ctx.CommandsNext.CreateFakeContext(member, ctx.Channel, command, ctx.Prefix, cmd, args);
-            await ctx.CommandsNext.ExecuteCommandAsync(fctx).ConfigureAwait(false);
+            await ctx.CommandsNext.ExecuteCommandAsync(fctx);
         }
 
         [Command("sql"), Description("Executes a raw SQL query."), Hidden, RequireOwner]
@@ -68,12 +68,12 @@ namespace Emzi0767.CompanionCube.Modules
             var i = 0;
             using (var cmd = this.Database.Database.GetDbConnection().CreateCommand())
             {
-                await this.Database.Database.OpenConnectionAsync().ConfigureAwait(false);
+                await this.Database.Database.OpenConnectionAsync();
 
                 cmd.CommandText = query;
-                using (var rdr = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
+                using (var rdr = await cmd.ExecuteReaderAsync())
                 {
-                    while (await rdr.ReadAsync().ConfigureAwait(false))
+                    while (await rdr.ReadAsync())
                     {
                         var dict = new Dictionary<string, string>();
                         for (i = 0; i < rdr.FieldCount; i++)
@@ -92,7 +92,7 @@ namespace Emzi0767.CompanionCube.Modules
                     Description = string.Concat("Query: ", Formatter.InlineCode(query), "."),
                     Color = new DiscordColor(0x007FFF)
                 };
-                await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
+                await ctx.RespondAsync("", embed: embed.Build());
                 return;
             }
 
@@ -120,7 +120,7 @@ namespace Emzi0767.CompanionCube.Modules
             if (dat.Count > 24)
                 embed.AddField("Display incomplete", string.Concat((dat.Count - 24).ToString("#,##0"), " results were omitted."), false);
             
-            await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
+            await ctx.RespondAsync("", embed: embed.Build());
         }
 
         [Command("eval"), Description("Evaluates a snippet of C# code, in context."), Hidden, RequireOwner]
@@ -140,7 +140,7 @@ namespace Emzi0767.CompanionCube.Modules
                 Title = "Evaluating...",
                 Color = new DiscordColor(0xD091B2)
             };
-            var msg = await ctx.RespondAsync("", embed: embed.Build()).ConfigureAwait(false);
+            var msg = await ctx.RespondAsync("", embed: embed.Build());
 
             var globals = new EvaluationEnvironment(ctx);
             var sopts = ScriptOptions.Default
@@ -171,7 +171,7 @@ namespace Emzi0767.CompanionCube.Modules
                 {
                     embed.AddField("Some errors ommited", string.Concat((csc.Length - 3).ToString("#,##0"), " more errors not displayed"), false);
                 }
-                await msg.ModifyAsync(embed: embed.Build()).ConfigureAwait(false);
+                await msg.ModifyAsync(embed: embed.Build());
                 return;
             }
 
@@ -180,7 +180,7 @@ namespace Emzi0767.CompanionCube.Modules
             var sw2 = Stopwatch.StartNew();
             try
             {
-                css = await cs.RunAsync(globals).ConfigureAwait(false);
+                css = await cs.RunAsync(globals);
                 rex = css.Exception;
             }
             catch (Exception ex)
@@ -197,7 +197,7 @@ namespace Emzi0767.CompanionCube.Modules
                     Description = string.Concat("Execution failed after ", sw2.ElapsedMilliseconds.ToString("#,##0"), "ms with `", rex.GetType(), ": ", rex.Message, "`."),
                     Color = new DiscordColor(0xD091B2),
                 };
-                await msg.ModifyAsync(embed: embed.Build()).ConfigureAwait(false);
+                await msg.ModifyAsync(embed: embed.Build());
                 return;
             }
 
@@ -215,21 +215,21 @@ namespace Emzi0767.CompanionCube.Modules
             if (css.ReturnValue != null)
                 embed.AddField("Return type", css.ReturnValue.GetType().ToString(), true);
 
-            await msg.ModifyAsync(embed: embed.Build()).ConfigureAwait(false);
+            await msg.ModifyAsync(embed: embed.Build());
         }
 
         [Command("nick"), Aliases("nickname"), Description("Changes the bot's nickname."), OwnerOrPermission(Permissions.ManageNicknames)]
         public async Task NicknameAsync(CommandContext ctx, [Description("New nickname for the bot.")] string new_nickname = "")
         {
             if (!ctx.Guild.Members.TryGetValue(ctx.Client.CurrentUser.Id, out var mbr))
-                mbr = await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id).ConfigureAwait(false);
+                mbr = await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id);
 
             await mbr.ModifyAsync(x =>
             {
                 x.Nickname = new_nickname;
                 x.AuditLogReason = string.Concat("Edited by ", ctx.User.Username, "#", ctx.User.Discriminator, " (", ctx.User.Id, ")");
-            }).ConfigureAwait(false);
-            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString()).ConfigureAwait(false);
+            });
+            await ctx.RespondAsync(DiscordEmoji.FromName(ctx.Client, ":msokhand:").ToString());
         }
 
         [Command("musicwhitelist"), Description("Sets whether the specified guild should be whitelisted for music. Invoking with no arguments lists whitelisted guilds."), Aliases("musicwl"), RequireOwner]
@@ -254,8 +254,8 @@ namespace Emzi0767.CompanionCube.Modules
                 this.Database.MusicWhitelist.Remove(enable);
             }
 
-            await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {Formatter.Bold(Formatter.Sanitize(guild.Name))} is {(whitelist ? "now whitelisted for music playback" : "not whitelisted for music playback anymore")}.").ConfigureAwait(false);
+            await this.Database.SaveChangesAsync();
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} {Formatter.Bold(Formatter.Sanitize(guild.Name))} is {(whitelist ? "now whitelisted for music playback" : "not whitelisted for music playback anymore")}.");
         }
 
         [Command("musicwhitelist")]
@@ -270,7 +270,7 @@ namespace Emzi0767.CompanionCube.Modules
                 sb.Append($"{gld.Id} ({Formatter.Sanitize(gld.Name)}): {(string.IsNullOrWhiteSpace(x.Reason) ? "no reason specified" : x.Reason)}\n");
             }
 
-            await ctx.RespondAsync(sb.ToString()).ConfigureAwait(false);
+            await ctx.RespondAsync(sb.ToString());
         }
 
         [Command("blacklist"), Description("Sets blacklisted status for a user, channel, or guild. Invoking with no arguments lists blacklisted entities."), Aliases("bl")]
@@ -297,8 +297,8 @@ namespace Emzi0767.CompanionCube.Modules
                 this.Database.EntityBlacklist.Remove(block);
             }
 
-            await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} User {user.Mention} is {(blacklisted ? "now blacklisted" : "no longer blacklisted")}.").ConfigureAwait(false);
+            await this.Database.SaveChangesAsync();
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} User {user.Mention} is {(blacklisted ? "now blacklisted" : "no longer blacklisted")}.");
         }
 
         [Command("blacklist")]
@@ -325,8 +325,8 @@ namespace Emzi0767.CompanionCube.Modules
                 this.Database.EntityBlacklist.Remove(block);
             }
 
-            await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Channel {channel.Mention} is {(blacklisted ? "now blacklisted" : "no longer blacklisted")}.").ConfigureAwait(false);
+            await this.Database.SaveChangesAsync();
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Channel {channel.Mention} is {(blacklisted ? "now blacklisted" : "no longer blacklisted")}.");
         }
 
         [Command("blacklist")]
@@ -353,8 +353,8 @@ namespace Emzi0767.CompanionCube.Modules
                 this.Database.EntityBlacklist.Remove(block);
             }
 
-            await this.Database.SaveChangesAsync().ConfigureAwait(false);
-            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Guild {Formatter.Bold(Formatter.Sanitize(guild.Name))} is {(blacklisted ? "now blacklisted" : "no longer blacklisted")}.").ConfigureAwait(false);
+            await this.Database.SaveChangesAsync();
+            await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Guild {Formatter.Bold(Formatter.Sanitize(guild.Name))} is {(blacklisted ? "now blacklisted" : "no longer blacklisted")}.");
         }
 
         [Command("blacklist")]
@@ -364,7 +364,7 @@ namespace Emzi0767.CompanionCube.Modules
             foreach (var x in this.Database.EntityBlacklist)
                 sb.Append($"{(ulong)x.Id} ({x.Kind}, since {x.Since:yyyy-MM-dd HH:mm:ss zzz}): {(string.IsNullOrWhiteSpace(x.Reason) ? "no reason specified" : x.Reason)}\n");
 
-            await ctx.RespondAsync(sb.ToString()).ConfigureAwait(false);
+            await ctx.RespondAsync(sb.ToString());
         }
 
         [Group("prefix"), ModuleLifespan(ModuleLifespan.Transient), Description("Commands for managing the prefixes that trigger the bot's commands."), Aliases("pfx")]
@@ -421,7 +421,7 @@ namespace Emzi0767.CompanionCube.Modules
                     }
                 }
 
-                await ctx.RespondAsync(sb.ToString()).ConfigureAwait(false);
+                await ctx.RespondAsync(sb.ToString());
             }
 
             [Command("add"), Description("Adds a prefix to this guild's command prefixes.")]
@@ -433,7 +433,7 @@ namespace Emzi0767.CompanionCube.Modules
 
                 if (gpfx?.EnableDefault != false && this.Bot.Configuration.Discord.DefaultPrefixes.Contains(prefix))
                 {
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} Cannot add default prefix.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} Cannot add default prefix.");
                     return;
                 }
 
@@ -453,8 +453,8 @@ namespace Emzi0767.CompanionCube.Modules
                     this.Database.Prefixes.Update(gpfx);
                 }
 
-                await this.Database.SaveChangesAsync().ConfigureAwait(false);
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix added.").ConfigureAwait(false);
+                await this.Database.SaveChangesAsync();
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix added.");
             }
 
             [Command("remove"), Description("Removes a prefix from this guild's command prefixes."), Aliases("rm", "delete", "del")]
@@ -470,12 +470,12 @@ namespace Emzi0767.CompanionCube.Modules
                 }
                 else if (gpfx != null && !gpfx.Prefixes.Contains(prefix))
                 {
-                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} This prefix is not configured.").ConfigureAwait(false);
+                    await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} This prefix is not configured.");
                     return;
                 }
 
-                await this.Database.SaveChangesAsync().ConfigureAwait(false);
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix removed.").ConfigureAwait(false);
+                await this.Database.SaveChangesAsync();
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Prefix removed.");
             }
 
             [Command("enabledefault"), Description("Configures whether default prefixes are to be enabled in this guild."), Aliases("default", "def")]
@@ -500,8 +500,8 @@ namespace Emzi0767.CompanionCube.Modules
                     this.Database.Prefixes.Update(gpfx);
                 }
 
-                await this.Database.SaveChangesAsync().ConfigureAwait(false);
-                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Setting saved.").ConfigureAwait(false);
+                await this.Database.SaveChangesAsync();
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msokhand:")} Setting saved.");
             }
         }
     }

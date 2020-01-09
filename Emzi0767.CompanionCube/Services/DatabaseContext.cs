@@ -84,8 +84,8 @@ namespace Emzi0767.CompanionCube.Services
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ForNpgsqlHasEnum(null, "entity_kind", new[] { "user", "channel", "guild" })
-                .ForNpgsqlHasEnum(null, "tag_kind", new[] { "channel", "guild", "global" })
+            modelBuilder.HasPostgresEnum<DatabaseEntityKind>()
+                .HasPostgresEnum<DatabaseTagKind>()
                 .HasPostgresExtension("fuzzystrmatch");
 
             modelBuilder.Entity<DatabaseMetadata>(entity =>
