@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -39,6 +40,17 @@ namespace Emzi0767.CompanionCube.Modules
         public FunCommandsModule(CSPRNG rng)
         {
             this.RNG = rng;
+        }
+
+        [Command("avatar"), Aliases("pfp"), Description("<@!255950165200994307>")]
+        public async Task AvatarAsync(CommandContext ctx, [RemainingText, Description("User whose avatar to display.")] DiscordUser user = null)
+        {
+            user ??= ctx.User;
+            var avatar = user.GetAvatarUrl(user.AvatarHash[0..2].SequenceEqual("a_") ? ImageFormat.Gif : ImageFormat.Png, 1024);
+            await ctx.RespondAsync(embed: new DiscordEmbedBuilder()
+                .WithAuthor(name: $"{user.Username}#{user.Discriminator}", url: null, iconUrl: avatar)
+                .WithImageUrl(avatar)
+                .Build());
         }
 
         [Command("choice"), Aliases("pick"), Description("Chooses a random option from supplied ones.")]

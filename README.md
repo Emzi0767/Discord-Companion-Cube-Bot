@@ -30,7 +30,7 @@ so no further NuGet configuration should be required. Should that happen to not
 be the case, however, add the following MyGet feed to your NuGet sources:
 `https://nuget.emzi0767.com/api/v3/index.json`
 
-### Visual Studio 2017
+### Visual Studio 2019
 Just open the solution and hit build, then publish. This will create a complete 
 bot distribution in `bin/Release/netcoreapp3.0/publish/`.
 
