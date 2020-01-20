@@ -67,7 +67,7 @@ namespace Emzi0767.CompanionCube.Services
         /// <param name="uri">URL to load tracks from.</param>
         /// <returns>Loaded tracks.</returns>
         public Task<LavalinkLoadResult> GetTracksAsync(Uri uri)
-            => this.Lavalink.LavalinkNode.GetTracksAsync(uri);
+            => this.Lavalink.LavalinkNode.Rest.GetTracksAsync(uri);
 
         /// <summary>
         /// Shuffles the supplied track list.

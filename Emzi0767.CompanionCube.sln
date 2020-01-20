@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emzi0767.CompanionCube", "Emzi0767.CompanionCube\Emzi0767.CompanionCube.csproj", "{7C0CA161-8E79-4DC5-8FA6-D0E2FDB23620}"
 EndProject
@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{06
 		Database\schema_v2_to_v3.sql = Database\schema_v2_to_v3.sql
 		Database\schema_v3_to_v4.sql = Database\schema_v3_to_v4.sql
 		Database\schema_v4_to_v5.sql = Database\schema_v4_to_v5.sql
+		Database\schema_v5_to_v6.sql = Database\schema_v5_to_v6.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{89849CF0-DE10-46A2-BFE5-0F1EBF6E09E0}"
