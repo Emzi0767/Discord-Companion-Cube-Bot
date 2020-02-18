@@ -111,7 +111,7 @@ namespace Emzi0767.CompanionCube.Data
             if (this.Player == null || !this.Player.IsConnected)
                 return;
 
-            if (this.NowPlaying.Track.TrackString == null)
+            if (this.NowPlaying.Track?.TrackString == null)
                 await this.PlayHandlerAsync();
         }
 
