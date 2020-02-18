@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
@@ -77,8 +78,8 @@ namespace Emzi0767.CompanionCube.Data
         /// </summary>
         public DiscordChannel CommandChannel { get; set; }
 
-        private List<MusicItem> QueueInternal { get; set; }
-        private string QueueSerialized { get; set; }
+        private List<MusicItem> QueueInternal { get; }
+        private SemaphoreSlim QueueInternalLock { get; }
         private DiscordGuild Guild { get; }
         private CSPRNG RNG { get; }
         private LavalinkService Lavalink { get; }
@@ -97,6 +98,7 @@ namespace Emzi0767.CompanionCube.Data
             this.RNG = rng;
             this.Lavalink = lavalink;
             this.Identifier = this.Guild.Id.ToString(CultureInfo.InvariantCulture);
+            this.QueueInternalLock = new SemaphoreSlim(1, 1);
             this.QueueInternal = new List<MusicItem>();
             this.Queue = new ReadOnlyCollection<MusicItem>(this.QueueInternal);
         }
@@ -104,67 +106,67 @@ namespace Emzi0767.CompanionCube.Data
         /// <summary>
         /// Begins playback.
         /// </summary>
-        public void Play()
+        public async Task PlayAsync()
         {
             if (this.Player == null || !this.Player.IsConnected)
                 return;
 
             if (this.NowPlaying.Track.TrackString == null)
-                this.PlayHandler();
+                await this.PlayHandlerAsync();
         }
 
         /// <summary>
         /// Stops the playback.
         /// </summary>
-        public void Stop()
+        public async Task StopAsync()
         {
             if (this.Player == null || !this.Player.IsConnected)
                 return;
 
             this.NowPlaying = default;
-            this.Player.Stop();
+            await this.Player.StopAsync();
         }
 
         /// <summary>
         /// Pauses the playback.
         /// </summary>
-        public void Pause()
+        public async Task PauseAsync()
         {
             if (this.Player == null || !this.Player.IsConnected)
                 return;
 
             this.IsPlaying = false;
-            this.Player.Pause();
+            await this.Player.PauseAsync();
         }
 
         /// <summary>
         /// Resumes the playback.
         /// </summary>
-        public void Resume()
+        public async Task ResumeAsync()
         {
             if (this.Player == null || !this.Player.IsConnected)
                 return;
 
             this.IsPlaying = true;
-            this.Player.Resume();
+            await this.Player.ResumeAsync();
         }
 
         /// <summary>
         /// Sets playback volume.
         /// </summary>
-        public void SetVolume(int volume)
+        public async Task SetVolumeAsync(int volume)
         {
             if (this.Player == null || !this.Player.IsConnected)
                 return;
 
-            this.Player.SetVolume(volume);
+            await this.Player.SetVolumeAsync(volume);
             this.Volume = volume;
         }
 
         /// <summary>
         /// Restarts current track.
         /// </summary>
-        public void Restart()
+        public async Task RestartAsync()
         {
             if (this.Player == null || !this.Player.IsConnected)
                 return;
@@ -172,10 +174,15 @@ namespace Emzi0767.CompanionCube.Data
             if (this.NowPlaying.Track.TrackString == null)
                 return;
 
-            lock (this.QueueInternal)
+            await this.QueueInternalLock.WaitAsync();
+            try
             {
                 this.QueueInternal.Insert(0, this.NowPlaying);
-                this.Player.Stop();
+                await this.Player.StopAsync();
+            }
+            finally
+            {
+                this.QueueInternalLock.Release();
             }
         }
 
@@ -184,15 +191,15 @@ namespace Emzi0767.CompanionCube.Data
         /// </summary>
         /// <param name="target">Where or how much to seek by.</param>
         /// <param name="relative">Whether the seek is relative.</param>
-        public void Seek(TimeSpan target, bool relative)
+        public async Task SeekAsync(TimeSpan target, bool relative)
         {
             if (this.Player == null || !this.Player.IsConnected)
                 return;
 
             if (!relative)
-                this.Player.Seek(target);
+                await this.Player.SeekAsync(target);
             else
-                this.Player.Seek(this.Player.CurrentState.PlaybackPosition + target);
+                await this.Player.SeekAsync(this.Player.CurrentState.PlaybackPosition + target);
         }
 
         /// <summary>
@@ -355,7 +362,7 @@ namespace Emzi0767.CompanionCube.Data
 
             this.Player = await this.Lavalink.LavalinkNode.ConnectAsync(channel);
             if (this.Volume != 100)
-                this.Player.SetVolume(this.Volume);
+                await this.Player.SetVolumeAsync(this.Volume);
             this.Player.PlaybackFinished += this.Player_PlaybackFinished;
         }
 
@@ -363,16 +370,15 @@ namespace Emzi0767.CompanionCube.Data
         /// Destroys a player for this guild.
         /// </summary>
         /// <returns></returns>
-        public Task DestroyPlayerAsync()
+        public async Task DestroyPlayerAsync()
         {
             if (this.Player == null)
-                return Task.CompletedTask;
+                return;
 
             if (this.Player.IsConnected)
-                this.Player.Disconnect();
+                await this.Player.DisconnectAsync();
 
             this.Player = null;
-            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -391,10 +397,10 @@ namespace Emzi0767.CompanionCube.Data
         {
             await Task.Delay(500);
             this.IsPlaying = false;
-            this.PlayHandler();
+            await this.PlayHandlerAsync();
         }
 
-        private void PlayHandler()
+        private async Task PlayHandlerAsync()
         {
             var itemN = this.Dequeue();
             if (itemN == null)
@@ -406,7 +412,7 @@ namespace Emzi0767.CompanionCube.Data
             var item = itemN.Value;
             this.NowPlaying = item;
             this.IsPlaying = true;
-            this.Player.Play(item.Track);
+            await this.Player.PlayAsync(item.Track);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Emzi0767.CompanionCube.Modules
     public sealed class LabModule : BaseCommandModule
     {
         [Command("rolecolour")]
-        [Aliases("rcolor", "rclr", "rc")]
+        [Aliases("rcolour", "rclr", "rc", "colour", "clr")]
         [Description("Facilitates <@!255950165200994307>' urge to change role colours every day, without human interaction. This will not create new roles.")]
         public async Task RoleColourAsync(CommandContext ctx, [RemainingText, Description("New colour you want for your role.")] DiscordColor newColour)
         {
@@ -56,7 +56,7 @@ namespace Emzi0767.CompanionCube.Modules
                 await msg.ModifyAsync(embed: AppendDescription(embed, "SIKE!"));
             }
 
-            DiscordEmbed AppendDescription(DiscordEmbedBuilder e, string t)
+            static DiscordEmbed AppendDescription(DiscordEmbedBuilder e, string t)
                 => e.WithDescription($"{e.Description} {t}").Build();
         }
     }

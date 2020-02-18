@@ -46,7 +46,10 @@ namespace Emzi0767.CompanionCube.Modules
         public async Task AvatarAsync(CommandContext ctx, [RemainingText, Description("User whose avatar to display.")] DiscordUser user = null)
         {
             user ??= ctx.User;
-            var avatar = user.GetAvatarUrl(user.AvatarHash[0..2].SequenceEqual("a_") ? ImageFormat.Gif : ImageFormat.Png, 1024);
+            var avatar = user.AvatarHash != null
+                ? user.GetAvatarUrl(user.AvatarHash[0..2].SequenceEqual("a_") ? ImageFormat.Gif : ImageFormat.Png, 1024)
+                : user.DefaultAvatarUrl;
+
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder()
                 .WithAuthor(name: $"{user.Username}#{user.Discriminator}", url: null, iconUrl: avatar)
                 .WithImageUrl(avatar)

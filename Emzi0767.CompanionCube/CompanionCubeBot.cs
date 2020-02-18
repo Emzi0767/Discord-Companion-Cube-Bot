@@ -293,7 +293,7 @@ namespace Emzi0767.CompanionCube
             if (gmd.IsPlaying && usrs.Count() == 1 && usrs.First() == this.Discord.CurrentUser)
             {
                 e.Client.DebugLogger.LogMessage(LogLevel.Info, LOG_TAG, $"All users left voice in {e.Guild.Name}, pausing playback", DateTime.Now);
-                gmd.Pause();
+                await gmd.PauseAsync();
 
                 if (gmd.CommandChannel != null)
                     await gmd.CommandChannel.SendMessageAsync($"{DiscordEmoji.FromName(e.Client, ":play_pause:")} All users left the channel, playback paused. You can resume it by joining the channel and using the `resume` command.");
