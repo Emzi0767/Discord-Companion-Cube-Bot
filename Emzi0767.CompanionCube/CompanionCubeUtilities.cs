@@ -98,9 +98,9 @@ namespace Emzi0767.CompanionCube
         /// <returns>Duration string.</returns>
         public static string ToDurationString(this TimeSpan ts)
         {
-            if (ts.TotalHours >= 1)
-                return ts.ToString(@"h\:mm\:ss");
-            return ts.ToString(@"m\:ss");
+            if (ts.Days > 0)
+                return $@"{ts:%d} days, {ts:hh\:mm\:ss}";
+            return ts.ToString(@"hh\:mm\:ss");
         }
 
         /// <summary>
