@@ -273,7 +273,7 @@ namespace Emzi0767.CompanionCube.Modules
             await ctx.RespondAsync(sb.ToString());
         }
 
-        [Command("blacklist"), Description("Sets blacklisted status for a user, channel, or guild. Invoking with no arguments lists blacklisted entities."), Aliases("bl")]
+        [Command("blacklist"), Description("Sets blacklisted status for a user, channel, or guild. Invoking with no arguments lists blacklisted entities."), Aliases("bl"), RequireOwner]
         public async Task BlacklistAsync(CommandContext ctx,
            [Description("User whose blacklisted status to change.")] DiscordUser user,
            [Description("Whether the user should be blacklisted.")] bool blacklisted,
