@@ -15,7 +15,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
@@ -27,7 +26,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
-using DSharpPlus.Interactivity.EventHandling;
 using DSharpPlus.Lavalink;
 using Emzi0767.CompanionCube.Attributes;
 using Emzi0767.CompanionCube.Data;
