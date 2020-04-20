@@ -146,7 +146,7 @@ namespace Emzi0767.CompanionCube.Modules
                 return;
             }
 
-            var msgC = string.Join("\n", results.Select((x, i) => $"{NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.UrlDecode(x.Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.UrlDecode(x.Author)))}"));
+            var msgC = string.Join("\n", results.Select((x, i) => $"{NumberMappings[i + 1]} {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Title)))} by {Formatter.Bold(Formatter.Sanitize(WebUtility.HtmlDecode(x.Author)))}"));
             msgC = $"{msgC}\n\nType a number 1-{results.Count()} to queue a track. To cancel, type cancel or {Numbers.Last()}.";
             var msg = await ctx.RespondAsync(msgC);
 
