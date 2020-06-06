@@ -14,10 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Lavalink;
+using DSharpPlus.Lavalink.EventArgs;
 using DSharpPlus.Net;
 using Emzi0767.CompanionCube.Data;
 
@@ -34,6 +36,9 @@ namespace Emzi0767.CompanionCube.Services
         public LavalinkNodeConnection LavalinkNode { get; private set; }
 
         private CompanionCubeConfigLavalink Configuration { get; }
+        private DiscordClient Discord { get; }
+
+        private readonly AsyncEvent<TrackExceptionEventArgs> _trackException;
 
         /// <summary>
         /// Creates a new Lavalink service with specified configuration options.
@@ -43,7 +48,9 @@ namespace Emzi0767.CompanionCube.Services
         public LavalinkService(CompanionCubeConfigLavalink cfg, DiscordClient client)
         {
             this.Configuration = cfg;
-            client.Ready += this.Client_Ready;
+            this.Discord = client;
+            this.Discord.Ready += this.Client_Ready;
+            this._trackException = new AsyncEvent<TrackExceptionEventArgs>(this.EventExceptionHandler, "CCUBE_LAVALINK_TRACK_EXCEPTION");
         }
 
         private async Task Client_Ready(ReadyEventArgs e)
@@ -59,6 +66,22 @@ namespace Emzi0767.CompanionCube.Services
                 SocketEndpoint = new ConnectionEndpoint(this.Configuration.Hostname, this.Configuration.Port),
                 RestEndpoint = new ConnectionEndpoint(this.Configuration.Hostname, this.Configuration.Port)
             });
+
+            this.LavalinkNode.TrackException += this.LavalinkNode_TrackException;
         }
+
+        private async Task LavalinkNode_TrackException(TrackExceptionEventArgs e)
+        {
+            await this._trackException.InvokeAsync(e);
+        }
+
+        public event AsyncEventHandler<TrackExceptionEventArgs> TrackExceptionThrown
+        {
+            add => this._trackException.Register(value);
+            remove => this._trackException.Unregister(value);
+        }
+
+        private void EventExceptionHandler(string name, Exception ex)
+            => this.Discord.DebugLogger.LogMessage(LogLevel.Error, "LL-CCube", $"Exception occured during track playback", DateTime.Now, ex);
     }
 }

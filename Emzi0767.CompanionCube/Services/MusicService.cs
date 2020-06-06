@@ -19,8 +19,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
+using DSharpPlus.Lavalink.EventArgs;
 using Emzi0767.CompanionCube.Data;
 
 namespace Emzi0767.CompanionCube.Services
@@ -33,18 +35,21 @@ namespace Emzi0767.CompanionCube.Services
         private LavalinkService Lavalink { get; }
         private CSPRNG RNG { get; }
         private ConcurrentDictionary<ulong, GuildMusicData> MusicData { get; }
-        private string PlayingQueues { get; set; }
+        private DiscordClient Discord { get; }
 
         /// <summary>
         /// Creates a new instance of this music service.
         /// </summary>
         /// <param name="redis">Redis client to use for persistence.</param>
         /// <param name="rng">Cryptographically-secure random number generator implementaion.</param>
-        public MusicService(CSPRNG rng, LavalinkService lavalink)
+        public MusicService(CSPRNG rng, LavalinkService lavalink, CompanionCubeBot bot)
         {
             this.Lavalink = lavalink;
             this.RNG = rng;
             this.MusicData = new ConcurrentDictionary<ulong, GuildMusicData>();
+            this.Discord = bot.Discord;
+
+            this.Lavalink.TrackExceptionThrown += this.Lavalink_TrackExceptionThrown;
         }
 
         /// <summary>
@@ -76,5 +81,16 @@ namespace Emzi0767.CompanionCube.Services
         /// <returns>Shuffled track collection.</returns>
         public IEnumerable<LavalinkTrack> Shuffle(IEnumerable<LavalinkTrack> tracks)
             => tracks.OrderBy(x => this.RNG.Next());
+
+        private async Task Lavalink_TrackExceptionThrown(TrackExceptionEventArgs e)
+        {
+            if (e.Player?.Guild == null)
+                return;
+
+            if (!this.MusicData.TryGetValue(e.Player.Guild.Id, out var gmd))
+                return;
+
+            await gmd.CommandChannel.SendMessageAsync($"{DiscordEmoji.FromName(this.Discord, ":msfrown:")} A problem occured while playing {Formatter.Bold(Formatter.Sanitize(e.Track.Title))} by {Formatter.Bold(Formatter.Sanitize(e.Track.Author))}:\n{e.Error}");
+        }
     }
 }
