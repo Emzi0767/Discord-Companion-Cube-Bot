@@ -17,7 +17,7 @@
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
-using DSharpPlus.Entities;
+using dse = DSharpPlus.Entities;
 
 namespace Emzi0767.CompanionCube
 {
@@ -29,19 +29,19 @@ namespace Emzi0767.CompanionCube
 
     public sealed class TagTypeConverter : IArgumentConverter<TagType>
     {
-        public Task<Optional<TagType>> ConvertAsync(string value, CommandContext ctx)
+        public Task<dse.Optional<TagType>> ConvertAsync(string value, CommandContext ctx)
         {
             value = value.ToLowerInvariant();
             switch (value)
             {
                 case "channel":
-                    return Task.FromResult(Optional.FromValue(TagType.Channel));
+                    return Task.FromResult(dse.Optional.FromValue(TagType.Channel));
 
                 case "guild":
-                    return Task.FromResult(Optional.FromValue(TagType.Guild));
+                    return Task.FromResult(dse.Optional.FromValue(TagType.Guild));
 
                 default:
-                    return Task.FromResult(Optional.FromNoValue<TagType>());
+                    return Task.FromResult(dse.Optional.FromNoValue<TagType>());
             }
         }
     }

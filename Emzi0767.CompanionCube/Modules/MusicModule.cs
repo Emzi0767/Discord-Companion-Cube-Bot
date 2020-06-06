@@ -81,7 +81,7 @@ namespace Emzi0767.CompanionCube.Modules
         public override async Task BeforeExecutionAsync(CommandContext ctx)
         {
             var vs = ctx.Member.VoiceState;
-            var chn = vs.Channel;
+            var chn = vs?.Channel;
             if (chn == null)
             {
                 await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msraisedhand:")} You need to be in a voice channel.");
@@ -380,10 +380,15 @@ namespace Emzi0767.CompanionCube.Modules
                 .ToArray();
 
             var trk = this.GuildMusic.NowPlaying;
-            if (!pages.Any() && trk.Track.TrackString == null)
-                pages = new[] { new Page("Queue is empty!", null) };
-            else if (!pages.Any())
-                pages = new[] { new Page($"Now playing: {this.GuildMusic.NowPlaying.ToTrackString()}", null) };
+            if (!pages.Any())
+            {
+                if (trk.Track?.TrackString == null)
+                    await ctx.RespondAsync("Queue is empty!");
+                else
+                    await ctx.RespondAsync($"Now playing: {this.GuildMusic.NowPlaying.ToTrackString()}");
+
+                return;
+            }
 
             var ems = new PaginationEmojis
             {
@@ -400,7 +405,7 @@ namespace Emzi0767.CompanionCube.Modules
         public async Task NowPlayingAsync(CommandContext ctx)
         {
             var track = this.GuildMusic.NowPlaying;
-            if (this.GuildMusic.NowPlaying.Track.TrackString == null)
+            if (this.GuildMusic.NowPlaying.Track?.TrackString == null)
             {
                 await ctx.RespondAsync($"Not playing.");
             }

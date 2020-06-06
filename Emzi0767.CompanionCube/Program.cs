@@ -21,6 +21,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Emzi0767.CompanionCube.Data;
 using Emzi0767.CompanionCube.Services;
+using Emzi0767.Utilities;
 using Npgsql;
 
 namespace Emzi0767.CompanionCube
