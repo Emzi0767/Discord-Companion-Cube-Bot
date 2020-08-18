@@ -132,7 +132,7 @@ namespace Emzi0767.CompanionCube
 
             // create service provider
             this.Services = new ServiceCollection()
-                .AddTransient<CSPRNG>()
+                .AddTransient<SecureRandom>()
                 .AddSingleton(this.ConnectionStringProvider)
                 .AddSingleton<MusicService>()
                 .AddScoped<DatabaseContext>()
@@ -140,6 +140,9 @@ namespace Emzi0767.CompanionCube
                 .AddSingleton(new YouTubeSearchProvider(cfg.YouTube))
                 .AddSingleton<HttpClient>()
                 .AddSingleton(this)
+                .AddSingleton<FeedTimerService>()
+                .AddScoped<FeedService>()
+                .AddSingleton(this.Discord)
                 .BuildServiceProvider(true);
 
             // create CommandsNext
@@ -249,6 +252,8 @@ namespace Emzi0767.CompanionCube
 
         private Task Discord_GuildDownloadCompleted(GuildDownloadCompletedEventArgs e)
         {
+            this.Services.GetRequiredService<FeedTimerService>().Start();
+
             e.Client.DebugLogger.LogMessage(LogLevel.Info, LOG_TAG, "All guilds are now available", DateTime.Now);
             return Task.CompletedTask;
         }
@@ -291,7 +296,7 @@ namespace Emzi0767.CompanionCube
                 return;
 
             var usrs = chn.Users;
-            if (gmd.IsPlaying && usrs.Count() == 1 && usrs.First() == this.Discord.CurrentUser)
+            if (gmd.IsPlaying && !usrs.Any(x => !x.IsBot))
             {
                 e.Client.DebugLogger.LogMessage(LogLevel.Info, LOG_TAG, $"All users left voice in {e.Guild.Name}, pausing playback", DateTime.Now);
                 await gmd.PauseAsync();
@@ -355,7 +360,7 @@ namespace Emzi0767.CompanionCube
                 return Task.FromResult(-1);
 
             var gldId = (long)gld.Id;
-            var db = new DatabaseContext(this.ConnectionStringProvider);
+            using var db = new DatabaseContext(this.ConnectionStringProvider);
             var gpfix = db.Prefixes.SingleOrDefault(x => x.GuildId == gldId);
             if (gpfix != null)
             {

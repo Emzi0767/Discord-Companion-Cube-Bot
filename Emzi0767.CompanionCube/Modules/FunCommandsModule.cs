@@ -24,7 +24,6 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Emzi0767.CompanionCube.Attributes;
-using Emzi0767.CompanionCube.Services;
 
 namespace Emzi0767.CompanionCube.Modules
 {
@@ -34,10 +33,10 @@ namespace Emzi0767.CompanionCube.Modules
     [NotBlacklisted]
     public class FunCommandsModule : BaseCommandModule
     {
-        private CSPRNG RNG { get; }
+        private SecureRandom RNG { get; }
         private Regex DiceRegex { get; } = new Regex(@"^(?<count>\d+)?d(?<sides>\d+)$", RegexOptions.Compiled | RegexOptions.ECMAScript);
 
-        public FunCommandsModule(CSPRNG rng)
+        public FunCommandsModule(SecureRandom rng)
         {
             this.RNG = rng;
         }

@@ -81,6 +81,55 @@ namespace Emzi0767.CompanionCube
         }
 
         /// <summary>
+        /// Returns a string trimmed to at most <paramref name="maxlen"/> characters.
+        /// </summary>
+        /// <param name="str">String to trim.</param>
+        /// <param name="maxlen">Maximum length of the resulting string.</param>
+        /// <returns>Trimmed string.</returns>
+        public static string AtMost(this string str, int maxlen)
+            => str.Length > maxlen
+                ? string.Create(maxlen, str, (buff, old) =>
+                {
+                    buff[^1] = '.';
+                    buff[^2] = '.';
+                    buff[^3] = '.';
+                    old.AsSpan().Slice(0, buff.Length - 3).CopyTo(buff);
+                })
+                : str;
+
+        /// <summary>
+        /// Creates a version of a URL with embeds suppressed.
+        /// </summary>
+        /// <param name="url">URL to suppress.</param>
+        /// <returns>Formatted URL.</returns>
+        public static string SuppressUrlEmbeds(this string url)
+            => string.Create(url.Length + 2, url, (buff, u) =>
+            {
+                buff[^1] = '>';
+                buff[0] = '<';
+                u.AsSpan().CopyTo(buff.Slice(1));
+            });
+
+        /// <summary>
+        /// Formats a feed as a message string.
+        /// </summary>
+        /// <param name="feed">Feed to format.</param>
+        /// <returns>Formatted feed.</returns>
+        public static string FormatFeed(this DatabaseRssFeed feed)
+            => string.Create(feed.Name.Length + 5 + feed.Url.Length, feed, (buff, f) =>
+            {
+                var fnl = f.Name.Length;
+
+                buff[^1] = ')';
+                buff[^2] = '>';
+                buff[fnl] = ' ';
+                buff[fnl + 1] = '(';
+                buff[fnl + 2] = '<';
+                f.Name.AsSpan().CopyTo(buff);
+                f.Url.AsSpan().CopyTo(buff.Slice(fnl + 3));
+            });
+
+        /// <summary>
         /// Gets the version of the bot's assembly.
         /// </summary>
         /// <returns>Bot version.</returns>

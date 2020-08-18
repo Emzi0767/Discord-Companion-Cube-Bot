@@ -25,6 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{06
 		Database\schema_v3_to_v4.sql = Database\schema_v3_to_v4.sql
 		Database\schema_v4_to_v5.sql = Database\schema_v4_to_v5.sql
 		Database\schema_v5_to_v6.sql = Database\schema_v5_to_v6.sql
+		Database\schema_v6_to_v7.sql = Database\schema_v6_to_v7.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{89849CF0-DE10-46A2-BFE5-0F1EBF6E09E0}"

@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Emzi0767.CompanionCube.Data
 {
@@ -225,5 +226,43 @@ namespace Emzi0767.CompanionCube.Data
         [ForeignKey("Kind,ContainerId,Name")]
         [InverseProperty("Revisions")]
         public DatabaseTag Tag { get; set; }
+    }
+
+    /// <summary>
+    /// Represents an RSS feed.
+    /// </summary>
+    [Table("rss_feeds")]
+    public sealed class DatabaseRssFeed
+    {
+        /// <summary>
+        /// Gets or sets the name of the feed.
+        /// </summary>
+        [Column("name")]
+        [NotNull]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URL of the feed.
+        /// </summary>
+        [Column("url")]
+        public string Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ID of the channel new items should be posted to.
+        /// </summary>
+        [Column("channel_id")]
+        public long ChannelId { get; set; }
+
+        /// <summary>
+        /// Gets or sets how many items to replay on initialize.
+        /// </summary>
+        [Column("init_replay")]
+        public int? InitializeReplayCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp of the last item. Null value means the feed has not yet been checked.
+        /// </summary>
+        [Column("last_timestamp", TypeName = "timestamptz")]
+        public DateTimeOffset? LastTimestamp { get; set; }
     }
 }

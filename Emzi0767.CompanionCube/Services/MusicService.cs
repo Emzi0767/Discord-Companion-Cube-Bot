@@ -33,7 +33,7 @@ namespace Emzi0767.CompanionCube.Services
     public sealed class MusicService
     {
         private LavalinkService Lavalink { get; }
-        private CSPRNG RNG { get; }
+        private SecureRandom RNG { get; }
         private ConcurrentDictionary<ulong, GuildMusicData> MusicData { get; }
         private DiscordClient Discord { get; }
 
@@ -42,7 +42,7 @@ namespace Emzi0767.CompanionCube.Services
         /// </summary>
         /// <param name="redis">Redis client to use for persistence.</param>
         /// <param name="rng">Cryptographically-secure random number generator implementaion.</param>
-        public MusicService(CSPRNG rng, LavalinkService lavalink, CompanionCubeBot bot)
+        public MusicService(SecureRandom rng, LavalinkService lavalink, CompanionCubeBot bot)
         {
             this.Lavalink = lavalink;
             this.RNG = rng;

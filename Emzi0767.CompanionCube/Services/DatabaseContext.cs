@@ -54,6 +54,11 @@ namespace Emzi0767.CompanionCube.Services
         /// </summary>
         public virtual DbSet<DatabaseTagRevision> TagRevisions { get; set; }
 
+        /// <summary>
+        /// Gets or sets defiend RSS feeds.
+        /// </summary>
+        public virtual DbSet<DatabaseRssFeed> RssFeeds { get; set; }
+
         private ConnectionStringProvider ConnectionStringProvider { get; }
 
         /// <summary>
@@ -128,6 +133,22 @@ namespace Emzi0767.CompanionCube.Services
                     .HasForeignKey(d => new { d.Kind, d.ContainerId, d.Name })
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("tag_revisions_container_id_fkey");
+            });
+
+            modelBuilder.Entity<DatabaseRssFeed>(entity =>
+            {
+                entity.HasKey(e => new { e.Url, e.ChannelId });
+
+                entity.HasAlternateKey(e => new { e.Name, e.ChannelId });
+
+                entity.HasIndex(e => e.Url)
+                    .HasName("ix_rss_url");
+
+                entity.HasIndex(e => e.ChannelId)
+                    .HasName("ix_rss_channel");
+
+                entity.HasIndex(e => e.Name)
+                    .HasName("ix_rss_name");
             });
         }
     }

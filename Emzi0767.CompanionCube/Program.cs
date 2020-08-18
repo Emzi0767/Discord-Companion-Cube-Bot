@@ -77,13 +77,15 @@ namespace Emzi0767.CompanionCube
 
             // create database connection and validate schema
             var dbcsp = new ConnectionStringProvider(cfg.PostgreSQL);
-            var db = new DatabaseContext(dbcsp);
-            var dbv = db.Metadata.SingleOrDefault(x => x.MetaKey == "schema_version");
-            if (dbv == null || dbv.MetaValue != "5")
-                throw new InvalidDataException("Database schema version mismatch.");
-            dbv = db.Metadata.SingleOrDefault(x => x.MetaKey == "project");
-            if (dbv == null || dbv.MetaValue != "Companion Cube")
-                throw new InvalidDataException("Database schema type mismatch.");
+            using (var db = new DatabaseContext(dbcsp))
+            {
+                var dbv = db.Metadata.SingleOrDefault(x => x.MetaKey == "schema_version");
+                if (dbv == null || dbv.MetaValue != "7")
+                    throw new InvalidDataException("Database schema version mismatch.");
+                dbv = db.Metadata.SingleOrDefault(x => x.MetaKey == "project");
+                if (dbv == null || dbv.MetaValue != "Companion Cube")
+                    throw new InvalidDataException("Database schema type mismatch.");
+            }
 
             Console.Write("\r[4/4] Creating and booting shards   ");
 

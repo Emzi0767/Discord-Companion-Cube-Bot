@@ -81,7 +81,7 @@ namespace Emzi0767.CompanionCube.Data
         private List<MusicItem> QueueInternal { get; }
         private SemaphoreSlim QueueInternalLock { get; }
         private DiscordGuild Guild { get; }
-        private CSPRNG RNG { get; }
+        private SecureRandom RNG { get; }
         private LavalinkService Lavalink { get; }
         private LavalinkGuildConnection Player { get; set; }
 
@@ -92,7 +92,7 @@ namespace Emzi0767.CompanionCube.Data
         /// <param name="rng">Cryptographically-secure random number generator implementation.</param>
         /// <param name="lavalink">Lavalink service.</param>
         /// <param name="redis">Redis service.</param>
-        public GuildMusicData(DiscordGuild guild, CSPRNG rng, LavalinkService lavalink)
+        public GuildMusicData(DiscordGuild guild, SecureRandom rng, LavalinkService lavalink)
         {
             this.Guild = guild;
             this.RNG = rng;
