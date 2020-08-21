@@ -220,5 +220,33 @@ namespace Emzi0767.CompanionCube.Modules
                 await ctx.RespondAsync(embed: embed.Build());
             }
         }
+
+        [Group("get")]
+        [Description("Hans, get ze...")]
+        [Hidden]
+        [RequirePrefixes("hans ", "hans, ", ShowInHelp = false)]
+        [ModuleLifespan(ModuleLifespan.Transient)]
+        public class GetModule : BaseCommandModule
+        {
+            private const string HANS_FLAMMENWERFER = "https://static.emzi0767.com/misc/hansflammenwerfer.png";
+            private const string HANS_LUGER = "https://static.emzi0767.com/misc/hansluger.jpg";
+
+            [Command("ze")]
+            [Aliases("the")]
+            [Description("Hans, get ze...")]
+            [Hidden]
+            public async Task ZeAsync(CommandContext ctx, 
+                [Description("The Hans will get")] HansTool tool)
+            {
+                var url = tool switch
+                {
+                    HansTool.Flammenwerfer => HANS_FLAMMENWERFER,
+                    HansTool.Luger => HANS_LUGER,
+                    _ => throw new ArgumentException("Invalid tool selected.", nameof(tool))
+                };
+
+                await ctx.RespondAsync(url);
+            }
+        }
     }
 }

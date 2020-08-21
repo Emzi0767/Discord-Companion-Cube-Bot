@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
@@ -166,7 +167,9 @@ namespace Emzi0767.CompanionCube
 
             // register type converters
             this.CommandsNext.RegisterConverter(new TagTypeConverter());
+            this.CommandsNext.RegisterConverter(new HansToolConverter());
             this.CommandsNext.RegisterUserFriendlyTypeName<TagType>("tag type");
+            this.CommandsNext.RegisterUserFriendlyTypeName<HansTool>("hans tool");
 
             // attach event handlers
             this.CommandsNext.CommandExecuted += this.CommandsNext_CommandExecuted;
@@ -331,7 +334,7 @@ namespace Emzi0767.CompanionCube
             { } // ignore
             else if (ex is ChecksFailedException cfe)
             {
-                if (!cfe.FailedChecks.OfType<NotBlacklistedAttribute>().Any())
+                if (!cfe.FailedChecks.Any(x => x is NotBlacklistedAttribute || x is RequirePrefixesAttribute))
                     embed = new DiscordEmbedBuilder
                     {
                         Title = "Permission denied",
@@ -366,7 +369,7 @@ namespace Emzi0767.CompanionCube
             {
                 foreach (var pfix in gpfix.Prefixes)
                 {
-                    var pfixLocation = msg.GetStringPrefixLength(pfix);
+                    var pfixLocation = msg.GetStringPrefixLength(pfix, StringComparison.OrdinalIgnoreCase);
                     if (pfixLocation != -1)
                         return Task.FromResult(pfixLocation);
                 }
@@ -377,7 +380,7 @@ namespace Emzi0767.CompanionCube
 
             foreach (var pfix in this.Configuration.Discord.DefaultPrefixes)
             {
-                var pfixLocation = msg.GetStringPrefixLength(pfix);
+                var pfixLocation = msg.GetStringPrefixLength(pfix, StringComparison.OrdinalIgnoreCase);
                 if (pfixLocation != -1)
                     return Task.FromResult(pfixLocation);
             }
