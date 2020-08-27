@@ -45,7 +45,7 @@ namespace Emzi0767.CompanionCube.Data
             this.BotVersion = CompanionCubeUtilities.GetBotVersion();
 
             // set the expected config version
-            this.ConfigVersion = 2;
+            this.ConfigVersion = 3;
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Emzi0767.CompanionCube.Data
         public void ValidateConfiguration(CompanionCubeConfig config)
         {
             // validate the config
-            if (config == null || config.Version == null || config.Discord == null || config.PostgreSQL == null || config.Lavalink == null || config.YouTube == null)
+            if (config == null || config.Version == null || config.Discord == null || config.PostgreSQL == null || config.Lavalink == null || config.YouTube == null || config.GitHub == null)
                 throw new ArgumentNullException(nameof(config), "Configuration data, or one of its parts, is null.");
 
             // validate config version

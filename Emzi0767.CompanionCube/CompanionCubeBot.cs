@@ -186,6 +186,9 @@ namespace Emzi0767.CompanionCube
 
             // create lavalink
             this.Lavalink = this.Discord.UseLavalink();
+
+            // add issue handler
+            this.Discord.AddExtension(new IssueHandlerExtension(cfg.GitHub));
         }
 
         /// <summary>

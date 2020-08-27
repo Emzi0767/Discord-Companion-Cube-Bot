@@ -1,6 +1,6 @@
 {
   "version": {
-    "config": 2
+    "config": 3
   },
   "discord": {
     "token": "insert_token_here",
@@ -26,5 +26,10 @@
   },
   "youtube": {
     "api_key": "insert_api_key_here"
+  },
+  "github": {
+    "enabled": true,
+    "channels": [],
+    "guilds": []
   }
 }

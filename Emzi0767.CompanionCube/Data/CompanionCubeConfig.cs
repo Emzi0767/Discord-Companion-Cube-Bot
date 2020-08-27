@@ -53,6 +53,12 @@ namespace Emzi0767.CompanionCube.Data
         /// </summary>
         [JsonProperty("youtube")]
         public CompanionCubeConfigYouTube YouTube { get; private set; } = new CompanionCubeConfigYouTube();
+
+        /// <summary>
+        /// Gets the GitHub API configuration.
+        /// </summary>
+        [JsonProperty("github")]
+        public CompanionCubeConfigGitHub GitHub { get; private set; } = new CompanionCubeConfigGitHub();
     }
 
     /// <summary>
@@ -197,5 +203,29 @@ namespace Emzi0767.CompanionCube.Data
         /// </summary>
         [JsonProperty("api_key")]
         public string ApiKey { get; private set; } = "insert_api_key_here";
+    }
+
+    /// <summary>
+    /// Represents GitHub section of the configuration file.
+    /// </summary>
+    public sealed class CompanionCubeConfigGitHub
+    {
+        /// <summary>
+        /// Gets whether processing is enabled.
+        /// </summary>
+        [JsonProperty("enabled")]
+        public bool IsEnabled { get; private set; }
+
+        /// <summary>
+        /// Gets the channels allowed to process Issues and PRs.
+        /// </summary>
+        [JsonProperty("channels")]
+        public ulong[] Channels { get; private set; }
+
+        /// <summary>
+        /// Gets the guilds allowed to process Issues and PRs.
+        /// </summary>
+        [JsonProperty("guilds")]
+        public ulong[] Guilds { get; private set; }
     }
 }
