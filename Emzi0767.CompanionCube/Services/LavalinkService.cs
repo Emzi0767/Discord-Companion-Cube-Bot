@@ -22,6 +22,7 @@ using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
 using DSharpPlus.Net;
 using Emzi0767.CompanionCube.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Emzi0767.CompanionCube.Services
 {
@@ -30,6 +31,8 @@ namespace Emzi0767.CompanionCube.Services
     /// </summary>
     public sealed class LavalinkService
     {
+        public static EventId LogEvent { get; } = new EventId(1001, "LL-CCube");
+
         /// <summary>
         /// Gets the Lavalink node connection.
         /// </summary>
@@ -82,6 +85,6 @@ namespace Emzi0767.CompanionCube.Services
         }
 
         private void EventExceptionHandler(string name, Exception ex)
-            => this.Discord.DebugLogger.LogMessage(LogLevel.Error, "LL-CCube", $"Exception occured during track playback", DateTime.Now, ex);
+            => this.Discord.Logger.LogError(LogEvent, $"Exception occured during track playback", DateTime.Now, ex);
     }
 }

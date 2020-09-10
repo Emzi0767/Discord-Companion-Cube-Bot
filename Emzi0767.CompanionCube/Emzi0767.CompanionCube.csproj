@@ -31,14 +31,14 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00712" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00712" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00712" />
-    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00712" />
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00722" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00722" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00722" />
+    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00722" />
     <PackageReference Include="Emzi0767.Common" Version="2.2.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.7.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.7">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
