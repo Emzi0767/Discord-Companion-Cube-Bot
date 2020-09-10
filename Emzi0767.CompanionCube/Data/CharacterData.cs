@@ -522,6 +522,12 @@ namespace Emzi0767.CompanionCube.Data
         Overlay = 1,
 
         /// <summary>
+        /// Diacritic reading marks for CJK unified ideographs.
+        /// </summary>
+        [EnumValue("6", "Diacritic reading marks for CJK unified ideographs")]
+        HanReading = 6,
+
+        /// <summary>
         /// Diacritic nukta marks in Brahmi-derived scripts.
         /// </summary>
         [EnumValue("7", "Diacritic nukta marks in Brahmi-derived scripts")]
@@ -1682,9 +1688,14 @@ namespace Emzi0767.CompanionCube.Data
             var cps = ImmutableDictionary.CreateBuilder<string, UnicodeCodepoint>();
             foreach (var xrcp in rawcps)
             {
-                var cat = this.CategoryMap[xrcp.GeneralCategory];
-                var cmbc = this.CombiningClassMap[xrcp.CanonicalCombiningClass];
-                var bidic = this.BidirectionalityClassMap[xrcp.BidiClass];
+                if (!this.CategoryMap.TryGetValue(xrcp.GeneralCategory, out var cat))
+                    throw new KeyNotFoundException($"Key not found: cat/'{xrcp.GeneralCategory}'.");
+                
+                if (!this.CombiningClassMap.TryGetValue(xrcp.CanonicalCombiningClass, out var cmbc))
+                    throw new KeyNotFoundException($"Key not found: cmbc/'{xrcp.CanonicalCombiningClass}'.");
+                
+                if (!this.BidirectionalityClassMap.TryGetValue(xrcp.BidiClass, out var bidic))
+                    throw new KeyNotFoundException($"Key not found: bidi/'{xrcp.BidiClass}'.");
 
                 var unidec = new UnicodeDecomposition(UnicodeDecompositionType.Unspecified, new string[0]);
                 if (!string.IsNullOrWhiteSpace(xrcp.DecompositionTypeAndMapping))
