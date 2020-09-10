@@ -136,6 +136,7 @@ namespace Emzi0767.CompanionCube
                 .AddSingleton<FeedTimerService>()
                 .AddScoped<FeedService>()
                 .AddSingleton(this.Discord)
+                .AddSingleton(new PooperService(this.Discord, this.ConnectionStringProvider))
                 .BuildServiceProvider(true);
 
             // create CommandsNext

@@ -80,7 +80,7 @@ namespace Emzi0767.CompanionCube
             using (var db = new DatabaseContext(dbcsp))
             {
                 var dbv = db.Metadata.SingleOrDefault(x => x.MetaKey == "schema_version");
-                if (dbv == null || dbv.MetaValue != "7")
+                if (dbv == null || dbv.MetaValue != "8")
                     throw new InvalidDataException("Database schema version mismatch.");
                 dbv = db.Metadata.SingleOrDefault(x => x.MetaKey == "project");
                 if (dbv == null || dbv.MetaValue != "Companion Cube")

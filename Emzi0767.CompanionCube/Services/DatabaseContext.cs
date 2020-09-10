@@ -59,6 +59,11 @@ namespace Emzi0767.CompanionCube.Services
         /// </summary>
         public virtual DbSet<DatabaseRssFeed> RssFeeds { get; set; }
 
+        /// <summary>
+        /// Gets or sets the pooper whitelist entries.
+        /// </summary>
+        public virtual DbSet<DatabasePooperWhitelist> PooperWhitelist { get; set; }
+
         private ConnectionStringProvider ConnectionStringProvider { get; }
 
         /// <summary>
@@ -149,6 +154,12 @@ namespace Emzi0767.CompanionCube.Services
 
                 entity.HasIndex(e => e.Name)
                     .HasName("ix_rss_name");
+            });
+
+            modelBuilder.Entity<DatabasePooperWhitelist>(entity =>
+            {
+                entity.HasIndex(e => e.GuildId)
+                    .HasName("ix_pooper_guild_id");
             });
         }
     }

@@ -265,4 +265,24 @@ namespace Emzi0767.CompanionCube.Data
         [Column("last_timestamp", TypeName = "timestamptz")]
         public DateTimeOffset? LastTimestamp { get; set; }
     }
+
+    /// <summary>
+    /// Represents an entry in the pooper's whitelist.
+    /// </summary>
+    [Table("pooper_whitelist")]
+    public sealed class DatabasePooperWhitelist
+    {
+        /// <summary>
+        /// Gets or sets the ID of the guild in which the pooper is active.
+        /// </summary>
+        [Key]
+        [Column("guild_id")]
+        public long GuildId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the comment attached to the entry.
+        /// </summary>
+        [Column("comment")]
+        public string Comment { get; set; }
+    }
 }
