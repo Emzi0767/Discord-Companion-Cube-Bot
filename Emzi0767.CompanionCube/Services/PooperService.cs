@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -28,6 +29,7 @@ namespace Emzi0767.CompanionCube.Services
     public sealed class PooperService
     {
         private static EventId LogEvent { get; } = new EventId(1002, "CCPoop");
+        private static Regex MentionableRegex { get; } = new Regex(@"[a-z0-9]{3,}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private DiscordClient Discord { get; }
         private ConnectionStringProvider ConnectionStringProvider { get; }
@@ -36,6 +38,7 @@ namespace Emzi0767.CompanionCube.Services
         {
             this.Discord = discord;
             this.Discord.GuildMemberUpdated += this.Discord_GuildMemberUpdated;
+            this.Discord.GuildMemberAdded += this.Discord_GuildMemberAdded;
 
             this.ConnectionStringProvider = csp;
         }
@@ -80,13 +83,18 @@ namespace Emzi0767.CompanionCube.Services
             await db.SaveChangesAsync();
         }
 
-        private async Task Discord_GuildMemberUpdated(GuildMemberUpdateEventArgs e)
+        private Task Discord_GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
+            => this.RunPooperAsync(e.Guild, e.Member);
+
+        private Task Discord_GuildMemberUpdated(DiscordClient sender, GuildMemberUpdateEventArgs e)
+            => this.RunPooperAsync(e.Guild, e.Member);
+
+        private async Task RunPooperAsync(DiscordGuild gld, DiscordMember mbr)
         {
-            var gid = (long)e.Guild.Id;
+            var gid = (long)gld.Id;
             if (!await this.CheckWhitelistAsync(gid))
                 return;
 
-            var gld = e.Guild;
             var cmbr = gld.CurrentMember;
             if (cmbr == null)
             {
@@ -94,7 +102,6 @@ namespace Emzi0767.CompanionCube.Services
                 return;
             }
 
-            var mbr = e.Member;
             if (!this.CanPoop(mbr, cmbr))
                 return;
 
@@ -137,6 +144,6 @@ namespace Emzi0767.CompanionCube.Services
         }
 
         public static bool IsPoopable(DiscordMember mbr)
-            => mbr.DisplayName[0] < '0';
+            => mbr.DisplayName[0] < '0' || !MentionableRegex.IsMatch(mbr.DisplayName);
     }
 }

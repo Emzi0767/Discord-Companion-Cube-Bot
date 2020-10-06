@@ -194,41 +194,41 @@ namespace Emzi0767.CompanionCube
             return this.Discord.ConnectAsync();
         }
 
-        private Task Discord_Ready(ReadyEventArgs e)
+        private Task Discord_Ready(DiscordClient sender, ReadyEventArgs e)
         {
-            e.Client.Logger.LogInformation(LogEvent, "Client is ready to process events", DateTime.Now);
+            sender.Logger.LogInformation(LogEvent, "Client is ready to process events", DateTime.Now);
 
             if (this.GameTimer == null && !string.IsNullOrWhiteSpace(this.Configuration.Discord.Game))
-                this.GameTimer = new Timer(this.GameTimerCallback, e.Client, TimeSpan.Zero, TimeSpan.FromHours(1));
+                this.GameTimer = new Timer(this.GameTimerCallback, sender, TimeSpan.Zero, TimeSpan.FromHours(1));
 
             return Task.CompletedTask;
         }
 
-        private Task Discord_GuildDownloadCompleted(GuildDownloadCompletedEventArgs e)
+        private Task Discord_GuildDownloadCompleted(DiscordClient sender, GuildDownloadCompletedEventArgs e)
         {
             this.Services.GetRequiredService<FeedTimerService>().Start();
 
-            e.Client.Logger.LogInformation(LogEvent, "All guilds are now available", DateTime.Now);
+            sender.Logger.LogInformation(LogEvent, "All guilds are now available", DateTime.Now);
             return Task.CompletedTask;
         }
 
-        private Task Discord_SocketErrored(SocketErrorEventArgs e)
+        private Task Discord_SocketErrored(DiscordClient sender, SocketErrorEventArgs e)
         {
             var ex = e.Exception;
             while (ex is AggregateException)
                 ex = ex.InnerException;
 
-            e.Client.Logger.LogCritical(LogEvent, $"Socket threw an exception {ex.GetType()}: {ex.Message}", DateTime.Now);
+            sender.Logger.LogCritical(LogEvent, $"Socket threw an exception {ex.GetType()}: {ex.Message}", DateTime.Now);
             return Task.CompletedTask;
         }
 
-        private Task Discord_GuildAvailable(GuildCreateEventArgs e)
+        private Task Discord_GuildAvailable(DiscordClient sender, GuildCreateEventArgs e)
         {
-            e.Client.Logger.LogInformation(LogEvent, $"Guild available: {e.Guild.Name}", DateTime.Now);
+            sender.Logger.LogInformation(LogEvent, $"Guild available: {e.Guild.Name}", DateTime.Now);
             return Task.CompletedTask;
         }
 
-        private async Task Discord_VoiceStateUpdated(VoiceStateUpdateEventArgs e)
+        private async Task Discord_VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
         {
             if (e.User == this.Discord.CurrentUser)
                 return;
@@ -242,15 +242,15 @@ namespace Emzi0767.CompanionCube
             var usrs = chn.Users;
             if (gmd.IsPlaying && !usrs.Any(x => !x.IsBot))
             {
-                e.Client.Logger.LogInformation(LogEvent, $"All users left voice in {e.Guild.Name}, pausing playback", DateTime.Now);
+                sender.Logger.LogInformation(LogEvent, $"All users left voice in {e.Guild.Name}, pausing playback", DateTime.Now);
                 await gmd.PauseAsync();
 
                 if (gmd.CommandChannel != null)
-                    await gmd.CommandChannel.SendMessageAsync($"{DiscordEmoji.FromName(e.Client, ":play_pause:")} All users left the channel, playback paused. You can resume it by joining the channel and using the `resume` command.");
+                    await gmd.CommandChannel.SendMessageAsync($"{DiscordEmoji.FromName(sender, ":play_pause:")} All users left the channel, playback paused. You can resume it by joining the channel and using the `resume` command.");
             }
         }
 
-        private Task CommandsNext_CommandExecuted(CommandExecutionEventArgs e)
+        private Task CommandsNext_CommandExecuted(CommandsNextExtension sender, CommandExecutionEventArgs e)
         {
             e.Context.Client.Logger.LogInformation(LogEvent,
                 $"User '{e.Context.User.Username}#{e.Context.User.Discriminator}' ({e.Context.User.Id}) executed '{e.Command.QualifiedName}' in #{e.Context.Channel.Name} ({e.Context.Channel.Id})",
@@ -258,7 +258,7 @@ namespace Emzi0767.CompanionCube
             return Task.CompletedTask;
         }
 
-        private async Task CommandsNext_CommandErrored(CommandErrorEventArgs e)
+        private async Task CommandsNext_CommandErrored(CommandsNextExtension sender, CommandErrorEventArgs e)
         {
             e.Context.Client.Logger.LogError(LogEvent,
                 $"User '{e.Context.User.Username}#{e.Context.User.Discriminator}' ({e.Context.User.Id}) tried to execute '{e.Command?.QualifiedName ?? "<unknown command>"}' "

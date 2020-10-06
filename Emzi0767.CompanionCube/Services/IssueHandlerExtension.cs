@@ -53,7 +53,7 @@ namespace Emzi0767.CompanionCube.Services
                 client.MessageCreated += this.Client_MessageCreated;
         }
 
-        private async Task Client_MessageCreated(MessageCreateEventArgs e)
+        private async Task Client_MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
         {
             if (e.Message.Content == null)
                 return;

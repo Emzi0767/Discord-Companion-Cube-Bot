@@ -82,7 +82,7 @@ namespace Emzi0767.CompanionCube.Services
         public IEnumerable<LavalinkTrack> Shuffle(IEnumerable<LavalinkTrack> tracks)
             => tracks.OrderBy(x => this.RNG.Next());
 
-        private async Task Lavalink_TrackExceptionThrown(TrackExceptionEventArgs e)
+        private async Task Lavalink_TrackExceptionThrown(LavalinkGuildConnection con, TrackExceptionEventArgs e)
         {
             if (e.Player?.Guild == null)
                 return;

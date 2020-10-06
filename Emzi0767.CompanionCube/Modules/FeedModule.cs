@@ -102,6 +102,12 @@ namespace Emzi0767.CompanionCube.Modules
         public async Task ListAsync(CommandContext ctx,
             [RemainingText, Description("Channel to list any attached feeds for.")] DiscordChannel channel)
         {
+            if (channel == null)
+            {
+                await ctx.RespondAsync($"{DiscordEmoji.FromName(ctx.Client, ":msfrown:")} You did not specify a channel");
+                return;
+            }
+
             var feeds = await this.Feeds.GetFeedsAsync(channel.Id);
             if (!feeds.Any())
             {

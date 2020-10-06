@@ -114,7 +114,7 @@ namespace Emzi0767.CompanionCube.Services
                         continue;
 
                     var posts = PrepareItems(raws.OrderBy(x => x.PublishDate));
-                    tasks.AddRange(posts.Select(x => chn.SendMessageAsync(embed: x)));
+                    tasks.AddRange(posts.Select(x => chn.SendMessageAsync(content: x.content, embed: x.embed)));
                 }
             }
 
@@ -170,23 +170,32 @@ namespace Emzi0767.CompanionCube.Services
             this.Database.RssFeeds.Remove(feed);
         }
 
-        private static IEnumerable<DiscordEmbed> PrepareItems(IEnumerable<SyndicationItem> items)
+        private static IEnumerable<(string content, DiscordEmbed embed)> PrepareItems(IEnumerable<SyndicationItem> items)
         {
             foreach (var item in items)
             {
-                var embed = new DiscordEmbedBuilder()
-                    .WithTitle(item.Title.Text)
-                    .WithDescription(item.Summary?.Text.AtMost(100))
-                    .WithUrl(item.Links.FirstOrDefault(x => x.RelationshipType.Equals(LinkRelContent, StringComparison.InvariantCultureIgnoreCase))?.Uri.ToString())
-                    .WithTimestamp(item.PublishDate);
+                var uri = item.Links.FirstOrDefault(x => x.RelationshipType.Equals(LinkRelContent, StringComparison.InvariantCultureIgnoreCase))?.Uri
+                    ?? item.Links.FirstOrDefault(x => x.Uri != null)?.Uri;
 
-                if (item.Authors.Count == 1)
+                if (uri == null)
                 {
-                    var author = item.Authors.First();
-                    embed.WithAuthor(author.Name);
-                }
+                    var embed = new DiscordEmbedBuilder()
+                        .WithTitle(item.Title.Text)
+                        .WithDescription(item.Summary?.Text.AtMost(100))
+                        .WithTimestamp(item.PublishDate);
 
-                yield return embed.Build();
+                    if (item.Authors.Count == 1)
+                    {
+                        var author = item.Authors.First();
+                        embed.WithAuthor(author.Name);
+                    }
+
+                    yield return (null, embed.Build());
+                }
+                else
+                {
+                    yield return (uri.OriginalString, null);
+                }
             }
         }
     }
