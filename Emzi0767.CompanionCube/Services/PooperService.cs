@@ -144,6 +144,6 @@ namespace Emzi0767.CompanionCube.Services
         }
 
         public static bool IsPoopable(DiscordMember mbr)
-            => mbr.DisplayName[0] < '0' || !MentionableRegex.IsMatch(mbr.DisplayName);
+            => mbr.DisplayName != "💩" && (mbr.DisplayName[0] < '0' || !MentionableRegex.IsMatch(mbr.DisplayName));
     }
 }
