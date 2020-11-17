@@ -106,7 +106,7 @@ namespace Emzi0767.CompanionCube.Services
             modelBuilder.Entity<DatabasePrefix>(entity =>
             {
                 entity.HasIndex(e => e.GuildId)
-                    .HasName("cc_prefixes_guild_id_key")
+                    .HasDatabaseName("cc_prefixes_guild_id_key")
                     .IsUnique();
 
                 entity.Property(e => e.GuildId).ValueGeneratedNever();
@@ -147,19 +147,19 @@ namespace Emzi0767.CompanionCube.Services
                 entity.HasAlternateKey(e => new { e.Name, e.ChannelId });
 
                 entity.HasIndex(e => e.Url)
-                    .HasName("ix_rss_url");
+                    .HasDatabaseName("ix_rss_url");
 
                 entity.HasIndex(e => e.ChannelId)
-                    .HasName("ix_rss_channel");
+                    .HasDatabaseName("ix_rss_channel");
 
                 entity.HasIndex(e => e.Name)
-                    .HasName("ix_rss_name");
+                    .HasDatabaseName("ix_rss_name");
             });
 
             modelBuilder.Entity<DatabasePooperWhitelist>(entity =>
             {
                 entity.HasIndex(e => e.GuildId)
-                    .HasName("ix_pooper_guild_id");
+                    .HasDatabaseName("ix_pooper_guild_id");
             });
         }
     }

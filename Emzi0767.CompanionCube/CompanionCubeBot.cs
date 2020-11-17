@@ -27,6 +27,7 @@ using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.Lavalink;
 using Emzi0767.CompanionCube.Attributes;
 using Emzi0767.CompanionCube.Data;
@@ -109,6 +110,7 @@ namespace Emzi0767.CompanionCube
                 TokenType = TokenType.Bot,
                 ShardCount = cfg.Discord.ShardCount,
                 ShardId = this.ShardId,
+                Intents = DiscordIntents.All,
 
                 AutoReconnect = true,
                 ReconnectIndefinitely = true,
