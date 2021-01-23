@@ -632,7 +632,7 @@ namespace Emzi0767.CompanionCube.Modules
             
             if (res.Any())
             {
-                var tstr = string.Join(", ", res.OrderBy(x => x.Name).Select(xt => Formatter.InlineCode(xt.Name)).Distinct());
+                var tstr = string.Join(", ", res.OrderBy(x => x.Name).Select(xt => Formatter.InlineCode(Formatter.Sanitize(xt.Name))).Distinct());
 
                 await ctx.RespondAsync($"Following tags matching your query were found:\n\n{tstr}");
             }
