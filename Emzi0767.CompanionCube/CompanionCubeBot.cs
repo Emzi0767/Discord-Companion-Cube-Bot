@@ -324,9 +324,17 @@ namespace Emzi0767.CompanionCube
 
         private Task<int> ResolvePrefixAsync(DiscordMessage msg)
         {
+            if (msg.Channel.Type == ChannelType.Private)
+                return Task.FromResult(0);
+
             var gld = msg.Channel.Guild;
             if (gld == null)
-                return Task.FromResult(0);
+            {
+                Discord.Logger.LogWarning("Guild {GuildId} was null on channel {ChannelId} when it shouldn't", 
+                    msg.Channel.GuildId, msg.Channel.Id);
+
+                return Task.FromResult(-1);
+            }
 
             var gldId = (long)gld.Id;
             using var db = new DatabaseContext(this.ConnectionStringProvider);
