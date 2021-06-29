@@ -32,10 +32,10 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.1.0-nightly-00863" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0-nightly-00863" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.1.0-nightly-00863" />
-    <PackageReference Include="DSharpPlus.Lavalink" Version="4.1.0-nightly-00863" />
+    <PackageReference Include="DSharpPlus" Version="4.1.0-nightly-00908" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0-nightly-00908" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.1.0-nightly-00908" />
+    <PackageReference Include="DSharpPlus.Lavalink" Version="4.1.0-nightly-00908" />
     <PackageReference Include="Emzi0767.Common" Version="2.6.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.9.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.6" />
